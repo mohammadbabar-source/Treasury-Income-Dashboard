@@ -6,90 +6,117 @@ import time
 # 1. Page Configuration
 st.set_page_config(page_title="Treasury Summary FY26-27", layout="wide", initial_sidebar_state="collapsed")
 
-# File Reference
 EXCEL_FILE = "Treasury Income FY26'27 - July26.xlsx"
 
-# Dynamic Data Ingestion with Safe Fallbacks
+# ---------------------------------------------------------
+# DIRECT EXCEL PARSING ENGINE
+# ---------------------------------------------------------
 try:
-    df_dash = pd.read_excel(EXCEL_FILE, sheet_name='Dashboard ')
-    total_income_jul = df_dash.iloc[8, 2] if not pd.isna(df_dash.iloc[8, 2]) else 99524284
+    # --- 1. Dashboard Sheet Parsing ---
+    df_dash = pd.read_excel(EXCEL_FILE, sheet_name='Dashboard ', header=None)
+    # Row 9 in Excel (idx 8 in pandas) holds monthly total income
+    # Col C = Jul (idx 2), Col D = Aug (idx 3), Col E = Sep (idx 4)
+    inc_jul = df_dash.iloc[8, 2] if pd.notna(df_dash.iloc[8, 2]) else 0
+    inc_aug = df_dash.iloc[8, 3] if pd.notna(df_dash.iloc[8, 3]) else 0
+    inc_sep = df_dash.iloc[8, 4] if pd.notna(df_dash.iloc[8, 4]) else 0
     
-    df_pool = pd.read_excel(EXCEL_FILE, sheet_name='Treasury Pool')
-    total_pool_val = df_pool.iloc[10, 2] if not pd.isna(df_pool.iloc[10, 2]) else 15586710293
+    q1_actual_income_mns = (inc_jul + inc_aug + inc_sep) / 1e6
 
-    lr_funds = df_pool.iloc[3, 2] / 1e6
-    osr_funds = df_pool.iloc[4, 2] / 1e6
-    inv_cdel = df_pool.iloc[5, 2] / 1e6
-    rpa_acc = df_pool.iloc[6, 2] / 1e6
-    wv_greenfin = df_pool.iloc[7, 2] / 1e6
-    op_funds = df_pool.iloc[8, 2] / 1e6
+    # Margin Breakdown for July
+    osr_jul = (df_dash.iloc[2, 2] if pd.notna(df_dash.iloc[2, 2]) else 0) / 1e6
+    rpa_jul = (df_dash.iloc[3, 2] if pd.notna(df_dash.iloc[3, 2]) else 0) / 1e6
+    esc_jul = (df_dash.iloc[4, 2] if pd.notna(df_dash.iloc[4, 2]) else 0) / 1e6
 
+    # --- 2. Treasury Pool Sheet Parsing ---
+    df_pool = pd.read_excel(EXCEL_FILE, sheet_name='Treasury Pool', header=None)
+    # Row 11 in Excel (idx 11 in pandas) holds Total Pool
+    pool_jul = (df_pool.iloc[11, 2] if pd.notna(df_pool.iloc[11, 2]) else 0) / 1e6
+    pool_aug = (df_pool.iloc[11, 3] if pd.notna(df_pool.iloc[11, 3]) else 0) / 1e6
+    pool_sep = (df_pool.iloc[11, 4] if pd.notna(df_pool.iloc[11, 4]) else 0) / 1e6
+    
+    # Latest available Pool figure in Q1
+    q1_pool_mns = pool_sep if pool_sep > 0 else pool_jul
+
+    # Pool Breakdown (July)
+    lr_funds = (df_pool.iloc[4, 2] if pd.notna(df_pool.iloc[4, 2]) else 0) / 1e6
+    osr_funds = (df_pool.iloc[5, 2] if pd.notna(df_pool.iloc[5, 2]) else 0) / 1e6
+    inv_cdel = (df_pool.iloc[6, 2] if pd.notna(df_pool.iloc[6, 2]) else 0) / 1e6
+    rpa_acc = (df_pool.iloc[7, 2] if pd.notna(df_pool.iloc[7, 2]) else 0) / 1e6
+    wv_greenfin = (df_pool.iloc[8, 2] if pd.notna(df_pool.iloc[8, 2]) else 0) / 1e6
+    op_funds = (df_pool.iloc[9, 2] if pd.notna(df_pool.iloc[9, 2]) else 0) / 1e6
+
+    # --- 3. MPR Sheet Parsing ---
     df_mpr = pd.read_excel(EXCEL_FILE, sheet_name='MPR')
     mpr_rate = float(df_mpr.iloc[0]['MPC Rate']) * 100
     next_mpr_date = pd.to_datetime(df_mpr.iloc[1]['MPC Meeting Date']).strftime('%b %d, %Y')
 
-    df_rates = pd.read_excel(EXCEL_FILE, sheet_name='Profit Rates')
-    top_bank_rate = "11.30%"
-    top_bank_name = "Samba Bank (Jul)"
-except Exception as e:
-    total_income_jul, total_pool_val, mpr_rate = 99524284, 15586710293, 11.50
-    next_mpr_date = "Sep 14, 2026"
-    lr_funds, osr_funds, inv_cdel, rpa_acc, wv_greenfin, op_funds = 5521.09, 9310.81, 98.91, 250.56, 337.10, 68.24
-    top_bank_rate, top_bank_name = "11.30%", "Samba Bank (Jul)"
+    # --- 4. Profit Rates Sheet Parsing ---
+    df_rates = pd.read_excel(EXCEL_FILE, sheet_name='Profit Rates', header=None)
+    rate_str = str(df_rates.iloc[2, 0])  # Row 3, Col A
+    top_bank_rate = rate_str.split('\n')[0] if '\n' in rate_str else "Samba 11.30%"
 
-# Quarterly Data Mapping Engine
+except Exception as e:
+    st.error(f"Error reading Excel file: {e}")
+    q1_actual_income_mns, q1_pool_mns = 99.52, 15586.71
+    inc_jul, inc_aug, inc_sep = 99.52, 0, 0
+    osr_jul, rpa_jul, esc_jul = 97.38, 1.15, 1.00
+    lr_funds, osr_funds, inv_cdel, rpa_acc, wv_greenfin, op_funds = 5521.09, 9310.81, 98.91, 250.56, 337.10, 68.24
+    mpr_rate, next_mpr_date = 11.50, "Sep 14, 2026"
+    top_bank_rate = "Samba 11.30%"
+
+# Dynamic Quarter Dictionary mapped directly from Excel
 quarter_data = {
     "Q1": {
         "period": "Q1 (Jul - Sep 2026)",
-        "total_income": 298.57,
-        "treasury_pool": total_pool_val / 1e6,
-        "forecasted_income": 312.40,
+        "total_income": q1_actual_income_mns,
+        "treasury_pool": q1_pool_mns,
+        "forecasted_income": q1_actual_income_mns, # Currently actual filled in Excel
         "annual_yield": "11.30%",
-        "months": ['Jul 26', 'Aug 26 (F)', 'Sep 26 (F)'],
-        "income_trend": [99.52, 105.20, 107.85],
-        "expense_trend": [10.20, 11.50, 11.00],
+        "months": ['Jul 26', 'Aug 26', 'Sep 26'],
+        "income_trend": [inc_jul / 1e6, inc_aug / 1e6, inc_sep / 1e6],
         "margin_labels": ['OSR Savings', 'RPA Savings', 'Escrow Savings'],
-        "margin_values": [97.38, 1.15, 1.00]
+        "margin_values": [osr_jul, rpa_jul, esc_jul]
     },
     "Q2": {
         "period": "Q2 (Oct - Dec 2026)",
-        "total_income": 310.25,
-        "treasury_pool": 15890.70,
-        "forecasted_income": 325.80,
-        "annual_yield": "11.45%",
-        "months": ['Oct 26 (F)', 'Nov 26 (F)', 'Dec 26 (F)'],
-        "income_trend": [102.10, 104.30, 103.85],
-        "expense_trend": [11.00, 12.10, 11.80],
+        "total_income": 0.0,
+        "treasury_pool": 0.0,
+        "forecasted_income": 0.0,
+        "annual_yield": "N/A",
+        "months": ['Oct 26', 'Nov 26', 'Dec 26'],
+        "income_trend": [0, 0, 0],
         "margin_labels": ['OSR Savings', 'RPA Savings', 'Escrow Savings'],
-        "margin_values": [98.50, 1.25, 1.05]
+        "margin_values": [0, 0, 0]
     },
     "Q3": {
         "period": "Q3 (Jan - Mar 2027)",
-        "total_income": 322.80,
-        "treasury_pool": 16278.35,
-        "forecasted_income": 338.50,
-        "annual_yield": "11.60%",
-        "months": ['Jan 27 (F)', 'Feb 27 (F)', 'Mar 27 (F)'],
-        "income_trend": [105.40, 108.20, 109.20],
-        "expense_trend": [11.50, 12.30, 12.00],
+        "total_income": 0.0,
+        "treasury_pool": 0.0,
+        "forecasted_income": 0.0,
+        "annual_yield": "N/A",
+        "months": ['Jan 27', 'Feb 27', 'Mar 27'],
+        "income_trend": [0, 0, 0],
         "margin_labels": ['OSR Savings', 'RPA Savings', 'Escrow Savings'],
-        "margin_values": [101.20, 1.30, 1.10]
+        "margin_values": [0, 0, 0]
     },
     "Q4": {
         "period": "Q4 (Apr - Jun 2027)",
-        "total_income": 335.40,
-        "treasury_pool": 16500.00,
-        "forecasted_income": 350.00,
-        "annual_yield": "11.75%",
-        "months": ['Apr 27 (F)', 'May 27 (F)', 'Jun 27 (F)'],
-        "income_trend": [110.10, 112.30, 113.00],
-        "expense_trend": [12.00, 12.50, 12.20],
+        "total_income": 0.0,
+        "treasury_pool": 0.0,
+        "forecasted_income": 0.0,
+        "annual_yield": "N/A",
+        "months": ['Apr 27', 'May 27', 'Jun 27'],
+        "income_trend": [0, 0, 0],
         "margin_labels": ['OSR Savings', 'RPA Savings', 'Escrow Savings'],
-        "margin_values": [104.50, 1.40, 1.15]
+        "margin_values": [0, 0, 0]
     }
 }
 
-# 2. Splash Screen
+# ---------------------------------------------------------
+# UI DISPLAY ENGINE
+# ---------------------------------------------------------
+
+# Splash Screen
 if 'first_load' not in st.session_state:
     st.session_state.first_load = True
 
@@ -99,7 +126,7 @@ if st.session_state.first_load:
         st.markdown("""
             <div style='display: flex; justify-content: center; align-items: center; height: 85vh; flex-direction: column; text-align: center; animation: fadeOut 0.5s ease-in 2s forwards;'>
                 <h1 style='color: #000000; font-size: 56px; letter-spacing: 2px; margin-bottom: 12px; font-weight: 900;'>KARANDAAZ TREASURY</h1>
-                <p style='color: #64748B; font-size: 22px; font-weight: 600; letter-spacing: 1px;'>Loading FY26-27 Quarterly Dashboard...</p>
+                <p style='color: #64748B; font-size: 22px; font-weight: 600; letter-spacing: 1px;'>Loading Direct Excel Portfolio Data...</p>
                 <div class="loader"></div>
             </div>
             <style>
@@ -113,7 +140,7 @@ if st.session_state.first_load:
     splash.empty()
     st.session_state.first_load = False
 
-# 3. Custom CSS Architecture
+# CSS Architecture
 st.markdown("""
     <style>
     * { font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif !important; box-sizing: border-box; }
@@ -155,12 +182,10 @@ with st.spinner("Rendering Visualizations..."):
         </div>
     """, unsafe_allow_html=True)
 
-    # Quarter Selection Dropdown (Q1, Q2, Q3, Q4)
     col_e1, col_date, col_e2 = st.columns([1, 0.25, 1])
     with col_date:
         selected_q = st.selectbox("", ["Q1", "Q2", "Q3", "Q4"], label_visibility="collapsed")
 
-    # Get active quarterly data context
     q_ctx = quarter_data[selected_q]
 
     st.write("")
@@ -200,9 +225,8 @@ with st.spinner("Rendering Visualizations..."):
     with sc1_right:
         fig_trend = go.Figure()
         fig_trend.add_trace(go.Scatter(x=q_ctx['months'], y=q_ctx['income_trend'], name='Total Income', line=dict(color=BLUE_ACCENT, width=4, shape='spline'), mode='lines+markers', marker=dict(size=9)))
-        fig_trend.add_trace(go.Scatter(x=q_ctx['months'], y=q_ctx['expense_trend'], name='Total Expenses', line=dict(color=GREEN_ACCENT, width=4, shape='spline'), mode='lines+markers', marker=dict(size=9)))
         fig_trend.update_layout(
-            title=dict(text=f"PROFIT & LOSS TREND ({selected_q})", font=dict(family="Segoe UI, Roboto", color='#000000', size=15, weight='bold'), x=0.5, y=0.95, xanchor='center', yanchor='top'),
+            title=dict(text=f"INCOME TREND ({selected_q})", font=dict(family="Segoe UI, Roboto", color='#000000', size=15, weight='bold'), x=0.5, y=0.95, xanchor='center', yanchor='top'),
             margin=dict(t=45, b=25, l=15, r=15), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
             legend=dict(yanchor="bottom", y=0.05, xanchor="right", x=0.95, font=dict(color="#111111", size=12)),
             xaxis=dict(showgrid=False, tickfont=dict(color="#111111", size=12)), 
@@ -237,7 +261,7 @@ with st.spinner("Rendering Visualizations..."):
 
     with bot2:
         fig_exp = go.Figure(data=[go.Pie(
-            labels=['OSR Savings', 'RPA Savings', 'Escrow'], values=[97.38, 1.15, 1.00], hole=0.60,
+            labels=['OSR Savings', 'RPA Savings', 'Escrow'], values=[osr_jul, rpa_jul, esc_jul], hole=0.60,
             marker_colors=[GREEN_ACCENT, '#34D399', '#6EE7B7'], textinfo='label', textposition='outside',
             marker=dict(line=dict(color='#FFFFFF', width=2))
         )])
@@ -252,12 +276,11 @@ with st.spinner("Rendering Visualizations..."):
             <div style='display: flex; flex-direction: column; height: 310px; justify-content: space-between;'>
                 <div class='kpi-card' style='text-align: center; height: 148px;'>
                     <div class='kpi-title' style='font-size: 13px;'>Highest Profit Rate</div><hr class='kpi-divider'>
-                    <div class='kpi-value' style='color:#2563EB; font-size: 28px;'>{top_bank_rate}</div>
-                    <div class='kpi-sub'>{top_bank_name}</div>
+                    <div class='kpi-value' style='color:#2563EB; font-size: 26px;'>{top_bank_rate}</div>
                 </div>
                 <div class='kpi-card' style='text-align: center; height: 148px;'>
                     <div class='kpi-title' style='font-size: 13px;'>MhePR</div><hr class='kpi-divider'>
-                    <div class='kpi-value' style='color:#2563EB; font-size: 28px;'>{mpr_rate:.2f}%</div>
+                    <div class='kpi-value' style='color:#2563EB; font-size: 26px;'>{mpr_rate:.2f}%</div>
                     <div class='kpi-sub'>Next Date: {next_mpr_date}</div>
                 </div>
             </div>
@@ -266,7 +289,7 @@ with st.spinner("Rendering Visualizations..."):
     with bot4:
         fig_bar = go.Figure()
         categories = ['Operational', 'WV Greenfin', 'RPA A/c', 'Inv/CDEL', 'LR Funds', 'OSR Funds']
-        fig_bar.add_trace(go.Bar(y=categories, x=[68, 337, 250, 98, 5521, 9310], name='Actual Pool (PKR M)', orientation='h', marker_color=BLUE_ACCENT))
+        fig_bar.add_trace(go.Bar(y=categories, x=[op_funds, wv_greenfin, rpa_acc, inv_cdel, lr_funds, osr_funds], name='Actual Pool (PKR M)', orientation='h', marker_color=BLUE_ACCENT))
         fig_bar.update_layout(
             title=dict(text="FUND POOL ALLOCATION (PKR M)", font=dict(family="Segoe UI, Roboto", color='#000000', size=15, weight='bold'), x=0.5, y=0.95, xanchor='center', yanchor='top'),
             barmode='group', margin=dict(t=45, b=25, l=15, r=15), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', 
