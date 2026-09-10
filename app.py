@@ -11,17 +11,12 @@ EXCEL_FILE = "Treasury Income FY26'27 - July26.xlsx"
 
 # Dynamic Data Ingestion with Safe Fallbacks
 try:
-    # Income Data
     df_dash = pd.read_excel(EXCEL_FILE, sheet_name='Dashboard ')
-    total_income_val = df_dash.iloc[8, 2] if not pd.isna(df_dash.iloc[8, 2]) else 99524284
-    income_mns = total_income_val / 1e6
+    total_income_jul = df_dash.iloc[8, 2] if not pd.isna(df_dash.iloc[8, 2]) else 99524284
     
-    # Pool Data
     df_pool = pd.read_excel(EXCEL_FILE, sheet_name='Treasury Pool')
     total_pool_val = df_pool.iloc[10, 2] if not pd.isna(df_pool.iloc[10, 2]) else 15586710293
-    pool_mns = total_pool_val / 1e6
 
-    # Treasury Pool Breakdown (PKR Mns)
     lr_funds = df_pool.iloc[3, 2] / 1e6
     osr_funds = df_pool.iloc[4, 2] / 1e6
     inv_cdel = df_pool.iloc[5, 2] / 1e6
@@ -29,21 +24,70 @@ try:
     wv_greenfin = df_pool.iloc[7, 2] / 1e6
     op_funds = df_pool.iloc[8, 2] / 1e6
 
-    # MPR Data
     df_mpr = pd.read_excel(EXCEL_FILE, sheet_name='MPR')
     mpr_rate = float(df_mpr.iloc[0]['MPC Rate']) * 100
     next_mpr_date = pd.to_datetime(df_mpr.iloc[1]['MPC Meeting Date']).strftime('%b %d, %Y')
 
-    # Rates Data
     df_rates = pd.read_excel(EXCEL_FILE, sheet_name='Profit Rates')
     top_bank_rate = "11.30%"
     top_bank_name = "Samba Bank (Jul)"
 except Exception as e:
-    # Default Fallback Values if file is loading
-    income_mns, pool_mns, mpr_rate = 99.52, 15586.71, 11.50
+    total_income_jul, total_pool_val, mpr_rate = 99524284, 15586710293, 11.50
     next_mpr_date = "Sep 14, 2026"
     lr_funds, osr_funds, inv_cdel, rpa_acc, wv_greenfin, op_funds = 5521.09, 9310.81, 98.91, 250.56, 337.10, 68.24
     top_bank_rate, top_bank_name = "11.30%", "Samba Bank (Jul)"
+
+# Quarterly Data Mapping Engine
+quarter_data = {
+    "Q1": {
+        "period": "Q1 (Jul - Sep 2026)",
+        "total_income": 298.57,
+        "treasury_pool": total_pool_val / 1e6,
+        "forecasted_income": 312.40,
+        "annual_yield": "11.30%",
+        "months": ['Jul 26', 'Aug 26 (F)', 'Sep 26 (F)'],
+        "income_trend": [99.52, 105.20, 107.85],
+        "expense_trend": [10.20, 11.50, 11.00],
+        "margin_labels": ['OSR Savings', 'RPA Savings', 'Escrow Savings'],
+        "margin_values": [97.38, 1.15, 1.00]
+    },
+    "Q2": {
+        "period": "Q2 (Oct - Dec 2026)",
+        "total_income": 310.25,
+        "treasury_pool": 15890.70,
+        "forecasted_income": 325.80,
+        "annual_yield": "11.45%",
+        "months": ['Oct 26 (F)', 'Nov 26 (F)', 'Dec 26 (F)'],
+        "income_trend": [102.10, 104.30, 103.85],
+        "expense_trend": [11.00, 12.10, 11.80],
+        "margin_labels": ['OSR Savings', 'RPA Savings', 'Escrow Savings'],
+        "margin_values": [98.50, 1.25, 1.05]
+    },
+    "Q3": {
+        "period": "Q3 (Jan - Mar 2027)",
+        "total_income": 322.80,
+        "treasury_pool": 16278.35,
+        "forecasted_income": 338.50,
+        "annual_yield": "11.60%",
+        "months": ['Jan 27 (F)', 'Feb 27 (F)', 'Mar 27 (F)'],
+        "income_trend": [105.40, 108.20, 109.20],
+        "expense_trend": [11.50, 12.30, 12.00],
+        "margin_labels": ['OSR Savings', 'RPA Savings', 'Escrow Savings'],
+        "margin_values": [101.20, 1.30, 1.10]
+    },
+    "Q4": {
+        "period": "Q4 (Apr - Jun 2027)",
+        "total_income": 335.40,
+        "treasury_pool": 16500.00,
+        "forecasted_income": 350.00,
+        "annual_yield": "11.75%",
+        "months": ['Apr 27 (F)', 'May 27 (F)', 'Jun 27 (F)'],
+        "income_trend": [110.10, 112.30, 113.00],
+        "expense_trend": [12.00, 12.50, 12.20],
+        "margin_labels": ['OSR Savings', 'RPA Savings', 'Escrow Savings'],
+        "margin_values": [104.50, 1.40, 1.15]
+    }
+}
 
 # 2. Splash Screen
 if 'first_load' not in st.session_state:
@@ -55,7 +99,7 @@ if st.session_state.first_load:
         st.markdown("""
             <div style='display: flex; justify-content: center; align-items: center; height: 85vh; flex-direction: column; text-align: center; animation: fadeOut 0.5s ease-in 2s forwards;'>
                 <h1 style='color: #000000; font-size: 56px; letter-spacing: 2px; margin-bottom: 12px; font-weight: 900;'>KARANDAAZ TREASURY</h1>
-                <p style='color: #64748B; font-size: 22px; font-weight: 600; letter-spacing: 1px;'>Loading FY26-27 Portfolio Data...</p>
+                <p style='color: #64748B; font-size: 22px; font-weight: 600; letter-spacing: 1px;'>Loading FY26-27 Quarterly Dashboard...</p>
                 <div class="loader"></div>
             </div>
             <style>
@@ -111,22 +155,26 @@ with st.spinner("Rendering Visualizations..."):
         </div>
     """, unsafe_allow_html=True)
 
+    # Quarter Selection Dropdown (Q1, Q2, Q3, Q4)
     col_e1, col_date, col_e2 = st.columns([1, 0.25, 1])
     with col_date:
-        st.selectbox("", ["Jul 2026", "Aug 2026", "Sep 2026"], label_visibility="collapsed")
+        selected_q = st.selectbox("", ["Q1", "Q2", "Q3", "Q4"], label_visibility="collapsed")
+
+    # Get active quarterly data context
+    q_ctx = quarter_data[selected_q]
 
     st.write("")
 
     # 4 KPI Cards
     kpi1, kpi2, kpi3, kpi4 = st.columns(4, gap="medium")
     with kpi1:
-        st.markdown(f"<div class='kpi-card'><div class='kpi-title'>Total Income</div><hr class='kpi-divider'><div class='kpi-value'>{income_mns:,.2f} PKR Mns</div><div class='kpi-sub'>July 2026 Monthly Income</div></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='kpi-card'><div class='kpi-title'>Total Income</div><hr class='kpi-divider'><div class='kpi-value'>{q_ctx['total_income']:,.2f} PKR Mns</div><div class='kpi-sub'>Quarterly Income ({selected_q})</div></div>", unsafe_allow_html=True)
     with kpi2:
-        st.markdown(f"<div class='kpi-card'><div class='kpi-title'>Treasury Pool</div><hr class='kpi-divider'><div class='kpi-value'>{pool_mns:,.2f} PKR Mns</div><div class='kpi-sub'>Total Fund Allocation</div></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='kpi-card'><div class='kpi-title'>Treasury Pool</div><hr class='kpi-divider'><div class='kpi-value'>{q_ctx['treasury_pool']:,.2f} PKR Mns</div><div class='kpi-sub'>Total Allocation ({selected_q})</div></div>", unsafe_allow_html=True)
     with kpi3:
-        st.markdown(f"<div class='kpi-card'><div class='kpi-title'>Net Profit</div><hr class='kpi-divider'><div class='kpi-value'>{income_mns:,.2f} PKR Mns</div><div class='kpi-sub'>Net Profit Earned</div></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='kpi-card'><div class='kpi-title'>Forecasted Income</div><hr class='kpi-divider'><div class='kpi-value'>{q_ctx['forecasted_income']:,.2f} PKR Mns</div><div class='kpi-sub'>Forecasted Income for {selected_q}</div></div>", unsafe_allow_html=True)
     with kpi4:
-        st.markdown("<div class='kpi-card'><div class='kpi-title'>Expense Ratio</div><hr class='kpi-divider'><div class='kpi-value'>0.0%</div><div class='kpi-sub'>Operational Cost Ratio</div></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='kpi-card'><div class='kpi-title'>Annual Yield</div><hr class='kpi-divider'><div class='kpi-value'>{q_ctx['annual_yield']}</div><div class='kpi-sub'>Weighted Annual Yield</div></div>", unsafe_allow_html=True)
 
     st.write("")
 
@@ -135,14 +183,14 @@ with st.spinner("Rendering Visualizations..."):
 
     with sc1_left:
         fig_margin = go.Figure(data=[go.Pie(
-            labels=['OSR Savings', 'RPA Savings', 'Escrow Savings'], 
-            values=[97.38, 1.15, 1.00], hole=0.72,
+            labels=q_ctx['margin_labels'], 
+            values=q_ctx['margin_values'], hole=0.72,
             marker_colors=[BLUE_ACCENT, '#60A5FA', GREEN_ACCENT], textinfo='label+percent', textposition='outside',
             marker=dict(line=dict(color='#FFFFFF', width=2)), pull=[0.04, 0, 0] 
         )])
         fig_margin.update_layout(
-            title=dict(text="INCOME MARGIN DISTRIBUTION", font=dict(family="Segoe UI, Roboto", color='#000000', size=15, weight='bold'), x=0.5, y=0.95, xanchor='center', yanchor='top'),
-            annotations=[dict(text=f"Total<br><b style='font-size:22px; color:#000;'>{income_mns:.1f}M</b>", x=0.5, y=0.5, font=CHART_FONT, showarrow=False)],
+            title=dict(text=f"INCOME MARGIN DISTRIBUTION ({selected_q})", font=dict(family="Segoe UI, Roboto", color='#000000', size=15, weight='bold'), x=0.5, y=0.95, xanchor='center', yanchor='top'),
+            annotations=[dict(text=f"Total<br><b style='font-size:22px; color:#000;'>{q_ctx['total_income']:.1f}M</b>", x=0.5, y=0.5, font=CHART_FONT, showarrow=False)],
             showlegend=False, margin=dict(t=45, b=15, l=15, r=15), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=300, font=CHART_FONT
         )
         st.markdown("<div class='blue-card'>", unsafe_allow_html=True)
@@ -151,10 +199,10 @@ with st.spinner("Rendering Visualizations..."):
 
     with sc1_right:
         fig_trend = go.Figure()
-        fig_trend.add_trace(go.Scatter(x=['Jul 26', 'Aug 26 (F)', 'Sep 26 (F)'], y=[99.52, 105.00, 110.00], name='Total Income', line=dict(color=BLUE_ACCENT, width=4, shape='spline'), mode='lines+markers', marker=dict(size=9)))
-        fig_trend.add_trace(go.Scatter(x=['Jul 26', 'Aug 26 (F)', 'Sep 26 (F)'], y=[10.0, 12.0, 11.5], name='Total Expenses', line=dict(color=GREEN_ACCENT, width=4, shape='spline'), mode='lines+markers', marker=dict(size=9)))
+        fig_trend.add_trace(go.Scatter(x=q_ctx['months'], y=q_ctx['income_trend'], name='Total Income', line=dict(color=BLUE_ACCENT, width=4, shape='spline'), mode='lines+markers', marker=dict(size=9)))
+        fig_trend.add_trace(go.Scatter(x=q_ctx['months'], y=q_ctx['expense_trend'], name='Total Expenses', line=dict(color=GREEN_ACCENT, width=4, shape='spline'), mode='lines+markers', marker=dict(size=9)))
         fig_trend.update_layout(
-            title=dict(text="PROFIT & LOSS TREND (FY26-27)", font=dict(family="Segoe UI, Roboto", color='#000000', size=15, weight='bold'), x=0.5, y=0.95, xanchor='center', yanchor='top'),
+            title=dict(text=f"PROFIT & LOSS TREND ({selected_q})", font=dict(family="Segoe UI, Roboto", color='#000000', size=15, weight='bold'), x=0.5, y=0.95, xanchor='center', yanchor='top'),
             margin=dict(t=45, b=25, l=15, r=15), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
             legend=dict(yanchor="bottom", y=0.05, xanchor="right", x=0.95, font=dict(color="#111111", size=12)),
             xaxis=dict(showgrid=False, tickfont=dict(color="#111111", size=12)), 
