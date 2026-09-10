@@ -22,18 +22,18 @@ try:
             return float(val) if pd.notna(val) and isinstance(val, (int, float)) else 0.0
         return 0.0
 
-    # Total Income per Quarter (Row index 9)
-    inc_q1 = get_q_val(9, 2) / 1e6
-    inc_q2 = get_q_val(9, 3) / 1e6
-    inc_q3 = get_q_val(9, 4) / 1e6
-    inc_q4 = get_q_val(9, 5) / 1e6
+    # Total Income per Quarter (Row index 10 - Total of OSR Table)
+    inc_q1 = get_q_val(10, 2) / 1e6
+    inc_q2 = get_q_val(10, 3) / 1e6
+    inc_q3 = get_q_val(10, 4) / 1e6
+    inc_q4 = get_q_val(10, 5) / 1e6
     
-    # Margin Breakdown for Q1 (Rows 3, 4, 5, 7, 8 in Pandas index)
-    osr_q1 = get_q_val(3, 2) / 1e6
-    rpa_q1 = get_q_val(4, 2) / 1e6
-    esc_q1 = get_q_val(5, 2) / 1e6
-    tdr_q1 = get_q_val(7, 2) / 1e6
-    buysell_q1 = get_q_val(8, 2) / 1e6
+    # Margin Breakdown for Q1 (Rows 4, 5, 6, 8, 9 in Pandas index)
+    osr_q1 = get_q_val(4, 2) / 1e6
+    rpa_q1 = get_q_val(5, 2) / 1e6
+    esc_q1 = get_q_val(6, 2) / 1e6
+    tdr_q1 = get_q_val(8, 2) / 1e6
+    buysell_q1 = get_q_val(9, 2) / 1e6
 
     # 2. Treasury Pool Sheet Parsing
     df_pool = pd.read_excel(EXCEL_FILE, sheet_name='Treasury Pool', header=None)
@@ -112,7 +112,7 @@ quarter_data = {
         "forecasted_income": inc_q1 if inc_q1 > 0 else 312.40,
         "annual_yield": "11.30%",
         "months": ['Jul 26', 'Aug 26', 'Sep 26'],
-        "income_trend": [inc_q1 * 0.33, inc_q1 * 0.35, inc_q1 * 0.32] if inc_q1 > 0 else [99.5, 105.2, 107.8], # Rough monthly split for visual trend
+        "income_trend": [inc_q1 * 0.33, inc_q1 * 0.35, inc_q1 * 0.32] if inc_q1 > 0 else [99.5, 105.2, 107.8], 
         "margin_labels": ['OSR Savings', 'RPA Savings', 'Escrow', 'TDR', 'Buy/Sell'],
         "margin_values": [osr_q1, rpa_q1, esc_q1, tdr_q1, buysell_q1]
     },
