@@ -5,37 +5,49 @@ import time
 # 1. Page Configuration
 st.set_page_config(page_title="Quarterly Dashboard", layout="wide", initial_sidebar_state="collapsed")
 
-# 2. Splash Screen & Loading Animation (Runs only once per visit)
+# 2. Splash Screen & Loading Animation
 if 'first_load' not in st.session_state:
     st.session_state.first_load = True
 
 if st.session_state.first_load:
-    # This creates a temporary container that takes over the screen
     splash = st.empty()
     with splash.container():
+        # Added a fadeOut animation to the splash screen so it disappears smoothly
         st.markdown("""
-            <div style='display: flex; justify-content: center; align-items: center; height: 80vh; flex-direction: column; text-align: center;'>
+            <div style='display: flex; justify-content: center; align-items: center; height: 80vh; flex-direction: column; text-align: center; animation: fadeOut 0.5s ease-in 2s forwards;'>
                 <h1 style='color: #50E3C2; font-size: 60px; letter-spacing: 2px; margin-bottom: 10px;'>KARANDAAZ PAKISTAN</h1>
                 <p style='color: #A0C0E0; font-size: 22px;'>Loading Treasury Financial Data...</p>
                 <div class="loader"></div>
             </div>
             <style>
-            /* Custom CSS Spinner */
             .loader { border: 6px solid #142340; border-top: 6px solid #50E3C2; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-top: 20px;}
             @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+            @keyframes fadeOut { 0% { opacity: 1; } 100% { opacity: 0; } }
             .stApp { background-color: #0A1428; }
             </style>
         """, unsafe_allow_html=True)
-        time.sleep(2.5) # Simulate the loading sequence for 2.5 seconds
+        time.sleep(2.4) # Wait for the fade-out to complete
     
-    # Destroy the splash screen to reveal the dashboard
     splash.empty()
     st.session_state.first_load = False
 
-# 3. Custom CSS for the Dashboard
+# 3. Custom CSS for Smooth Dashboard Load
 st.markdown("""
     <style>
-    .block-container { padding-top: 1rem; padding-bottom: 0rem; max-width: 98%; }
+    /* 🌟 THE MAGIC: Smooth slide-up and fade-in animation for the whole dashboard */
+    @keyframes smoothLoad {
+        0% { opacity: 0; transform: translateY(40px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Apply the animation to the main Streamlit container */
+    .block-container { 
+        padding-top: 1rem; 
+        padding-bottom: 0rem; 
+        max-width: 98%; 
+        animation: smoothLoad 1.2s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+    }
+    
     .metric-card {
         background: linear-gradient(145deg, rgba(20, 35, 60, 0.8), rgba(10, 20, 40, 0.8));
         border: 1px solid #2C4A70;
@@ -44,9 +56,9 @@ st.markdown("""
         text-align: center;
         margin-bottom: 15px;
         box-shadow: 0 8px 16px rgba(0,0,0,0.4);
-        transition: transform 0.2s;
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s;
     }
-    .metric-card:hover { transform: translateY(-3px); border-color: #50E3C2; }
+    .metric-card:hover { transform: translateY(-5px) scale(1.02); border-color: #50E3C2; }
     .metric-title { color: #E0E0E0; font-size: 16px; margin-bottom: 5px; font-weight: 500;}
     .metric-value { color: #FFFFFF; font-size: 28px; font-weight: bold; margin: 0; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
     .metric-sub { color: #A0C0E0; font-size: 12px; margin-top: 5px; line-height: 1.2; }
@@ -55,7 +67,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Wrap the dashboard generation in a Streamlit spinner just in case charts take a moment
 with st.spinner("Rendering Visualizations..."):
     
     st.markdown("<h2 style='text-align: center; margin-bottom: 15px;'>Quarterly Financial Performance Dashboard - Q2 Closing (Apr-Jun)</h2>", unsafe_allow_html=True)
@@ -78,9 +89,7 @@ with st.spinner("Rendering Visualizations..."):
             values=[70, 20, 10], hole=0.75,
             marker_colors=['#2C6296', '#66B3E9', '#50E3C2'],
             textinfo='label+percent', textposition='outside',
-            # UPGRADED PIE STYLING: Dark borders and exploding the biggest slice
-            marker=dict(line=dict(color='#0A1428', width=3)),
-            pull=[0.05, 0, 0] 
+            marker=dict(line=dict(color='#0A1428', width=3)), pull=[0.05, 0, 0] 
         )])
         fig_margin.update_layout(
             title=dict(text="Net Income Margin Distribution", font=dict(color='white', size=14), x=0.5),
@@ -111,9 +120,7 @@ with st.spinner("Rendering Visualizations..."):
             values=[35, 25, 20, 15, 5], hole=0.6,
             marker_colors=['#2C6296', '#4B90E2', '#66B3E9', '#50E3C2', '#A3E4D7'],
             textinfo='label+percent', textposition='outside',
-            # UPGRADED PIE STYLING:
-            marker=dict(line=dict(color='#0A1428', width=3)),
-            pull=[0.05, 0, 0, 0, 0]
+            marker=dict(line=dict(color='#0A1428', width=3)), pull=[0.05, 0, 0, 0, 0]
         )])
         fig_treasury.update_layout(
             title=dict(text="Treasury Portfolio Split", font=dict(color='white', size=14), x=0.5),
@@ -128,9 +135,7 @@ with st.spinner("Rendering Visualizations..."):
             values=[40, 18, 15, 12, 15], hole=0.6,
             marker_colors=['#229954', '#52BE80', '#50E3C2', '#A3E4D7', '#4B90E2'],
             textinfo='label+percent', textposition='outside',
-            # UPGRADED PIE STYLING:
-            marker=dict(line=dict(color='#0A1428', width=3)),
-            pull=[0.05, 0, 0, 0, 0]
+            marker=dict(line=dict(color='#0A1428', width=3)), pull=[0.05, 0, 0, 0, 0]
         )])
         fig_exp.update_layout(
             title=dict(text="Expense Breakdown Q2", font=dict(color='white', size=14), x=0.5),
