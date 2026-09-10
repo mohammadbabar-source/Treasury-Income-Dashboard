@@ -126,7 +126,7 @@ st.markdown("""
         background: #FFFFFF; 
         border: 1px solid #E2E8F0; 
         border-radius: 14px; 
-        padding: 24px 20px; 
+        padding: 20px 16px; 
         box-shadow: 0 4px 14px rgba(0,0,0,0.03); 
         height: 100%; 
         display: flex; 
@@ -138,8 +138,8 @@ st.markdown("""
     }
     .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.07); }
     .kpi-title { font-size: 14px; font-weight: 800; color: #0F172A; text-transform: uppercase; letter-spacing: 0.8px; width: 100%; }
-    .kpi-value { font-size: 32px; font-weight: 900; color: #0F172A; line-height: 1.2; margin-top: 8px; width: 100%; }
-    .kpi-sub { font-size: 13px; font-weight: 600; color: #64748B; margin-top: 6px; width: 100%; }
+    .kpi-value { font-size: 28px; font-weight: 900; color: #0F172A; line-height: 1.2; margin-top: 6px; width: 100%; }
+    .kpi-sub { font-size: 13px; font-weight: 600; color: #64748B; margin-top: 4px; width: 100%; }
     .kpi-divider { border: 0; border-top: 1px solid #E2E8F0; margin: 10px 0; width: 80%; }
 
     /* Blue Accent Cards for Charts */
@@ -209,8 +209,8 @@ with st.spinner("Rendering Visualizations..."):
 
     st.write("")
 
-    # Screen 1 Charts - NARROWED COLUMN RATIO FOR LINE GRAPH
-    sc1_left, sc1_right, sc1_space = st.columns([1.2, 1.1, 0.7], gap="medium")
+    # Screen 1 Charts with Rate & MhePR Cards placed beside the Income Trend Graph
+    sc1_left, sc1_mid, sc1_cards = st.columns([1.1, 1.1, 0.8], gap="medium")
 
     with sc1_left:
         st.markdown(f"<div class='blue-card'><div class='blue-card-title'>INCOME MARGIN DISTRIBUTION ({selected_q})</div>", unsafe_allow_html=True)
@@ -234,7 +234,7 @@ with st.spinner("Rendering Visualizations..."):
         st.plotly_chart(fig_margin, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    with sc1_right:
+    with sc1_mid:
         st.markdown(f"<div class='blue-card'><div class='blue-card-title'>INCOME TREND ({selected_q})</div>", unsafe_allow_html=True)
         fig_trend = go.Figure()
         
@@ -266,14 +266,30 @@ with st.spinner("Rendering Visualizations..."):
         st.plotly_chart(fig_trend, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # SCREEN 2: BOTTOM SECTION
+    with sc1_cards:
+        st.markdown(f"""
+            <div style='display: flex; flex-direction: column; height: 350px; justify-content: space-between;'>
+                <div class='kpi-card' style='text-align: center; height: 168px;'>
+                    <div class='kpi-title' style='font-size: 13px;'>Highest Profit Rate</div><hr class='kpi-divider'>
+                    <div class='kpi-value' style='color:#2563EB; font-size: 28px;'>{top_bank_rate}</div>
+                    <div class='kpi-sub'>{top_bank_name}</div>
+                </div>
+                <div class='kpi-card' style='text-align: center; height: 168px;'>
+                    <div class='kpi-title' style='font-size: 13px;'>MhePR</div><hr class='kpi-divider'>
+                    <div class='kpi-value' style='color:#2563EB; font-size: 28px;'>{mpr_rate:.2f}%</div>
+                    <div class='kpi-sub'>Next Date: {next_mpr_date}</div>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+
+    # SCREEN 2: BOTTOM SECTION (3 Columns now that Rates moved to Screen 1)
     st.markdown("""
         <div class="screen-2-header">
             <h3>Detailed Treasury Portfolio Breakdown</h3>
         </div>
     """, unsafe_allow_html=True)
 
-    bot1, bot2, bot3, bot4 = st.columns([1.1, 1.1, 0.9, 1.5], gap="medium")
+    bot1, bot2, bot3 = st.columns([1, 1, 1.4], gap="medium")
 
     with bot1:
         st.markdown(f"<div class='blue-card' style='border-top-color:#10B981;'><div class='blue-card-title'>TREASURY POOL SPLIT</div>", unsafe_allow_html=True)
@@ -299,22 +315,6 @@ with st.spinner("Rendering Visualizations..."):
         st.markdown("</div>", unsafe_allow_html=True)
 
     with bot3:
-        st.markdown(f"""
-            <div style='display: flex; flex-direction: column; height: 100%; justify-content: space-between;'>
-                <div class='kpi-card' style='text-align: center; height: 48%;'>
-                    <div class='kpi-title' style='font-size: 13px;'>Highest Profit Rate</div><hr class='kpi-divider'>
-                    <div class='kpi-value' style='color:#2563EB; font-size: 28px;'>{top_bank_rate}</div>
-                    <div class='kpi-sub'>{top_bank_name}</div>
-                </div>
-                <div class='kpi-card' style='text-align: center; height: 48%;'>
-                    <div class='kpi-title' style='font-size: 13px;'>MhePR</div><hr class='kpi-divider'>
-                    <div class='kpi-value' style='color:#2563EB; font-size: 28px;'>{mpr_rate:.2f}%</div>
-                    <div class='kpi-sub'>Next Date: {next_mpr_date}</div>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-
-    with bot4:
         st.markdown(f"<div class='blue-card' style='border-top-color:#10B981;'><div class='blue-card-title'>FUND POOL ALLOCATION</div>", unsafe_allow_html=True)
         fig_bar = go.Figure()
         categories = ['Operational', 'WV Greenfin', 'RPA A/c', 'Inv/CDEL', 'LR Funds', 'OSR Funds']
