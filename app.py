@@ -1,62 +1,117 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 
-st.set_page_config(page_title="Treasury Dashboard", layout="wide")
-st.title("🏦 Treasury Income Dashboard")
-st.markdown("Visualizing bank profits and account performance from July '25 to June '26.")
+# Set dark theme and wide layout
+st.set_page_config(page_title="Financial Dashboard", layout="wide", initial_sidebar_state="collapsed")
 
-FILE_NAME = "Treasury Income July  25 - June 26.xlsx"
+# Title
+st.title("🏦 Treasury Financial Dashboard")
+st.markdown("---")
 
-try:
-    df = pd.read_excel(FILE_NAME, sheet_name='Treasury Bank Profits mapped ', header=1)
+# Create the top row with 3 main columns (mimicking the image layout)
+# The ratios [1, 1.2, 1.5] dictate how wide each column is
+top_col1, top_col2, top_col3 = st.columns([1, 1.2, 1.5])
+
+with top_col1:
+    # 4 Metrics stacked in a grid-like fashion using nested columns
+    st.subheader("Key Metrics")
+    m1, m2 = st.columns(2)
+    m1.metric(label="Total Income", value="$250,000")
+    m2.metric(label="Total Treasury Pool", value="$180,000") # Changed from Expenses
     
-    df = df.dropna(how='all', axis=1).dropna(how='all', axis=0)
-    df['Total'] = pd.to_numeric(df['Total'], errors='coerce').fillna(0)
-    df = df[df['Bank Name'].notna()]
-
-    # 🛠️ THE FIX: Force these columns to be text so dates/numbers don't crash the charts
-    df['Bank Name'] = df['Bank Name'].astype(str)
-    df['Account Title'] = df['Account Title'].astype(str)
+    st.write("") # Spacing
     
-    # 🛠️ EXTRA CLEANUP: Remove any row where the Bank Name is literally just the word "Bank Name"
-    df = df[df['Bank Name'] != 'Bank Name']
+    m3, m4 = st.columns(2)
+    # NOTE: Change "Net Profit" below to whatever you meant to type!
+    m3.metric(label="Net Profit", value="$70,000") 
+    m4.metric(label="Expense Ratio", value="72.0%")
 
-    # --- DASHBOARD METRICS (KPIs) ---
-    st.subheader("📊 Executive Summary")
+with top_col2:
+    st.subheader("Income by Product")
+    # New Pie Chart: Savings, T-Bills, Buy/Sell, TDR
+    pie_data = pd.DataFrame({
+        'Product': ['Savings Account', 'T-Bills', 'Buy/Sell', 'TDR'],
+        'Value': [85000, 90000, 45000, 30000]
+    })
     
-    total_income = df['Total'].sum()
-    total_accounts = len(df['Account Title'].unique())
-    top_bank = df.groupby('Bank Name')['Total'].sum().idxmax()
+    # Create a donut chart using Plotly
+    fig_pie = px.pie(
+        pie_data, 
+        names='Product', 
+        values='Value', 
+        hole=0.6, # Makes it a donut chart
+        color_discrete_sequence=['#4B90E2', '#50E3C2', '#F5A623', '#B8E986']
+    )
+    fig_pie.update_layout(
+        margin=dict(t=0, b=0, l=0, r=0),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="white")
+    )
+    st.plotly_chart(fig_pie, use_container_width=True)
 
-    col1, col2, col3 = st.columns(3)
-    col1.metric(label="Total Treasury Income", value=f"PKR {total_income:,.0f}")
-    col2.metric(label="Total Bank Accounts", value=f"{total_accounts}")
-    col3.metric(label="Highest Yielding Bank", value=f"{top_bank}")
+with top_col3:
+    st.subheader("Quarterly Profit Trend (Q1 - Q4)")
+    # New Line Chart: Q1, Q2, Q3, Q4
+    trend_data = pd.DataFrame({
+        'Quarter': ['Q1', 'Q2', 'Q3', 'Q4'],
+        'Profit Earned': [45000, 55000, 70000, 85000]
+    })
     
-    st.divider()
+    fig_line = px.line(
+        trend_data, 
+        x='Quarter', 
+        y='Profit Earned',
+        markers=True,
+        line_shape='spline' # Makes the line curved and smooth
+    )
+    fig_line.update_traces(line_color='#50E3C2', marker=dict(size=8))
+    fig_line.update_layout(
+        margin=dict(t=20, b=20, l=0, r=0),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="white"),
+        xaxis_title="",
+        yaxis_title="Profit ($)"
+    )
+    st.plotly_chart(fig_line, use_container_width=True)
 
-    # --- DASHBOARD CHARTS ---
-    st.subheader("📈 Income Breakdown")
+st.markdown("---")
+
+# Create the bottom row (keeping the rest the same as requested)
+bottom_col1, bottom_col2, bottom_col3 = st.columns([1, 1, 2])
+
+with bottom_col1:
+    st.subheader("Current Ratio")
+    st.markdown("<h2 style='text-align: center; color: #50E3C2;'>2.1</h2>", unsafe_allow_html=True)
+    st.caption("Indicates Excellent Liquidity Position")
+
+with bottom_col2:
+    st.subheader("Debt-to-Equity")
+    st.markdown("<h2 style='text-align: center; color: #50E3C2;'>0.8</h2>", unsafe_allow_html=True)
+    st.caption("Conservative Leverage - Minimal Risk")
+
+with bottom_col3:
+    st.subheader("Budget vs. Actual")
+    # Simple horizontal bar chart dummy data
+    bar_data = pd.DataFrame({
+        'Category': ['Salaries', 'R&D', 'Rent', 'Marketing'],
+        'Budget': [28500, 9200, 5820, 13300],
+        'Actual': [25380, 18580, 11343, 10488]
+    })
     
-    chart_col1, chart_col2 = st.columns(2)
+    fig_bar = go.Figure()
+    fig_bar.add_trace(go.Bar(y=bar_data['Category'], x=bar_data['Budget'], name='Budget', orientation='h', marker_color='#4B90E2'))
+    fig_bar.add_trace(go.Bar(y=bar_data['Category'], x=bar_data['Actual'], name='Actual', orientation='h', marker_color='#50E3C2'))
     
-    with chart_col1:
-        st.markdown("**Total Income by Bank**")
-        bank_totals = df.groupby('Bank Name')['Total'].sum().sort_values(ascending=False)
-        st.bar_chart(bank_totals)
-        
-    with chart_col2:
-        st.markdown("**Income by Account Title (Top 5)**")
-        account_totals = df.groupby('Account Title')['Total'].sum().sort_values(ascending=False).head(5)
-        st.bar_chart(account_totals)
-
-    st.divider()
-
-    with st.expander("🔍 View Raw Data Table (Click to expand)"):
-        clean_table = df.drop(columns=[col for col in df.columns if 'Unnamed' in str(col) or 'GL BAL' in str(col)])
-        st.dataframe(clean_table, use_container_width=True)
-
-except FileNotFoundError:
-    st.error(f"⚠️ I cannot find '{FILE_NAME}'. Please check the file name.")
-except Exception as e:
-    st.error(f"⚠️ An error occurred: {e}")
+    fig_bar.update_layout(
+        barmode='group',
+        margin=dict(t=0, b=0, l=0, r=0),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="white"),
+        legend=dict(yanchor="bottom", y=1.02, xanchor="right", x=1, orientation="h")
+    )
+    st.plotly_chart(fig_bar, use_container_width=True)
