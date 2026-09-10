@@ -12,60 +12,99 @@ if 'first_load' not in st.session_state:
 if st.session_state.first_load:
     splash = st.empty()
     with splash.container():
-        # Added a fadeOut animation to the splash screen so it disappears smoothly
         st.markdown("""
             <div style='display: flex; justify-content: center; align-items: center; height: 80vh; flex-direction: column; text-align: center; animation: fadeOut 0.5s ease-in 2s forwards;'>
-                <h1 style='color: #50E3C2; font-size: 60px; letter-spacing: 2px; margin-bottom: 10px;'>KARANDAAZ PAKISTAN</h1>
-                <p style='color: #A0C0E0; font-size: 22px;'>Loading Treasury Financial Data...</p>
+                <h1 style='color: #0B2545; font-size: 56px; letter-spacing: 1px; margin-bottom: 10px; font-weight: 700;'>KARANDAAZ PAKISTAN</h1>
+                <p style='color: #333333; font-size: 20px; font-weight: 400;'>Loading Treasury Financial Data...</p>
                 <div class="loader"></div>
             </div>
             <style>
-            .loader { border: 6px solid #142340; border-top: 6px solid #50E3C2; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-top: 20px;}
+            .loader { border: 6px solid #E0E6ED; border-top: 6px solid #0B2545; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-top: 20px;}
             @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
             @keyframes fadeOut { 0% { opacity: 1; } 100% { opacity: 0; } }
-            .stApp { background-color: #0A1428; }
+            .stApp { background-color: #FFFFFF; }
             </style>
         """, unsafe_allow_html=True)
-        time.sleep(2.4) # Wait for the fade-out to complete
+        time.sleep(2.4)
     
     splash.empty()
     st.session_state.first_load = False
 
-# 3. Custom CSS for Smooth Dashboard Load
+# 3. Typography & Styling: White Background, Black Text, Dark Navy Blue Headers
 st.markdown("""
     <style>
-    /* 🌟 THE MAGIC: Smooth slide-up and fade-in animation for the whole dashboard */
+    * {
+        font-family: 'Roboto', 'Arial', sans-serif !important;
+        font-style: normal !important;
+        text-decoration: none !important;
+    }
+
     @keyframes smoothLoad {
-        0% { opacity: 0; transform: translateY(40px); }
+        0% { opacity: 0; transform: translateY(30px); }
         100% { opacity: 1; transform: translateY(0); }
     }
     
-    /* Apply the animation to the main Streamlit container */
     .block-container { 
         padding-top: 1rem; 
         padding-bottom: 0rem; 
         max-width: 98%; 
-        animation: smoothLoad 1.2s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        animation: smoothLoad 1s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
     }
     
+    /* App White Background */
+    .stApp { 
+        background-color: #FFFFFF !important; 
+    }
+
+    /* Dark Navy Blue Headers */
+    h1, h2, h3, h4, h5, h6 { 
+        color: #0B2545 !important; 
+        font-weight: 700 !important; 
+    }
+
+    /* White Metric Cards with Navy Borders */
     .metric-card {
-        background: linear-gradient(145deg, rgba(20, 35, 60, 0.8), rgba(10, 20, 40, 0.8));
-        border: 1px solid #2C4A70;
-        border-radius: 16px;
+        background-color: #FFFFFF;
+        border: 1px solid #D1D9E6;
+        border-radius: 12px;
         padding: 15px;
         text-align: center;
         margin-bottom: 15px;
-        box-shadow: 0 8px 16px rgba(0,0,0,0.4);
-        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s;
+        box-shadow: 0 4px 12px rgba(11, 37, 69, 0.08);
+        transition: transform 0.3s ease, border-color 0.3s ease;
     }
-    .metric-card:hover { transform: translateY(-5px) scale(1.02); border-color: #50E3C2; }
-    .metric-title { color: #E0E0E0; font-size: 16px; margin-bottom: 5px; font-weight: 500;}
-    .metric-value { color: #FFFFFF; font-size: 28px; font-weight: bold; margin: 0; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
-    .metric-sub { color: #A0C0E0; font-size: 12px; margin-top: 5px; line-height: 1.2; }
-    .stApp { background-color: #0A1428; }
-    h1, h2, h3, h4 { color: white !important; }
+    .metric-card:hover { 
+        transform: translateY(-3px); 
+        border-color: #0B2545; 
+    }
+    
+    .metric-title { 
+        color: #0B2545; 
+        font-size: 15px; 
+        margin-bottom: 5px; 
+        font-weight: 700; 
+    }
+    .metric-value { 
+        color: #111111; 
+        font-size: 28px; 
+        font-weight: 700; 
+        margin: 0; 
+    }
+    .metric-sub { 
+        color: #4A5568; 
+        font-size: 12px; 
+        font-weight: 400; 
+        margin-top: 5px; 
+        line-height: 1.3; 
+    }
     </style>
 """, unsafe_allow_html=True)
+
+# Shared Color Constants & Font Settings
+NAVY_BLUE = "#0B2545"
+TEXT_BLACK = "#111111"
+GRID_GRAY = "#E2E8F0"
+CHART_FONT = dict(family="Roboto, Arial, sans-serif", color=TEXT_BLACK, size=12)
 
 with st.spinner("Rendering Visualizations..."):
     
@@ -87,27 +126,29 @@ with st.spinner("Rendering Visualizations..."):
         fig_margin = go.Figure(data=[go.Pie(
             labels=['Core Operations', 'New Projects', 'Investment Yields'],
             values=[70, 20, 10], hole=0.75,
-            marker_colors=['#2C6296', '#66B3E9', '#50E3C2'],
+            marker_colors=['#0B2545', '#134074', '#00A896'],
             textinfo='label+percent', textposition='outside',
-            marker=dict(line=dict(color='#0A1428', width=3)), pull=[0.05, 0, 0] 
+            marker=dict(line=dict(color='#FFFFFF', width=2)), pull=[0.04, 0, 0] 
         )])
         fig_margin.update_layout(
-            title=dict(text="Net Income Margin Distribution", font=dict(color='white', size=14), x=0.5),
-            annotations=[dict(text="Margin<br><b style='font-size:24px; color:#50E3C2'>28.0%</b>", x=0.5, y=0.5, font_color='white', showarrow=False)],
+            title=dict(text="Net Income Margin Distribution", font=dict(family="Roboto, Arial, sans-serif", color=NAVY_BLUE, size=14, weight='bold'), x=0.5),
+            annotations=[dict(text="Margin<br><b style='font-size:22px; color:#0B2545;'>28.0%</b>", x=0.5, y=0.5, font=CHART_FONT, showarrow=False)],
             showlegend=False, margin=dict(t=30, b=10, l=10, r=10),
-            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=250
+            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=250,
+            font=CHART_FONT
         )
         st.plotly_chart(fig_margin, use_container_width=True)
 
     with top_col3:
         fig_trend = go.Figure()
-        fig_trend.add_trace(go.Scatter(x=['Apr', 'May', 'Jun'], y=[65000, 78000, 87000], name='Total Income', line=dict(color='white', width=4, shape='spline'), mode='lines+markers', marker=dict(size=8, color='#50E3C2', line=dict(width=2, color='white'))))
-        fig_trend.add_trace(go.Scatter(x=['Apr', 'May', 'Jun'], y=[48000, 55000, 65000], name='Total Expenses', line=dict(color='#4B90E2', width=4, shape='spline'), mode='lines+markers', marker=dict(size=8)))
+        fig_trend.add_trace(go.Scatter(x=['Apr', 'May', 'Jun'], y=[65000, 78000, 87000], name='Total Income', line=dict(color='#0B2545', width=3, shape='spline'), mode='lines+markers', marker=dict(size=7, color='#00A896')))
+        fig_trend.add_trace(go.Scatter(x=['Apr', 'May', 'Jun'], y=[48000, 55000, 65000], name='Total Expenses', line=dict(color='#4A90E2', width=3, shape='spline'), mode='lines+markers', marker=dict(size=7)))
         fig_trend.update_layout(
-            title=dict(text="Profit & Loss Quarterly Trend (Apr-Jun)", font=dict(color='white', size=14), x=0.5),
-            margin=dict(t=30, b=20, l=10, r=10), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color='white'),
+            title=dict(text="Profit & Loss Quarterly Trend (Apr-Jun)", font=dict(family="Roboto, Arial, sans-serif", color=NAVY_BLUE, size=14, weight='bold'), x=0.5),
+            margin=dict(t=30, b=20, l=10, r=10), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
             legend=dict(yanchor="bottom", y=0.1, xanchor="right", x=0.95, bgcolor='rgba(0,0,0,0)'),
-            xaxis=dict(showgrid=False), yaxis=dict(showgrid=True, gridcolor='#1C2A45', zeroline=False), height=250
+            xaxis=dict(showgrid=False), yaxis=dict(showgrid=True, gridcolor=GRID_GRAY, zeroline=False), height=250,
+            font=CHART_FONT
         )
         st.plotly_chart(fig_trend, use_container_width=True)
 
@@ -118,14 +159,15 @@ with st.spinner("Rendering Visualizations..."):
         fig_treasury = go.Figure(data=[go.Pie(
             labels=['T-Bills', 'Corp Bonds', 'Cash/Equiv', 'Sov Bonds', 'REITs'],
             values=[35, 25, 20, 15, 5], hole=0.6,
-            marker_colors=['#2C6296', '#4B90E2', '#66B3E9', '#50E3C2', '#A3E4D7'],
+            marker_colors=['#0B2545', '#134074', '#2A6F97', '#00A896', '#62B6CB'],
             textinfo='label+percent', textposition='outside',
-            marker=dict(line=dict(color='#0A1428', width=3)), pull=[0.05, 0, 0, 0, 0]
+            marker=dict(line=dict(color='#FFFFFF', width=2)), pull=[0.04, 0, 0, 0, 0]
         )])
         fig_treasury.update_layout(
-            title=dict(text="Treasury Portfolio Split", font=dict(color='white', size=14), x=0.5),
+            title=dict(text="Treasury Portfolio Split", font=dict(family="Roboto, Arial, sans-serif", color=NAVY_BLUE, size=14, weight='bold'), x=0.5),
             showlegend=False, margin=dict(t=30, b=10, l=10, r=10),
-            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=250
+            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=250,
+            font=CHART_FONT
         )
         st.plotly_chart(fig_treasury, use_container_width=True)
 
@@ -133,27 +175,28 @@ with st.spinner("Rendering Visualizations..."):
         fig_exp = go.Figure(data=[go.Pie(
             labels=['Salaries', 'R&D', 'Rent', 'Marketing', 'Infra'],
             values=[40, 18, 15, 12, 15], hole=0.6,
-            marker_colors=['#229954', '#52BE80', '#50E3C2', '#A3E4D7', '#4B90E2'],
+            marker_colors=['#0B2545', '#1D4ED8', '#00A896', '#3B82F6', '#93C5FD'],
             textinfo='label+percent', textposition='outside',
-            marker=dict(line=dict(color='#0A1428', width=3)), pull=[0.05, 0, 0, 0, 0]
+            marker=dict(line=dict(color='#FFFFFF', width=2)), pull=[0.04, 0, 0, 0, 0]
         )])
         fig_exp.update_layout(
-            title=dict(text="Expense Breakdown Q2", font=dict(color='white', size=14), x=0.5),
+            title=dict(text="Expense Breakdown Q2", font=dict(family="Roboto, Arial, sans-serif", color=NAVY_BLUE, size=14, weight='bold'), x=0.5),
             showlegend=False, margin=dict(t=30, b=10, l=10, r=10),
-            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=250
+            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=250,
+            font=CHART_FONT
         )
         st.plotly_chart(fig_exp, use_container_width=True)
 
     with bot_col3:
         st.markdown("""
-            <div class='metric-card' style='margin-top:15px; padding: 25px 10px;'>
+            <div class='metric-card' style='margin-top:15px; padding: 22px 10px;'>
                 <div class='metric-title'>Current Highest Profit</div>
-                <div class='metric-value' style='color: #50E3C2; font-size: 24px;'>5.35% <span style='font-size:14px'>p.a.</span></div>
+                <div class='metric-value' style='color: #0B2545; font-size: 24px;'>5.35% <span style='font-size:14px; font-weight:400;'>p.a.</span></div>
                 <div class='metric-sub'>Premier Trust Bank<br>July 2024</div>
             </div>
-            <div class='metric-card' style='padding: 25px 10px;'>
+            <div class='metric-card' style='padding: 22px 10px;'>
                 <div class='metric-title'>MhePR</div>
-                <div class='metric-value' style='color: #50E3C2; font-size: 24px;'>4.80%</div>
+                <div class='metric-value' style='color: #0B2545; font-size: 24px;'>4.80%</div>
                 <div class='metric-sub'>Next MPR Date:<br>August 14, 2024</div>
             </div>
         """, unsafe_allow_html=True)
@@ -164,14 +207,15 @@ with st.spinner("Rendering Visualizations..."):
         actual = [7048, 22030, 10488, 11343, 15580, 25580]
         budget = [3253, 17800, 13300, 5820, 9200, 28500]
         
-        fig_bar.add_trace(go.Bar(y=categories, x=budget, name='Budget', orientation='h', marker_color='#4B90E2', marker_line_color='#0A1428', marker_line_width=1))
-        fig_bar.add_trace(go.Bar(y=categories, x=actual, name='Actual', orientation='h', marker_color='#50E3C2', marker_line_color='#0A1428', marker_line_width=1))
+        fig_bar.add_trace(go.Bar(y=categories, x=budget, name='Budget', orientation='h', marker_color='#134074'))
+        fig_bar.add_trace(go.Bar(y=categories, x=actual, name='Actual', orientation='h', marker_color='#00A896'))
         
         fig_bar.update_layout(
-            title=dict(text="Q2 Budget vs. Actual", font=dict(color='white', size=14), x=0.5),
+            title=dict(text="Q2 Budget vs. Actual", font=dict(family="Roboto, Arial, sans-serif", color=NAVY_BLUE, size=14, weight='bold'), x=0.5),
             barmode='group', margin=dict(t=30, b=20, l=10, r=10),
-            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color='white'),
+            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
             legend=dict(yanchor="bottom", y=0.1, xanchor="right", x=0.95, bgcolor='rgba(0,0,0,0)'),
-            xaxis=dict(showgrid=True, gridcolor='#1C2A45', zeroline=False), yaxis=dict(showgrid=False), height=250
+            xaxis=dict(showgrid=True, gridcolor=GRID_GRAY, zeroline=False), yaxis=dict(showgrid=False), height=250,
+            font=CHART_FONT
         )
         st.plotly_chart(fig_bar, use_container_width=True)
