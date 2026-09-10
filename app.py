@@ -121,7 +121,7 @@ st.markdown("""
     .glow-line { height: 3px; flex-grow: 1; max-width: 380px; background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.6), transparent); box-shadow: 0 0 12px rgba(59, 130, 246, 0.6); }
     .header-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 12px 40px; margin: 0 20px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05); font-weight: 900; font-size: 26px; color: #000000; letter-spacing: 1.5px; text-transform: uppercase; }
 
-    /* Centered & Scaled KPI Cards (Reverted to nice large size) */
+    /* Centered & Scaled KPI Cards */
     .kpi-card { 
         background: #FFFFFF; 
         border: 1px solid #E2E8F0; 
@@ -209,8 +209,8 @@ with st.spinner("Rendering Visualizations..."):
 
     st.write("")
 
-    # Screen 1 Charts 
-    sc1_left, sc1_right = st.columns([1, 1.8], gap="medium")
+    # Screen 1 Charts - NARROWED COLUMN RATIO FOR LINE GRAPH
+    sc1_left, sc1_right, sc1_space = st.columns([1.2, 1.1, 0.7], gap="medium")
 
     with sc1_left:
         st.markdown(f"<div class='blue-card'><div class='blue-card-title'>INCOME MARGIN DISTRIBUTION ({selected_q})</div>", unsafe_allow_html=True)
@@ -228,7 +228,7 @@ with st.spinner("Rendering Visualizations..."):
             margin=dict(t=20, b=20, l=40, r=40), 
             paper_bgcolor='rgba(0,0,0,0)', 
             plot_bgcolor='rgba(0,0,0,0)', 
-            height=300, # Reverted back to normal size
+            height=300, 
             font=CHART_FONT
         )
         st.plotly_chart(fig_margin, use_container_width=True)
@@ -238,7 +238,6 @@ with st.spinner("Rendering Visualizations..."):
         st.markdown(f"<div class='blue-card'><div class='blue-card-title'>INCOME TREND ({selected_q})</div>", unsafe_allow_html=True)
         fig_trend = go.Figure()
         
-        # THIS IS THE ONLY COMPACT GRAPH: Single thinner line, compact height, squeezed x-axis
         fig_trend.add_trace(go.Scatter(
             x=q_ctx['months'], 
             y=q_ctx['income_trend'], 
@@ -249,7 +248,7 @@ with st.spinner("Rendering Visualizations..."):
         ))
         
         fig_trend.update_layout(
-            margin=dict(t=10, b=10, l=10, r=10), 
+            margin=dict(t=15, b=15, l=15, r=15), 
             paper_bgcolor='rgba(0,0,0,0)', 
             plot_bgcolor='rgba(0,0,0,0)',
             showlegend=False, 
@@ -261,7 +260,7 @@ with st.spinner("Rendering Visualizations..."):
                 tickformat="d",
                 ticksuffix=" PKR Mns"
             ), 
-            height=200, # SPECIFIC COMPACT HEIGHT JUST FOR THIS GRAPH
+            height=200, 
             font=CHART_FONT
         )
         st.plotly_chart(fig_trend, use_container_width=True)
