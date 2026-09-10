@@ -53,8 +53,9 @@ def get_quarter_rates(q_key):
         if not df_rates.empty and len(df_rates) > 3 and col_idx < df_rates.shape[1]:
             raw_val = df_rates.iloc[3, col_idx]
         
+        # Display 'Pending / Not Updated' if cell in Excel is blank/NaN
         if pd.isna(raw_val) or not str(raw_val).strip():
-            rates_list = ["1. Samba 11.30%", "2. UBL 11.00%", "3. BAFL 10.75%"]
+            rates_list = ["Pending / Not Updated"]
         else:
             lines = str(raw_val).strip().split('\n')
             rates_list = [line.replace('%%', '%').strip() for line in lines if line.strip()]
