@@ -1,171 +1,157 @@
 import streamlit as st
+import plotly.graph_objects as go
+import time
 
 # 1. Page Configuration
-st.set_page_config(page_title="Portfolio Summary", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Treasury Summary", layout="wide", initial_sidebar_state="collapsed")
 
-# 2. Custom CSS for exact 1-to-1 styling
+# 2. Splash Screen (Clean White Theme)
+if 'first_load' not in st.session_state:
+    st.session_state.first_load = True
+
+if st.session_state.first_load:
+    splash = st.empty()
+    with splash.container():
+        st.markdown("""
+            <div style='display: flex; justify-content: center; align-items: center; height: 80vh; flex-direction: column; text-align: center; animation: fadeOut 0.5s ease-in 2s forwards;'>
+                <h1 style='color: #000000; font-size: 56px; letter-spacing: 1.5px; margin-bottom: 10px; font-weight: 900;'>KARANDAAZ TREASURY</h1>
+                <p style='color: #64748B; font-size: 20px; font-weight: 600; letter-spacing: 1px;'>Loading Portfolio Summary...</p>
+                <div class="loader"></div>
+            </div>
+            <style>
+            .loader { border: 4px solid #F1F5F9; border-top: 4px solid #2563EB; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-top: 20px;}
+            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+            @keyframes fadeOut { 0% { opacity: 1; } 100% { opacity: 0; } }
+            .stApp { background-color: #FFFFFF; }
+            </style>
+        """, unsafe_allow_html=True)
+        time.sleep(2.4)
+    splash.empty()
+    st.session_state.first_load = False
+
+# 3. Custom CSS Matching Your Image 1:1
 st.markdown("""
     <style>
     /* Global Settings */
     * { font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif !important; }
     .stApp { background-color: #FFFFFF !important; }
-    
-    /* Hide default Streamlit elements for a cleaner look */
-    header { visibility: hidden; }
-    .block-container { padding-top: 2rem; max-width: 95%; }
+    .block-container { padding-top: 1.5rem; padding-bottom: 0rem; max-width: 96%; animation: smoothLoad 0.8s ease-out forwards; }
+    @keyframes smoothLoad { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
 
     /* Top Glowing Header */
-    .header-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 2rem;
-        margin-top: 1rem;
-    }
-    .glow-line {
-        height: 2px;
-        flex-grow: 1;
-        max-width: 300px;
-        background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent);
-        box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
-    }
-    .header-card {
-        background: #FFFFFF;
-        border: 1px solid #F1F5F9;
-        border-radius: 8px;
-        padding: 15px 40px;
-        margin: 0 20px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        font-weight: 900;
-        font-size: 24px;
-        color: #000000;
-        letter-spacing: 1px;
-    }
+    .header-container { display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; margin-top: 0.5rem; }
+    .glow-line { height: 2px; flex-grow: 1; max-width: 350px; background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent); box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+    .header-card { background: #FFFFFF; border: 1px solid #F1F5F9; border-radius: 8px; padding: 15px 40px; margin: 0 20px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); font-weight: 900; font-size: 24px; color: #000000; letter-spacing: 1px; text-transform: uppercase; }
 
-    /* Staging Title Cards (Grey Boxes) */
-    .staging-title {
-        background: #E6ECF2;
-        border-radius: 12px;
-        padding: 20px;
-        text-align: center;
-        font-weight: 900;
-        font-size: 18px;
-        color: #000000;
-        letter-spacing: 1.5px;
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-        margin-bottom: 25px;
-    }
+    /* Clean Shadow Cards for Metrics */
+    .stage-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 15px 20px; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.04); transition: transform 0.2s ease; }
+    .stage-card:hover { transform: translateY(-2px); box-shadow: 0 8px 15px rgba(0,0,0,0.08); }
+    .stage-card-title { font-size: 13px; font-weight: 800; color: #000000; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stage-card-value { font-size: 26px; font-weight: 900; color: #000000; }
+    .stage-card-sub { font-size: 12px; font-weight: 600; color: #64748B; margin-top: 4px; }
+    .stage-card hr { border-top: 1px solid #F1F5F9; margin: 10px 0; }
 
-    /* Center Main Card */
-    .center-card {
-        background: #FFFFFF;
-        border: 2px solid #2563EB; /* Blue Border */
-        border-radius: 12px;
-        padding: 40px 20px;
-        text-align: center;
-        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.15);
-        margin-top: 20px;
-    }
-    .center-title { font-size: 16px; font-weight: 700; color: #333333; letter-spacing: 1px; margin-bottom: 10px; }
-    .center-value { font-size: 42px; font-weight: 900; color: #000000; margin-bottom: 10px; }
-    .center-sub { font-size: 11px; font-weight: 600; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px; }
-    
-    /* Small Stage Cards */
-    .stage-card {
-        background: #FFFFFF;
-        border-radius: 8px;
-        padding: 12px 20px;
-        text-align: center;
-        margin-bottom: 15px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    }
-    .stage-card-title { font-size: 12px; font-weight: 800; color: #000000; margin-bottom: 8px; }
-    .stage-card-value { font-size: 18px; font-weight: 900; color: #000000; }
-    .stage-card-pct { font-size: 12px; font-weight: 600; color: #64748B; }
-    
-    /* Specific Border Colors for Stages */
-    .stage-1 { border: 1px solid #10B981; } /* Green */
-    .stage-1 hr { border-top: 1px solid #D1FAE5; margin: 8px 0; }
-    
-    .stage-2 { border: 1px solid #F59E0B; } /* Orange */
-    .stage-2 hr { border-top: 1px solid #FEF3C7; margin: 8px 0; }
-    
-    .stage-3 { border: 1px solid #EF4444; } /* Red */
-    .stage-3 hr { border-top: 1px solid #FEE2E2; margin: 8px 0; }
-
-    /* Dropdown alignment */
-    .stSelectbox { max-width: 200px; margin: 0 auto; }
-    div[data-baseweb="select"] > div { border-radius: 8px; }
+    /* Blue Bordered Cards for Charts */
+    .center-card { background: #FFFFFF; border: 2px solid #2563EB; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.10); margin-bottom: 15px; }
+    .center-title { font-size: 15px; font-weight: 800; color: #000000; letter-spacing: 1px; margin-bottom: 5px; text-transform: uppercase; }
     </style>
 """, unsafe_allow_html=True)
 
-# 3. Top Glowing Header
-st.markdown("""
-    <div class="header-container">
-        <div class="glow-line"></div>
-        <div class="header-card">KARANDAAZ PORTFOLIO SUMMARY</div>
-        <div class="glow-line"></div>
-    </div>
-""", unsafe_allow_html=True)
+CHART_FONT = dict(family="Segoe UI, Roboto, sans-serif", color="#000000", size=12)
+BLUE_ACCENT = '#2563EB'
+GREEN_ACCENT = '#10B981'
 
-# 4. Date Dropdown (Centered)
-col_empty1, col_date, col_empty2 = st.columns([1, 0.3, 1])
-with col_date:
-    st.selectbox("", ["Jun 26", "Jul 26", "Aug 26"], label_visibility="collapsed")
-
-st.write("") # Spacing
-st.write("")
-
-# 5. Main 3-Column Layout
-left_col, center_col, right_col = st.columns([1, 1.2, 1], gap="large")
-
-# --- LEFT COLUMN (CIC STAGING) ---
-with left_col:
-    st.markdown("<div class='staging-title'>CIC STAGING</div>", unsafe_allow_html=True)
+with st.spinner("Rendering Visualizations..."):
     
+    # Glowing Header
     st.markdown("""
-        <div class='stage-card stage-1'>
-            <div class='stage-card-title'>CIC STAGE 1</div><hr>
-            <div class='stage-card-value'>12,106 M <span class='stage-card-pct'>(73.8%)</span></div>
-        </div>
-        <div class='stage-card stage-2'>
-            <div class='stage-card-title'>CIC STAGE 2</div><hr>
-            <div class='stage-card-value'>2,436 M <span class='stage-card-pct'>(14.8%)</span></div>
-        </div>
-        <div class='stage-card stage-3'>
-            <div class='stage-card-title'>CIC STAGE 3</div><hr>
-            <div class='stage-card-value'>1,858 M <span class='stage-card-pct'>(11.4%)</span></div>
+        <div class="header-container">
+            <div class="glow-line"></div>
+            <div class="header-card">Treasury Portfolio Summary</div>
+            <div class="glow-line"></div>
         </div>
     """, unsafe_allow_html=True)
 
+    # Date Dropdown
+    col_empty1, col_date, col_empty2 = st.columns([1, 0.2, 1])
+    with col_date:
+        st.selectbox("", ["Q2 (Apr-Jun)", "Q1 (Jan-Mar)", "Q4 (Oct-Dec)"], label_visibility="collapsed")
+    st.write("")
 
-# --- CENTER COLUMN (MAIN PORTFOLIO) ---
-with center_col:
-    st.markdown("""
-        <div class='center-card'>
-            <div class='center-title'>KARANDAAZ PORTFOLIO</div>
-            <hr style="border: none; border-top: 1px solid #E2E8F0; width: 60%; margin: 10px auto;">
-            <div class='center-value'>37.7 B</div>
-            <div class='center-sub'>CLICK TO EXPAND</div>
-        </div>
-    """, unsafe_allow_html=True)
+    # --- TOP ROW (Metrics) ---
+    m1, m2, m3, m4 = st.columns(4)
+    with m1: st.markdown("<div class='stage-card'><div class='stage-card-title'>Total Income</div><hr><div class='stage-card-value'>$250,000</div><div class='stage-card-sub'>Quarterly Earnings</div></div>", unsafe_allow_html=True)
+    with m2: st.markdown("<div class='stage-card'><div class='stage-card-title'>Treasury Pool</div><hr><div class='stage-card-value'>$180,000</div><div class='stage-card-sub'>Current Allocation</div></div>", unsafe_allow_html=True)
+    with m3: st.markdown("<div class='stage-card'><div class='stage-card-title'>Net Profit</div><hr><div class='stage-card-value'>$70,000</div><div class='stage-card-sub'>After Expenses</div></div>", unsafe_allow_html=True)
+    with m4: st.markdown("<div class='stage-card'><div class='stage-card-title'>Expense Ratio</div><hr><div class='stage-card-value'>72.0%</div><div class='stage-card-sub'>Operational Cost</div></div>", unsafe_allow_html=True)
 
+    # --- MIDDLE ROW (Charts in Blue Border Cards) ---
+    chart_col1, chart_col2 = st.columns([1, 1.8])
 
-# --- RIGHT COLUMN (I I STAGING) ---
-with right_col:
-    st.markdown("<div class='staging-title'>I I STAGING</div>", unsafe_allow_html=True)
-    
-    st.markdown("""
-        <div class='stage-card stage-1'>
-            <div class='stage-card-title'>I I STAGE 1</div><hr>
-            <div class='stage-card-value'>475 M <span class='stage-card-pct'>(2.9%)</span></div>
-        </div>
-        <div class='stage-card stage-2'>
-            <div class='stage-card-title'>I I STAGE 2</div><hr>
-            <div class='stage-card-value'>66 M <span class='stage-card-pct'>(0.4%)</span></div>
-        </div>
-        <div class='stage-card stage-3'>
-            <div class='stage-card-title'>I I STAGE 3</div><hr>
-            <div class='stage-card-value'>85 M <span class='stage-card-pct'>(0.5%)</span></div>
-        </div>
-    """, unsafe_allow_html=True)
+    with chart_col1:
+        st.markdown("<div class='center-card'><div class='center-title'>Income Margin Distribution</div><hr style='border-top:1px solid #E2E8F0; margin:10px 0;'>", unsafe_allow_html=True)
+        fig_margin = go.Figure(data=[go.Pie(
+            labels=['Core Ops', 'New Proj', 'Invest Yields'], values=[70, 20, 10], hole=0.75,
+            marker_colors=[BLUE_ACCENT, '#60A5FA', GREEN_ACCENT], textinfo='label+percent', textposition='outside',
+            marker=dict(line=dict(color='#FFFFFF', width=2)), pull=[0.05, 0, 0] 
+        )])
+        fig_margin.update_layout(
+            annotations=[dict(text="Margin<br><b style='font-size:24px; color:#000;'>28.0%</b>", x=0.5, y=0.5, font=CHART_FONT, showarrow=False)],
+            showlegend=False, margin=dict(t=10, b=10, l=10, r=10), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=220, font=CHART_FONT
+        )
+        st.plotly_chart(fig_margin, use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with chart_col2:
+        st.markdown("<div class='center-card'><div class='center-title'>Profit & Loss Quarterly Trend</div><hr style='border-top:1px solid #E2E8F0; margin:10px 0;'>", unsafe_allow_html=True)
+        fig_trend = go.Figure()
+        fig_trend.add_trace(go.Scatter(x=['Apr', 'May', 'Jun'], y=[65000, 78000, 87000], name='Total Income', line=dict(color=BLUE_ACCENT, width=3, shape='spline'), mode='lines+markers', marker=dict(size=8)))
+        fig_trend.add_trace(go.Scatter(x=['Apr', 'May', 'Jun'], y=[48000, 55000, 65000], name='Total Expenses', line=dict(color=GREEN_ACCENT, width=3, shape='spline'), mode='lines+markers', marker=dict(size=8)))
+        fig_trend.update_layout(
+            margin=dict(t=10, b=10, l=10, r=10), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+            legend=dict(yanchor="bottom", y=0.1, xanchor="right", x=0.95),
+            xaxis=dict(showgrid=False), yaxis=dict(showgrid=True, gridcolor='#F1F5F9', zeroline=False), height=220, font=CHART_FONT
+        )
+        st.plotly_chart(fig_trend, use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # --- BOTTOM ROW (More Charts & KPIs) ---
+    bot_col1, bot_col2, bot_col3, bot_col4 = st.columns([1.2, 1.2, 1, 1.8])
+
+    with bot_col1:
+        st.markdown("<div class='stage-card'><div class='stage-card-title'>Portfolio Split</div><hr>", unsafe_allow_html=True)
+        fig_treasury = go.Figure(data=[go.Pie(labels=['T-Bills', 'Corp Bonds', 'Cash/Equiv', 'Sov Bonds', 'REITs'], values=[35, 25, 20, 15, 5], hole=0.6, marker_colors=[BLUE_ACCENT, '#3B82F6', '#60A5FA', '#93C5FD', '#BFDBFE'], textinfo='label', textposition='outside', marker=dict(line=dict(color='#FFFFFF', width=2)))])
+        fig_treasury.update_layout(showlegend=False, margin=dict(t=10, b=10, l=10, r=10), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=200, font=CHART_FONT)
+        st.plotly_chart(fig_treasury, use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with bot_col2:
+        st.markdown("<div class='stage-card'><div class='stage-card-title'>Expense Breakdown</div><hr>", unsafe_allow_html=True)
+        fig_exp = go.Figure(data=[go.Pie(labels=['Salaries', 'R&D', 'Rent', 'Marketing', 'Infra'], values=[40, 18, 15, 12, 15], hole=0.6, marker_colors=[GREEN_ACCENT, '#34D399', '#6EE7B7', '#A7F3D0', '#D1FAE5'], textinfo='label', textposition='outside', marker=dict(line=dict(color='#FFFFFF', width=2)))])
+        fig_exp.update_layout(showlegend=False, margin=dict(t=10, b=10, l=10, r=10), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=200, font=CHART_FONT)
+        st.plotly_chart(fig_exp, use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with bot_col3:
+        st.markdown("""
+            <div class='stage-card' style='padding: 22px 10px;'>
+                <div class='stage-card-title'>Highest Profit Rate</div><hr>
+                <div class='stage-card-value' style='color:#2563EB;'>5.35%</div>
+                <div class='stage-card-sub'>Premier Trust Bank (Jul)</div>
+            </div>
+            <div class='stage-card' style='padding: 22px 10px;'>
+                <div class='stage-card-title'>MhePR</div><hr>
+                <div class='stage-card-value' style='color:#2563EB;'>4.80%</div>
+                <div class='stage-card-sub'>Next Date: Aug 14</div>
+            </div>
+        """, unsafe_allow_html=True)
+
+    with bot_col4:
+        st.markdown("<div class='stage-card'><div class='stage-card-title'>Budget vs. Actual</div><hr>", unsafe_allow_html=True)
+        fig_bar = go.Figure()
+        categories = ['Others', 'Infra', 'Market', 'Rent', 'R&D', 'Salaries']
+        fig_bar.add_trace(go.Bar(y=categories, x=[3253, 17800, 13300, 5820, 9200, 28500], name='Budget', orientation='h', marker_color='#94A3B8'))
+        fig_bar.add_trace(go.Bar(y=categories, x=[7048, 22030, 10488, 11343, 15580, 25580], name='Actual', orientation='h', marker_color=BLUE_ACCENT))
+        fig_bar.update_layout(barmode='group', margin=dict(t=10, b=10, l=10, r=10), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', legend=dict(yanchor="bottom", y=0.1, xanchor="right", x=0.95), xaxis=dict(showgrid=True, gridcolor='#F1F5F9'), yaxis=dict(showgrid=False), height=200, font=CHART_FONT)
+        st.plotly_chart(fig_bar, use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
