@@ -13,31 +13,75 @@ EXCEL_FILE = "Treasury Income FY26'27 - July26.xlsx"
 # DYNAMIC DATA INGESTION FROM EXCEL
 # ---------------------------------------------------------
 try:
-    df_dash = pd.read_excel(EXCEL_FILE, sheet_name='Dashboard ')
-    total_income_jul = df_dash.iloc[8, 2] if not pd.isna(df_dash.iloc[8, 2]) else 99524284
+    df_dash = pd.read_excel(EXCEL_FILE, sheet_name='Dashboard ', header=None)
     
-    df_pool = pd.read_excel(EXCEL_FILE, sheet_name='Treasury Pool')
-    total_pool_val = df_pool.iloc[10, 2] if not pd.isna(df_pool.iloc[10, 2]) else 15586710293
+    # Helper function to get row value safely
+    def get_dash_val(row_idx, col_idx):
+        if row_idx < len(df_dash) and col_idx < df_dash.shape[1]:
+            val = df_dash.iloc[row_idx, col_idx]
+            return float(val) if pd.notna(val) and isinstance(val, (int, float)) else 0.0
+        return 0.0
 
-    lr_funds = df_pool.iloc[3, 2] / 1e6
-    osr_funds = df_pool.iloc[4, 2] / 1e6
-    inv_cdel = df_pool.iloc[5, 2] / 1e6
-    rpa_acc = df_pool.iloc[6, 2] / 1e6
-    wv_greenfin = df_pool.iloc[7, 2] / 1e6
-    op_funds = df_pool.iloc[8, 2] / 1e6
+    # Monthly Incomes (Row 9 in Excel -> index 8 in 0-indexed pandas)
+    inc_jul = get_dash_val(8, 2) / 1e6
+    inc_aug = get_dash_val(8, 3) / 1e6
+    inc_sep = get_dash_val(8, 4) / 1e6
+    inc_oct = get_dash_val(8, 5) / 1e6
+    inc_nov = get_dash_val(8, 6) / 1e6
+    inc_dec = get_dash_val(8, 7) / 1e6
+    inc_jan = get_dash_val(8, 8) / 1e6
+    inc_feb = get_dash_val(8, 9) / 1e6
+    inc_mar = get_dash_val(8, 10) / 1e6
+    inc_apr = get_dash_val(8, 11) / 1e6
+    inc_may = get_dash_val(8, 12) / 1e6
+    inc_jun = get_dash_val(8, 13) / 1e6
 
+    # July Margin Breakdown (Rows 3, 4, 5 in Excel -> index 2, 3, 4)
+    osr_jul = get_dash_val(2, 2) / 1e6
+    rpa_jul = get_dash_val(3, 2) / 1e6
+    esc_jul = get_dash_val(4, 2) / 1e6
+
+    # --- Treasury Pool Sheet Parsing ---
+    df_pool = pd.read_excel(EXCEL_FILE, sheet_name='Treasury Pool', header=None)
+    
+    def get_pool_val(row_idx, col_idx):
+        if row_idx < len(df_pool) and col_idx < df_pool.shape[1]:
+            val = df_pool.iloc[row_idx, col_idx]
+            return float(val) if pd.notna(val) and isinstance(val, (int, float)) else 0.0
+        return 0.0
+
+    pool_jul = get_pool_val(10, 2) / 1e6
+    pool_aug = get_pool_val(10, 3) / 1e6
+    pool_sep = get_pool_val(10, 4) / 1e6
+
+    # Latest Pool Breakdown (July)
+    lr_funds = get_pool_val(3, 2) / 1e6
+    osr_funds = get_pool_val(4, 2) / 1e6
+    inv_cdel = get_pool_val(5, 2) / 1e6
+    rpa_acc = get_pool_val(6, 2) / 1e6
+    wv_greenfin = get_pool_val(7, 2) / 1e6
+    op_funds = get_pool_val(8, 2) / 1e6
+
+    # --- MPR Sheet Parsing ---
     df_mpr = pd.read_excel(EXCEL_FILE, sheet_name='MPR')
     mpr_rate = float(df_mpr.iloc[0]['MPC Rate']) * 100
     next_mpr_date = pd.to_datetime(df_mpr.iloc[1]['MPC Meeting Date']).strftime('%b %d, %Y')
 
-    df_rates = pd.read_excel(EXCEL_FILE, sheet_name='Profit Rates', header=None)
+    # --- Profit Rates Sheet Parsing ---
+    df_rates = pd.read_excel(EXCEL_FILE, sheet_name='Profit Rates')
+
 except Exception as e:
-    total_income_jul, total_pool_val, mpr_rate = 99524284, 15586710293, 11.50
-    next_mpr_date = "Sep 14, 2026"
+    inc_jul, inc_aug, inc_sep = 99.52, 0.0, 0.0
+    inc_oct, inc_nov, inc_dec = 0.0, 0.0, 0.0
+    inc_jan, inc_feb, inc_mar = 0.0, 0.0, 0.0
+    inc_apr, inc_may, inc_jun = 0.0, 0.0, 0.0
+    osr_jul, rpa_jul, esc_jul = 97.38, 1.15, 1.00
+    pool_jul, pool_aug, pool_sep = 15586.71, 15890.70, 16278.35
     lr_funds, osr_funds, inv_cdel, rpa_acc, wv_greenfin, op_funds = 5521.09, 9310.81, 98.91, 250.56, 337.10, 68.24
+    mpr_rate, next_mpr_date = 11.50, "Sep 14, 2026"
     df_rates = pd.DataFrame()
 
-# Helper to fetch bank profit rates per quarter directly from Excel
+# Helper to fetch bank profit rates per quarter robustly from Excel (using iloc[-1])
 quarter_months_map = {
     "Q1": [("Jul 2026", 0), ("Aug 2026", 1), ("Sep 2026", 2)],
     "Q2": [("Oct 2026", 3), ("Nov 2026", 4), ("Dec 2026", 5)],
@@ -50,10 +94,9 @@ def get_quarter_rates(q_key):
     result = []
     for month_label, col_idx in months:
         raw_val = None
-        if not df_rates.empty and len(df_rates) > 3 and col_idx < df_rates.shape[1]:
-            raw_val = df_rates.iloc[3, col_idx]
+        if not df_rates.empty and col_idx < df_rates.shape[1]:
+            raw_val = df_rates.iloc[-1, col_idx] # Always gets the last row containing rate text
         
-        # Display 'Pending / Not Updated' if cell in Excel is blank/NaN
         if pd.isna(raw_val) or not str(raw_val).strip():
             rates_list = ["Pending / Not Updated"]
         else:
@@ -68,50 +111,53 @@ def get_quarter_rates(q_key):
     return result
 
 # Quarterly Data Mapping Engine 
+q1_total_income = inc_jul + inc_aug + inc_sep
+q1_pool = pool_sep if pool_sep > 0 else (pool_aug if pool_aug > 0 else pool_jul)
+
 quarter_data = {
     "Q1": {
         "period": "Q1 (Jul - Sep 2026)",
-        "total_income": 298.57,
-        "treasury_pool": total_pool_val / 1e6,
-        "forecasted_income": 312.40,
+        "total_income": q1_total_income,
+        "treasury_pool": q1_pool,
+        "forecasted_income": q1_total_income if q1_total_income > 0 else 312.40,
         "annual_yield": "11.30%",
         "months": ['Jul 26', 'Aug 26', 'Sep 26'],
-        "income_trend": [99.5, 105.2, 107.8],
-        "margin_labels": ['OSR Savings', 'Operational Fees', 'Interest Income', 'Core Income'],
-        "margin_values": [97.38, 45.00, 105.00, 51.19]
+        "income_trend": [inc_jul, inc_aug, inc_sep],
+        "margin_labels": ['OSR Savings', 'RPA Savings', 'Escrow Savings'],
+        "margin_values": [osr_jul, rpa_jul, esc_jul] if osr_jul > 0 else [97.38, 1.15, 1.00]
     },
     "Q2": {
         "period": "Q2 (Oct - Dec 2026)",
-        "total_income": 310.25,
-        "treasury_pool": 15890.70,
-        "forecasted_income": 325.80,
-        "annual_yield": "11.45%",
+        "total_income": inc_oct + inc_nov + inc_dec,
+        "treasury_pool": 0.0,
+        "forecasted_income": 0.0,
+        "annual_yield": "N/A",
         "months": ['Oct 26', 'Nov 26', 'Dec 26'],
-        "income_trend": [102.1, 104.3, 103.8],
-        "margin_labels": ['OSR Savings', 'Operational Fees', 'Interest Income', 'Core Income'],
-        "margin_values": [98.50, 48.20, 110.00, 53.55]
+        "income_trend": [inc_oct, inc_nov, inc_dec],
+        "margin_labels": ['OSR Savings', 'RPA Savings', 'Escrow Savings'],
+        "margin_values": [0, 0, 0]
     },
     "Q3": {
         "period": "Q3 (Jan - Mar 2027)",
-        "total_income": 322.80,
-        "treasury_pool": 16278.35,
-        "forecasted_income": 338.50,
-        "annual_yield": "11.60%",
+        "total_income": inc_jan + inc_feb + inc_mar,
+        "treasury_pool": 0.0,
+        "forecasted_income": 0.0,
+        "annual_yield": "N/A",
         "months": ['Jan 27', 'Feb 27', 'Mar 27'],
-        "income_trend": [105.4, 108.2, 109.2],
-        "margin_labels": ['OSR Savings', 'Operational Fees', 'Interest Income', 'Core Income'],
-        "margin_values": [101.20, 50.00, 115.00, 56.60]
+        "income_trend": [inc_jan, inc_feb, inc_mar],
+        "margin_labels": ['OSR Savings', 'RPA Savings', 'Escrow Savings'],
+        "margin_values": [0, 0, 0]
     },
     "Q4": {
         "period": "Q4 (Apr - Jun 2027)",
-        "total_income": 335.40,
-        "treasury_pool": 16500.00,
-        "forecasted_income": 350.00,
-        "annual_yield": "11.75%",
+        "total_income": inc_apr + inc_may + inc_jun,
+        "treasury_pool": 0.0,
+        "forecasted_income": 0.0,
+        "annual_yield": "N/A",
         "months": ['Apr 27', 'May 27', 'Jun 27'],
-        "income_trend": [110.1, 112.3, 113.0],
-        "margin_labels": ['OSR Savings', 'Operational Fees', 'Interest Income', 'Core Income'],
-        "margin_values": [104.50, 52.00, 120.00, 58.90]
+        "income_trend": [inc_apr, inc_may, inc_jun],
+        "margin_labels": ['OSR Savings', 'RPA Savings', 'Escrow Savings'],
+        "margin_values": [0, 0, 0]
     }
 }
 
@@ -370,7 +416,7 @@ with st.spinner("Rendering Visualizations..."):
     with bot2:
         st.markdown(f"<div class='card' style='border-top-color:#10B981;'><div class='card-title'>INCOME TYPE BREAKDOWN</div>", unsafe_allow_html=True)
         fig_exp = go.Figure(data=[go.Pie(
-            labels=['OSR Savings', 'RPA Savings', 'Escrow'], values=[97.38, 1.15, 1.00], hole=0.60,
+            labels=['OSR Savings', 'RPA Savings', 'Escrow'], values=[osr_jul, rpa_jul, esc_jul] if osr_jul > 0 else [97.38, 1.15, 1.00], hole=0.60,
             marker_colors=[GREEN_ACCENT, '#34D399', '#6EE7B7'], textinfo='label', textposition='outside',
             marker=dict(line=dict(color='#FFFFFF', width=2))
         )])
@@ -382,7 +428,7 @@ with st.spinner("Rendering Visualizations..."):
         st.markdown(f"<div class='card' style='border-top-color:#10B981;'><div class='card-title'>FUND POOL ALLOCATION</div>", unsafe_allow_html=True)
         fig_bar = go.Figure()
         categories = ['Operational', 'WV Greenfin', 'RPA A/c', 'Inv/CDEL', 'LR Funds', 'OSR Funds']
-        fig_bar.add_trace(go.Bar(y=categories, x=[68, 337, 250, 98, 5521, 9310], name='Actual Pool', orientation='h', marker_color=BLUE_ACCENT))
+        fig_bar.add_trace(go.Bar(y=categories, x=[op_funds, wv_greenfin, rpa_acc, inv_cdel, lr_funds, osr_funds], name='Actual Pool', orientation='h', marker_color=BLUE_ACCENT))
         fig_bar.update_layout(
             barmode='group', margin=dict(t=20, b=20, l=10, r=10), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', 
             legend=dict(yanchor="bottom", y=0.05, xanchor="right", x=0.95, font=dict(color="#0F172A", size=12)), 
