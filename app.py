@@ -117,16 +117,17 @@ st.markdown("""
     header { visibility: hidden; height: 0; }
     .block-container { padding-top: 1rem !important; padding-bottom: 2rem !important; padding-left: 2rem !important; padding-right: 2rem !important; max-width: 100% !important; }
 
+    /* Top Glowing Header */
     .header-container { display: flex; align-items: center; justify-content: center; margin-top: 0px !important; margin-bottom: 12px; }
     .glow-line { height: 3px; flex-grow: 1; max-width: 380px; background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.6), transparent); box-shadow: 0 0 12px rgba(59, 130, 246, 0.6); }
     .header-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 12px 40px; margin: 0 20px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05); font-weight: 900; font-size: 26px; color: #000000; letter-spacing: 1.5px; text-transform: uppercase; }
 
-    /* Centered & Scaled KPI Cards */
+    /* Centered & Scaled Top KPI Cards */
     .kpi-card { 
         background: #FFFFFF; 
         border: 1px solid #E2E8F0; 
         border-radius: 14px; 
-        padding: 20px 16px; 
+        padding: 22px 18px; 
         box-shadow: 0 4px 14px rgba(0,0,0,0.03); 
         height: 100%; 
         display: flex; 
@@ -138,37 +139,61 @@ st.markdown("""
     }
     .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.07); }
     .kpi-title { font-size: 14px; font-weight: 800; color: #0F172A; text-transform: uppercase; letter-spacing: 0.8px; width: 100%; }
-    .kpi-value { font-size: 28px; font-weight: 900; color: #0F172A; line-height: 1.2; margin-top: 6px; width: 100%; }
-    .kpi-sub { font-size: 13px; font-weight: 600; color: #64748B; margin-top: 4px; width: 100%; }
-    .kpi-divider { border: 0; border-top: 1px solid #E2E8F0; margin: 10px 0; width: 80%; }
+    .kpi-value { font-size: 30px; font-weight: 900; color: #0F172A; line-height: 1.2; margin-top: 8px; width: 100%; }
+    .kpi-sub { font-size: 13px; font-weight: 600; color: #64748B; margin-top: 6px; width: 100%; }
+    .kpi-divider { border: 0; border-top: 1px solid #E2E8F0; margin: 10px 0; width: 85%; }
 
-    /* Blue Accent Cards for Charts */
-    .blue-card {
+    /* Unified Card Containers for Header + Chart */
+    .card {
         background: #FFFFFF;
         border: 1px solid #E2E8F0;
-        border-top: 4px solid #2563EB; 
+        border-top: 4px solid #2563EB;
         border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+        padding: 20px 22px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.05);
         height: 100%;
         display: flex;
         flex-direction: column;
-        align-items: center;
+        justify-content: space-between;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .blue-card-title {
-        font-size: 16px;
+    .card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,0.08); }
+    
+    .card-title {
+        font-size: 15px;
         font-weight: 800;
         color: #0F172A;
         text-transform: uppercase;
         letter-spacing: 1px;
-        margin-bottom: 10px;
         text-align: center;
+        margin-bottom: 12px;
         width: 100%;
     }
 
+    /* Refined Right-Side Rate Cards */
+    .rate-card {
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-top: 4px solid #2563EB;
+        border-radius: 16px;
+        padding: 22px 18px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .rate-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,0.08); }
+    .rate-card-title { font-size: 14px; font-weight: 800; color: #0F172A; text-transform: uppercase; letter-spacing: 0.8px; width: 100%; }
+    .rate-card-value { font-size: 36px; font-weight: 900; color: #2563EB; line-height: 1.1; margin-top: 10px; width: 100%; }
+    .rate-card-sub { font-size: 13px; font-weight: 600; color: #64748B; margin-top: 8px; width: 100%; }
+
     div[data-testid="stPlotlyChart"] { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
 
-    .screen-2-header { margin-top: 45px; margin-bottom: 20px; text-align: center; }
+    .screen-2-header { margin-top: 40px; margin-bottom: 20px; text-align: center; }
     .screen-2-header h3 { font-size: 20px; font-weight: 900; color: #0F172A; letter-spacing: 1.2px; text-transform: uppercase; margin: 0; }
     div[data-baseweb="select"] > div { border-radius: 10px; font-size: 14px; font-weight: 600; }
     </style>
@@ -196,7 +221,7 @@ with st.spinner("Rendering Visualizations..."):
     q_ctx = quarter_data[selected_q]
     st.write("")
 
-    # 4 Centered KPI Cards
+    # 4 Centered Top KPI Cards
     kpi1, kpi2, kpi3, kpi4 = st.columns(4, gap="medium")
     with kpi1:
         st.markdown(f"<div class='kpi-card'><div class='kpi-title'>Total Income</div><hr class='kpi-divider'><div class='kpi-value'>{q_ctx['total_income']:,.2f} PKR Mns</div><div class='kpi-sub'>Quarterly Income ({selected_q})</div></div>", unsafe_allow_html=True)
@@ -209,11 +234,12 @@ with st.spinner("Rendering Visualizations..."):
 
     st.write("")
 
-    # Screen 1 Charts with Rate & MhePR Cards placed beside the Income Trend Graph
-    sc1_left, sc1_mid, sc1_cards = st.columns([1.1, 1.1, 0.8], gap="medium")
+    # Equalize Middle Row Height (1fr, 1.5fr, 0.8fr)
+    sc1_left, sc1_mid, sc1_cards = st.columns([1, 1.5, 0.8], gap="medium")
 
+    # --- Donut Chart Card ---
     with sc1_left:
-        st.markdown(f"<div class='blue-card'><div class='blue-card-title'>INCOME MARGIN DISTRIBUTION ({selected_q})</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='card'><div class='card-title'>INCOME MARGIN DISTRIBUTION ({selected_q})</div>", unsafe_allow_html=True)
         fig_margin = go.Figure(data=[go.Pie(
             labels=q_ctx['margin_labels'], 
             values=q_ctx['margin_values'], hole=0.68,
@@ -228,31 +254,32 @@ with st.spinner("Rendering Visualizations..."):
             margin=dict(t=20, b=20, l=40, r=40), 
             paper_bgcolor='rgba(0,0,0,0)', 
             plot_bgcolor='rgba(0,0,0,0)', 
-            height=300, 
+            height=310, 
             font=CHART_FONT
         )
         st.plotly_chart(fig_margin, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
+    # --- Line Chart Card (Full 100% Canvas Width Expansion) ---
     with sc1_mid:
-        st.markdown(f"<div class='blue-card'><div class='blue-card-title'>INCOME TREND ({selected_q})</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='card'><div class='card-title'>INCOME TREND ({selected_q})</div>", unsafe_allow_html=True)
         fig_trend = go.Figure()
         
         fig_trend.add_trace(go.Scatter(
             x=q_ctx['months'], 
             y=q_ctx['income_trend'], 
             name='Total Income', 
-            line=dict(color=BLUE_ACCENT, width=2.5, shape='spline', smoothing=0.3), 
+            line=dict(color=BLUE_ACCENT, width=3, shape='spline', smoothing=0.3), 
             mode='lines+markers', 
-            marker=dict(size=8)
+            marker=dict(size=9, color=BLUE_ACCENT)
         ))
         
         fig_trend.update_layout(
-            margin=dict(t=15, b=15, l=15, r=15), 
+            margin=dict(t=15, b=20, l=20, r=20), 
             paper_bgcolor='rgba(0,0,0,0)', 
             plot_bgcolor='rgba(0,0,0,0)',
             showlegend=False, 
-            xaxis=dict(showgrid=False, tickfont=dict(color="#0F172A", size=13), range=[-0.8, 2.8]), 
+            xaxis=dict(showgrid=False, tickfont=dict(color="#0F172A", size=13)), 
             yaxis=dict(
                 showgrid=True, gridcolor='#E2E8F0', 
                 tickfont=dict(color="#0F172A", size=13), 
@@ -260,29 +287,30 @@ with st.spinner("Rendering Visualizations..."):
                 tickformat="d",
                 ticksuffix=" PKR Mns"
             ), 
-            height=200, 
+            height=310, 
             font=CHART_FONT
         )
         st.plotly_chart(fig_trend, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
+    # --- Right-Side Rate Cards ---
     with sc1_cards:
         st.markdown(f"""
-            <div style='display: flex; flex-direction: column; height: 350px; justify-content: space-between;'>
-                <div class='kpi-card' style='text-align: center; height: 168px;'>
-                    <div class='kpi-title' style='font-size: 13px;'>Highest Profit Rate</div><hr class='kpi-divider'>
-                    <div class='kpi-value' style='color:#2563EB; font-size: 28px;'>{top_bank_rate}</div>
-                    <div class='kpi-sub'>{top_bank_name}</div>
+            <div style='display: flex; flex-direction: column; height: 380px; justify-content: space-between; gap: 16px;'>
+                <div class='rate-card'>
+                    <div class='rate-card-title'>Highest Profit Rate</div><hr class='kpi-divider'>
+                    <div class='rate-card-value'>{top_bank_rate}</div>
+                    <div class='rate-card-sub'>{top_bank_name}</div>
                 </div>
-                <div class='kpi-card' style='text-align: center; height: 168px;'>
-                    <div class='kpi-title' style='font-size: 13px;'>MhePR</div><hr class='kpi-divider'>
-                    <div class='kpi-value' style='color:#2563EB; font-size: 28px;'>{mpr_rate:.2f}%</div>
-                    <div class='kpi-sub'>Next Date: {next_mpr_date}</div>
+                <div class='rate-card'>
+                    <div class='rate-card-title'>MhePR</div><hr class='kpi-divider'>
+                    <div class='rate-card-value'>{mpr_rate:.2f}%</div>
+                    <div class='rate-card-sub'>Next Date: {next_mpr_date}</div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
 
-    # SCREEN 2: BOTTOM SECTION (3 Columns now that Rates moved to Screen 1)
+    # SCREEN 2: BOTTOM SECTION
     st.markdown("""
         <div class="screen-2-header">
             <h3>Detailed Treasury Portfolio Breakdown</h3>
@@ -292,7 +320,7 @@ with st.spinner("Rendering Visualizations..."):
     bot1, bot2, bot3 = st.columns([1, 1, 1.4], gap="medium")
 
     with bot1:
-        st.markdown(f"<div class='blue-card' style='border-top-color:#10B981;'><div class='blue-card-title'>TREASURY POOL SPLIT</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='card' style='border-top-color:#10B981;'><div class='card-title'>TREASURY POOL SPLIT</div>", unsafe_allow_html=True)
         fig_treasury = go.Figure(data=[go.Pie(
             labels=['OSR Funds', 'LR Funds', 'WV Greenfin', 'RPA A/c', 'Inv/CDEL', 'Operational'], 
             values=[osr_funds, lr_funds, wv_greenfin, rpa_acc, inv_cdel, op_funds], hole=0.60,
@@ -304,7 +332,7 @@ with st.spinner("Rendering Visualizations..."):
         st.markdown("</div>", unsafe_allow_html=True)
 
     with bot2:
-        st.markdown(f"<div class='blue-card' style='border-top-color:#10B981;'><div class='blue-card-title'>INCOME TYPE BREAKDOWN</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='card' style='border-top-color:#10B981;'><div class='card-title'>INCOME TYPE BREAKDOWN</div>", unsafe_allow_html=True)
         fig_exp = go.Figure(data=[go.Pie(
             labels=['OSR Savings', 'RPA Savings', 'Escrow'], values=[97.38, 1.15, 1.00], hole=0.60,
             marker_colors=[GREEN_ACCENT, '#34D399', '#6EE7B7'], textinfo='label', textposition='outside',
@@ -315,7 +343,7 @@ with st.spinner("Rendering Visualizations..."):
         st.markdown("</div>", unsafe_allow_html=True)
 
     with bot3:
-        st.markdown(f"<div class='blue-card' style='border-top-color:#10B981;'><div class='blue-card-title'>FUND POOL ALLOCATION</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='card' style='border-top-color:#10B981;'><div class='card-title'>FUND POOL ALLOCATION</div>", unsafe_allow_html=True)
         fig_bar = go.Figure()
         categories = ['Operational', 'WV Greenfin', 'RPA A/c', 'Inv/CDEL', 'LR Funds', 'OSR Funds']
         fig_bar.add_trace(go.Bar(y=categories, x=[68, 337, 250, 98, 5521, 9310], name='Actual Pool', orientation='h', marker_color=BLUE_ACCENT))
