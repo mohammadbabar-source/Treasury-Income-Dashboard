@@ -9,7 +9,9 @@ st.set_page_config(page_title="Treasury Summary FY26-27", layout="wide", initial
 # File Reference
 EXCEL_FILE = "Treasury Income FY26'27 - July26.xlsx"
 
-# Dynamic Data Ingestion with Safe Fallbacks
+# ---------------------------------------------------------
+# DYNAMIC DATA INGESTION FROM EXCEL
+# ---------------------------------------------------------
 try:
     df_dash = pd.read_excel(EXCEL_FILE, sheet_name='Dashboard ')
     total_income_jul = df_dash.iloc[8, 2] if not pd.isna(df_dash.iloc[8, 2]) else 99524284
@@ -28,14 +30,41 @@ try:
     mpr_rate = float(df_mpr.iloc[0]['MPC Rate']) * 100
     next_mpr_date = pd.to_datetime(df_mpr.iloc[1]['MPC Meeting Date']).strftime('%b %d, %Y')
 
-    df_rates = pd.read_excel(EXCEL_FILE, sheet_name='Profit Rates')
-    top_bank_rate = "11.30%"
-    top_bank_name = "Samba Bank (Jul)"
+    df_rates = pd.read_excel(EXCEL_FILE, sheet_name='Profit Rates', header=None)
 except Exception as e:
     total_income_jul, total_pool_val, mpr_rate = 99524284, 15586710293, 11.50
     next_mpr_date = "Sep 14, 2026"
     lr_funds, osr_funds, inv_cdel, rpa_acc, wv_greenfin, op_funds = 5521.09, 9310.81, 98.91, 250.56, 337.10, 68.24
-    top_bank_rate, top_bank_name = "11.30%", "Samba Bank (Jul)"
+    df_rates = pd.DataFrame()
+
+# Helper to fetch bank profit rates per quarter directly from Excel
+quarter_months_map = {
+    "Q1": [("Jul 2026", 0), ("Aug 2026", 1), ("Sep 2026", 2)],
+    "Q2": [("Oct 2026", 3), ("Nov 2026", 4), ("Dec 2026", 5)],
+    "Q3": [("Jan 2027", 6), ("Feb 2027", 7), ("Mar 2027", 8)],
+    "Q4": [("Apr 2027", 9), ("May 2027", 10), ("Jun 2027", 11)],
+}
+
+def get_quarter_rates(q_key):
+    months = quarter_months_map.get(q_key, quarter_months_map["Q1"])
+    result = []
+    for month_label, col_idx in months:
+        raw_val = None
+        if not df_rates.empty and len(df_rates) > 3 and col_idx < df_rates.shape[1]:
+            raw_val = df_rates.iloc[3, col_idx]
+        
+        if pd.isna(raw_val) or not str(raw_val).strip():
+            rates_list = ["1. Samba 11.30%", "2. UBL 11.00%", "3. BAFL 10.75%"]
+        else:
+            lines = str(raw_val).strip().split('\n')
+            rates_list = [line.replace('%%', '%').strip() for line in lines if line.strip()]
+        
+        result.append({
+            "month": month_label,
+            "rates": rates_list,
+            "inline": " &bull; ".join(rates_list)
+        })
+    return result
 
 # Quarterly Data Mapping Engine 
 quarter_data = {
@@ -141,7 +170,7 @@ st.markdown("""
     .kpi-title { font-size: 14px; font-weight: 800; color: #0F172A; text-transform: uppercase; letter-spacing: 0.8px; width: 100%; }
     .kpi-value { font-size: 30px; font-weight: 900; color: #0F172A; line-height: 1.2; margin-top: 8px; width: 100%; }
     .kpi-sub { font-size: 13px; font-weight: 600; color: #64748B; margin-top: 6px; width: 100%; }
-    .kpi-divider { border: 0; border-top: 1px solid #E2E8F0; margin: 10px 0; width: 85%; }
+    .kpi-divider { border: 0; border-top: 1px solid #E2E8F0; margin: 8px 0; width: 85%; }
 
     /* Unified Card Containers for Header + Chart */
     .card {
@@ -170,26 +199,23 @@ st.markdown("""
         width: 100%;
     }
 
-    /* Refined Right-Side Rate Cards */
+    /* Refined Bank Profit Rates Container */
     .rate-card {
         background: #FFFFFF;
         border: 1px solid #E2E8F0;
         border-top: 4px solid #2563EB;
         border-radius: 16px;
-        padding: 22px 18px;
+        padding: 16px 18px;
         box-shadow: 0 6px 20px rgba(0,0,0,0.05);
-        height: 100%;
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
         text-align: center;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
     .rate-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,0.08); }
     .rate-card-title { font-size: 14px; font-weight: 800; color: #0F172A; text-transform: uppercase; letter-spacing: 0.8px; width: 100%; }
-    .rate-card-value { font-size: 36px; font-weight: 900; color: #2563EB; line-height: 1.1; margin-top: 10px; width: 100%; }
-    .rate-card-sub { font-size: 13px; font-weight: 600; color: #64748B; margin-top: 8px; width: 100%; }
 
     div[data-testid="stPlotlyChart"] { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
 
@@ -219,6 +245,7 @@ with st.spinner("Rendering Visualizations..."):
         selected_q = st.selectbox("", ["Q1", "Q2", "Q3", "Q4"], label_visibility="collapsed")
 
     q_ctx = quarter_data[selected_q]
+    q_rates_list = get_quarter_rates(selected_q)
     st.write("")
 
     # 4 Centered Top KPI Cards
@@ -234,8 +261,8 @@ with st.spinner("Rendering Visualizations..."):
 
     st.write("")
 
-    # Equalize Middle Row Height (1fr, 1.5fr, 0.8fr)
-    sc1_left, sc1_mid, sc1_cards = st.columns([1, 1.5, 0.8], gap="medium")
+    # Screen 1 Charts with Bank Profit Rates (All 3 months) & MhePR Cards
+    sc1_left, sc1_mid, sc1_cards = st.columns([1, 1.4, 0.9], gap="medium")
 
     # --- Donut Chart Card ---
     with sc1_left:
@@ -260,7 +287,7 @@ with st.spinner("Rendering Visualizations..."):
         st.plotly_chart(fig_margin, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # --- Line Chart Card (Full 100% Canvas Width Expansion) ---
+    # --- Line Chart Card ---
     with sc1_mid:
         st.markdown(f"<div class='card'><div class='card-title'>INCOME TREND ({selected_q})</div>", unsafe_allow_html=True)
         fig_trend = go.Figure()
@@ -293,19 +320,27 @@ with st.spinner("Rendering Visualizations..."):
         st.plotly_chart(fig_trend, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # --- Right-Side Rate Cards ---
+    # --- Right-Side Rate Cards: Profit Rates across all 3 months of Quarter + MhePR ---
+    rates_boxes_html = ""
+    for month_info in q_rates_list:
+        rates_boxes_html += f"""
+        <div style='background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 6px 10px; margin-bottom: 6px; text-align: left;'>
+            <div style='font-size: 11px; font-weight: 800; color: #2563EB; text-transform: uppercase; letter-spacing: 0.5px;'>{month_info['month']}</div>
+            <div style='font-size: 12px; font-weight: 700; color: #0F172A; margin-top: 2px; line-height: 1.2;'>{month_info['inline']}</div>
+        </div>
+        """
+
     with sc1_cards:
         st.markdown(f"""
-            <div style='display: flex; flex-direction: column; height: 380px; justify-content: space-between; gap: 16px;'>
-                <div class='rate-card'>
-                    <div class='rate-card-title'>Highest Profit Rate</div><hr class='kpi-divider'>
-                    <div class='rate-card-value'>{top_bank_rate}</div>
-                    <div class='rate-card-sub'>{top_bank_name}</div>
+            <div style='display: flex; flex-direction: column; height: 380px; justify-content: space-between; gap: 12px;'>
+                <div class='rate-card' style='height: 250px;'>
+                    <div class='rate-card-title'>Bank Profit Rates ({selected_q})</div><hr class='kpi-divider' style='margin: 6px 0 8px 0;'>
+                    <div style='width: 100%;'>{rates_boxes_html}</div>
                 </div>
-                <div class='rate-card'>
-                    <div class='rate-card-title'>MhePR</div><hr class='kpi-divider'>
-                    <div class='rate-card-value'>{mpr_rate:.2f}%</div>
-                    <div class='rate-card-sub'>Next Date: {next_mpr_date}</div>
+                <div class='kpi-card' style='height: 118px; border-top: 4px solid #2563EB;'>
+                    <div class='kpi-title' style='font-size: 13px;'>MhePR</div><hr class='kpi-divider' style='margin: 4px 0;'>
+                    <div class='kpi-value' style='color:#2563EB; font-size: 24px;'>{mpr_rate:.2f}%</div>
+                    <div class='kpi-sub' style='margin-top: 2px;'>Next Date: {next_mpr_date}</div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
