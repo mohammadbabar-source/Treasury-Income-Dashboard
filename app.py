@@ -6,51 +6,43 @@ import time
 # 1. Page Configuration
 st.set_page_config(page_title="Treasury Summary FY26-27", layout="wide", initial_sidebar_state="collapsed")
 
-# File Reference - (We map to the synced file name in the system)
+# File Reference
 EXCEL_FILE = "Treasury Income FY26'27 - July26.xlsx"
 
 # ---------------------------------------------------------
 # DYNAMIC DATA INGESTION FROM EXCEL
 # ---------------------------------------------------------
 try:
-    # 1. NEW 'Quarterly' Sheet Parsing
     df_q = pd.read_excel(EXCEL_FILE, sheet_name='Quarterly', header=None)
-    
     def get_q_val(row_idx, col_idx):
         if row_idx < len(df_q) and col_idx < df_q.shape[1]:
             val = df_q.iloc[row_idx, col_idx]
             return float(val) if pd.notna(val) and isinstance(val, (int, float)) else 0.0
         return 0.0
 
-    # Total Income per Quarter (Row index 10)
     inc_q1 = get_q_val(10, 2) / 1e6
     inc_q2 = get_q_val(10, 3) / 1e6
     inc_q3 = get_q_val(10, 4) / 1e6
     inc_q4 = get_q_val(10, 5) / 1e6
     
-    # Margin Breakdown for Q1 (Rows 4, 5, 6, 8, 9 in Pandas index)
     osr_q1 = get_q_val(4, 2) / 1e6
     rpa_q1 = get_q_val(5, 2) / 1e6
     esc_q1 = get_q_val(6, 2) / 1e6
     tdr_q1 = get_q_val(8, 2) / 1e6
     buysell_q1 = get_q_val(9, 2) / 1e6
 
-    # 2. Treasury Pool Sheet Parsing
     df_pool = pd.read_excel(EXCEL_FILE, sheet_name='Treasury Pool', header=None)
-    
     def get_pool_val(row_idx, col_idx):
         if row_idx < len(df_pool) and col_idx < df_pool.shape[1]:
             val = df_pool.iloc[row_idx, col_idx]
             return float(val) if pd.notna(val) and isinstance(val, (int, float)) else 0.0
         return 0.0
 
-    # Getting the pool totals (Row index 11)
     pool_jul = get_pool_val(11, 2) / 1e6
     pool_aug = get_pool_val(11, 3) / 1e6
     pool_sep = get_pool_val(11, 4) / 1e6
     q1_pool = pool_sep if pool_sep > 0 else (pool_aug if pool_aug > 0 else pool_jul)
 
-    # Q1 Latest Pool Breakdown
     lr_funds = get_pool_val(4, 4) / 1e6 if get_pool_val(4, 4) > 0 else get_pool_val(4, 2) / 1e6
     osr_funds = get_pool_val(5, 4) / 1e6 if get_pool_val(5, 4) > 0 else get_pool_val(5, 2) / 1e6
     inv_cdel = get_pool_val(6, 4) / 1e6 if get_pool_val(6, 4) > 0 else get_pool_val(6, 2) / 1e6
@@ -58,12 +50,10 @@ try:
     wv_greenfin = get_pool_val(8, 4) / 1e6 if get_pool_val(8, 4) > 0 else get_pool_val(8, 2) / 1e6
     op_funds = get_pool_val(9, 4) / 1e6 if get_pool_val(9, 4) > 0 else get_pool_val(9, 2) / 1e6
 
-    # 3. MPR Sheet Parsing
     df_mpr = pd.read_excel(EXCEL_FILE, sheet_name='MPR')
     mpr_rate = float(df_mpr.iloc[0]['MPC Rate']) * 100
     next_mpr_date = pd.to_datetime(df_mpr.iloc[1]['MPC Meeting Date']).strftime('%b %d, %Y')
 
-    # 4. Profit Rates Sheet Parsing
     df_rates = pd.read_excel(EXCEL_FILE, sheet_name='Profit Rates')
 
 except Exception as e:
@@ -74,7 +64,6 @@ except Exception as e:
     mpr_rate, next_mpr_date = 11.50, "Sep 14, 2026"
     df_rates = pd.DataFrame()
 
-# Helper to fetch bank profit rates per quarter robustly from Excel (using iloc[-1])
 quarter_months_map = {
     "Q1": [("Jul 2026", 0), ("Aug 2026", 1), ("Sep 2026", 2)],
     "Q2": [("Oct 2026", 3), ("Nov 2026", 4), ("Dec 2026", 5)],
@@ -103,7 +92,6 @@ def get_quarter_rates(q_key):
         })
     return result
 
-# Quarterly Data Mapping Engine 
 quarter_data = {
     "Q1": {
         "period": "Q1 (Jul - Sep 2026)",
@@ -238,14 +226,44 @@ st.markdown("""
         align-items: center; 
         text-align: center; 
         transition: transform 0.2s ease, box-shadow 0.2s ease; 
-        gap: 8px;
+        gap: 8px; 
     }
     .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(30, 58, 138, 0.15); }
     .kpi-val { font-size: 38px; font-weight: 900; color: #0F172A; line-height: 1.1; margin: 4px 0; }
     .kpi-lbl { font-size: 15px; font-weight: 900; color: #1E293B; text-transform: uppercase; letter-spacing: 1px; }
     .kpi-sub { font-size: 13px; font-weight: 700; color: #10B981; }
 
-    /* Streamlit Selectbox Customization */
+    /* Streamlit Plotly Chart Customization to act as the unified card container */
+    div[data-testid="stPlotlyChart"] { 
+        background-color: #FFFFFF !important; 
+        border-radius: 16px !important; 
+        border: 1px solid #E2E8F0 !important; 
+        border-top: 5px solid #2563EB !important; 
+        box-shadow: 0 8px 24px rgba(30, 58, 138, 0.12) !important; 
+        padding: 15px !important; 
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    div[data-testid="stPlotlyChart"]:hover {
+        transform: translateY(-3px); 
+        box-shadow: 0 12px 32px rgba(30, 58, 138, 0.25) !important;
+    }
+
+    /* Refined Bank/Table HTML Containers */
+    .html-card {
+        background-color: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-top: 5px solid #2563EB;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 8px 24px rgba(30, 58, 138, 0.12);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        height: 100%;
+    }
+    .html-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(30, 58, 138, 0.25); }
+
     div[data-baseweb="select"] > div { border-radius: 12px; font-size: 18px; font-weight: 600; padding: 4px; }
     </style>
 """, unsafe_allow_html=True)
@@ -296,12 +314,12 @@ with st.spinner("Rendering Visualizations..."):
         st.markdown(f"<div class='kpi-card'><div class='kpi-lbl'>FORECASTED INCOME</div><div class='kpi-val'>{q_ctx['forecasted_income']:,.2f} M</div><div class='kpi-sub'>Forecasted for {selected_q}</div></div>", unsafe_allow_html=True)
     with kpi4:
         st.markdown(f"<div class='kpi-card'><div class='kpi-lbl'>ANNUAL YIELD</div><div class='kpi-val'>{q_ctx['annual_yield']}</div><div class='kpi-sub'>Weighted Annual Yield</div></div>", unsafe_allow_html=True)
-    
+
     st.markdown("<div style='height: 25px;'></div>", unsafe_allow_html=True) # Space between rows
 
     bot_col1, bot_col2, bot_col3 = st.columns(3, gap="medium")
 
-    # 1. Bank Profit Rates Card (Column View)
+    # 1. Bank Profit Rates Card
     month_cols_html = "<div style='display: flex; justify-content: space-between; width: 100%; gap: 10px; margin-top: 10px; height: 100%;'>"
     for month_info in q_rates_list:
         rates_br = "<br>".join(month_info['rates'])
@@ -312,23 +330,19 @@ with st.spinner("Rendering Visualizations..."):
         st.markdown(f"<div class='kpi-card' style='justify-content: center; height: 210px;'><div class='kpi-lbl'>BANK PROFIT RATES ({selected_q})</div>{month_cols_html}</div>", unsafe_allow_html=True)
 
     # 2. MPR Rate Card (Split into 2 Columns)
-    mpr_split_html = f"""
-    <div style='display: flex; justify-content: space-between; width: 100%; height: 100%; align-items: center;'>
-        <!-- Left: MPR Rate -->
-        <div style='flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 1px solid #E2E8F0; padding-right: 10px;'>
-            <div style='color:#2563EB; font-size: 40px; font-weight: 900; line-height: 1.1;'>{mpr_rate:.2f}%</div>
-            <div style='font-size: 15px; font-weight: 900; color: #1E293B; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 10px;'>MPR RATE</div>
-            <div style='font-size: 13px; font-weight: 700; color: #10B981; margin-top: 4px;'>Next Date: {next_mpr_date}</div>
-        </div>
-        <!-- Right: Benchmark -->
-        <div style='flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding-left: 10px;'>
-            <div style='color:#0F172A; font-size: 40px; font-weight: 900; line-height: 1.1;'>{mpr_rate - 1.5:.2f}%</div>
-            <div style='font-size: 15px; font-weight: 900; color: #2563EB; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 10px;'>BENCHMARK</div>
-            <div style='font-size: 13px; font-weight: 700; color: #10B981; margin-top: 4px;'>MPR - 1.5%</div>
-        </div>
-    </div>
-    """
-
+    mpr_split_html = (
+        "<div style='display: flex; justify-content: space-between; width: 100%; height: 100%; align-items: center;'>"
+        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 1px solid #E2E8F0; padding-right: 10px;'>"
+        f"<div style='color:#2563EB; font-size: 40px; font-weight: 900; line-height: 1.1;'>{mpr_rate:.2f}%</div>"
+        "<div style='font-size: 15px; font-weight: 900; color: #1E293B; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 10px;'>MPR RATE</div>"
+        f"<div style='font-size: 13px; font-weight: 700; color: #10B981; margin-top: 4px;'>Next Date: {next_mpr_date}</div>"
+        "</div>"
+        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding-left: 10px;'>"
+        f"<div style='color:#0F172A; font-size: 40px; font-weight: 900; line-height: 1.1;'>{mpr_rate - 1.5:.2f}%</div>"
+        "<div style='font-size: 15px; font-weight: 900; color: #2563EB; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 10px;'>BENCHMARK</div>"
+        "<div style='font-size: 13px; font-weight: 700; color: #10B981; margin-top: 4px;'>MPR - 1.5%</div>"
+        "</div></div>"
+    )
     with bot_col2:
         st.markdown(f"<div class='kpi-card' style='justify-content: center; height: 210px; padding: 10px;'>{mpr_split_html}</div>", unsafe_allow_html=True)
 
@@ -341,24 +355,24 @@ with st.spinner("Rendering Visualizations..."):
         "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px 4px; text-align: center;'><div style='font-size: 14px; font-weight: 900; color: #10B981; text-transform: uppercase;'>1Y</div><div style='font-size: 20px; font-weight: 900; color: #0F172A; margin-top: 10px;'>--%</div></div>"
         "</div>"
     )
-
     with bot_col3:
         st.markdown(f"<div class='kpi-card' style='justify-content: center; height: 210px;'><div class='kpi-lbl'>PKR YIELDS</div>{pkr_yields_html}</div>", unsafe_allow_html=True)
+
 
     # =========================================================
     # NEW SECTION: CURRENT INVESTMENT POSITION
     # =========================================================
     
-    # 1. Spacer & Section Header
     st.markdown("<div style='height: 36px;'></div>", unsafe_allow_html=True)
-    st.markdown("""
-        <div style="text-align: left; margin-bottom: 24px;">
-            <h3 style="font-size: 25px; font-weight: 900; color: #0F172A; letter-spacing: 1.2px; text-transform: uppercase; margin: 0;">Current Investment Position</h3>
-            <p style="color: #64748B; font-size: 16px; font-weight: 600; margin-top: 4px;">Instrument-Level Ledger & Portfolio Concentration</p>
-        </div>
-    """, unsafe_allow_html=True)
+    
+    st.markdown(
+        "<div style='text-align: left; margin-bottom: 24px;'>"
+        "<h3 style='font-size: 25px; font-weight: 900; color: #0F172A; letter-spacing: 1.2px; text-transform: uppercase; margin: 0;'>Current Investment Position</h3>"
+        "<p style='color: #64748B; font-size: 16px; font-weight: 600; margin-top: 4px;'>Instrument-Level Ledger & Portfolio Concentration</p>"
+        "</div>", 
+        unsafe_allow_html=True
+    )
 
-    # 2. Placeholder Data Structure (Ready for Excel mapping)
     investment_data = [
         {"instrument": "Savings Accounts", "value": 450.00, "conc": 45.0},
         {"instrument": "T-Bills", "value": 300.00, "conc": 30.0},
@@ -367,18 +381,9 @@ with st.spinner("Rendering Visualizations..."):
     ]
     gross_portfolio_value = sum(item["value"] for item in investment_data)
 
-    # 3. Two-Column Grid Setup (1fr : 1.4fr)
     inv_col1, inv_col2 = st.columns([1, 1.4], gap="large")
 
-    # --- Left Card: Portfolio Concentration (Donut Chart) ---
     with inv_col1:
-        st.markdown("""
-            <div style='background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 24px 20px 0px 20px; box-shadow: 0 6px 16px rgba(30, 58, 138, 0.08);'>
-                <div style='font-size: 18px; font-weight: 900; color: #0F172A; text-transform: uppercase;'>Portfolio Concentration</div>
-                <div style='font-size: 13px; font-weight: 600; color: #64748B; margin-top: 4px;'>% of Gross Investment Portfolio</div>
-            </div>
-        """, unsafe_allow_html=True)
-        
         fig_inv_donut = go.Figure(data=[go.Pie(
             labels=[item["instrument"] for item in investment_data],
             values=[item["value"] for item in investment_data],
@@ -390,60 +395,45 @@ with st.spinner("Rendering Visualizations..."):
         )])
         
         fig_inv_donut.update_layout(
+            title=dict(text="PORTFOLIO CONCENTRATION", x=0.5, font=dict(size=18, color="#0F172A", family="Arial Black")),
             showlegend=False,
-            margin=dict(t=20, b=20, l=40, r=40),
+            margin=dict(t=60, b=25, l=45, r=45),
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
-            height=320,
+            height=400,
             font=CHART_FONT
         )
-        
-        st.markdown("<div style='margin-top: -15px; background: #FFFFFF; border-left: 1px solid #E2E8F0; border-right: 1px solid #E2E8F0; border-bottom: 1px solid #E2E8F0; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; box-shadow: 0 6px 16px rgba(30, 58, 138, 0.08); padding-bottom: 10px;'>", unsafe_allow_html=True)
         st.plotly_chart(fig_inv_donut, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
 
-    # --- Right Card: Position by Instrument (PKR Table) ---
-    table_rows = ""
-    for item in investment_data:
-        table_rows += f"""
-        <tr class="inv-row">
-            <td style="padding: 14px 16px; border-bottom: 1px solid #E2E8F0; text-align: left; font-weight: 700; color: #0F172A;">{item['instrument']}</td>
-            <td style="padding: 14px 16px; border-bottom: 1px solid #E2E8F0; text-align: right; font-weight: 600; color: #1E293B;">{item['value']:,.2f}</td>
-            <td style="padding: 14px 16px; border-bottom: 1px solid #E2E8F0; text-align: right; font-weight: 800; color: #2563EB;">{item['conc']:.1f}%</td>
-        </tr>
-        """
-        
     with inv_col2:
-        st.markdown(f"""
-            <style>
-            .inv-row {{ transition: background-color 0.15s ease; }}
-            .inv-row:hover {{ background-color: #F8FAFC; }}
-            </style>
+        table_rows = ""
+        for item in investment_data:
+            table_rows += (
+                "<tr class='inv-row'>"
+                f"<td style='padding: 14px 16px; border-bottom: 1px solid #E2E8F0; text-align: left; font-weight: 700; color: #0F172A;'>{item['instrument']}</td>"
+                f"<td style='padding: 14px 16px; border-bottom: 1px solid #E2E8F0; text-align: right; font-weight: 600; color: #1E293B;'>{item['value']:,.2f}</td>"
+                f"<td style='padding: 14px 16px; border-bottom: 1px solid #E2E8F0; text-align: right; font-weight: 800; color: #2563EB;'>{item['conc']:.1f}%</td>"
+                "</tr>"
+            )
             
-            <div style='background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 24px 20px; box-shadow: 0 6px 16px rgba(30, 58, 138, 0.08); height: 100%; display: flex; flex-direction: column;'>
-                <div style='font-size: 18px; font-weight: 900; color: #0F172A; text-transform: uppercase;'>Position by Instrument</div>
-                <div style='font-size: 13px; font-weight: 600; color: #64748B; margin-top: 4px; margin-bottom: 20px;'>Market Value & Concentration</div>
-                
-                <div style="flex-grow: 1; border-radius: 8px; overflow: hidden; border: 1px solid #E2E8F0;">
-                    <table style="width: 100%; border-collapse: collapse; font-size: 15px; background: white;">
-                        <thead>
-                            <tr style="background-color: #1E293B; color: #FFFFFF;">
-                                <th style="padding: 14px 16px; text-align: left; font-weight: 800;">INSTRUMENT</th>
-                                <th style="padding: 14px 16px; text-align: right; font-weight: 800;">MARKET VALUE (PKR Mns)</th>
-                                <th style="padding: 14px 16px; text-align: right; font-weight: 800;">CONC. (%)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {table_rows}
-                        </tbody>
-                        <tfoot>
-                            <tr style="background-color: #F1F5F9;">
-                                <td style="padding: 16px 16px; text-align: left; font-weight: 900; color: #0F172A;">Gross Portfolio</td>
-                                <td style="padding: 16px 16px; text-align: right; font-weight: 900; color: #0F172A;">{gross_portfolio_value:,.2f}</td>
-                                <td style="padding: 16px 16px; text-align: right; font-weight: 900; color: #2563EB;">100.0%</td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
+        table_html = (
+            "<style>.inv-row { transition: background-color 0.15s ease; } .inv-row:hover { background-color: #F8FAFC; }</style>"
+            "<div class='html-card'>"
+            "<div style='font-size: 18px; font-weight: 900; color: #0F172A; text-transform: uppercase;'>POSITION BY INSTRUMENT</div>"
+            "<div style='font-size: 13px; font-weight: 600; color: #64748B; margin-top: 4px; margin-bottom: 20px;'>Market Value & Concentration</div>"
+            "<div style='flex-grow: 1; width: 100%; border-radius: 8px; overflow: hidden; border: 1px solid #E2E8F0;'>"
+            "<table style='width: 100%; border-collapse: collapse; font-size: 15px; background: white;'>"
+            "<thead><tr style='background-color: #1E293B; color: #FFFFFF;'>"
+            "<th style='padding: 14px 16px; text-align: left; font-weight: 800;'>INSTRUMENT</th>"
+            "<th style='padding: 14px 16px; text-align: right; font-weight: 800;'>MARKET VALUE (PKR Mns)</th>"
+            "<th style='padding: 14px 16px; text-align: right; font-weight: 800;'>CONC. (%)</th>"
+            "</tr></thead>"
+            f"<tbody>{table_rows}</tbody>"
+            "<tfoot><tr style='background-color: #F1F5F9;'>"
+            "<td style='padding: 16px 16px; text-align: left; font-weight: 900; color: #0F172A;'>Gross Portfolio</td>"
+            f"<td style='padding: 16px 16px; text-align: right; font-weight: 900; color: #0F172A;'>{gross_portfolio_value:,.2f}</td>"
+            "<td style='padding: 16px 16px; text-align: right; font-weight: 900; color: #2563EB;'>100.0%</td>"
+            "</tr></tfoot>"
+            "</table></div></div>"
+        )
+        st.markdown(table_html, unsafe_allow_html=True)
