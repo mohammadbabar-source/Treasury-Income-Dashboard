@@ -6,43 +6,51 @@ import time
 # 1. Page Configuration
 st.set_page_config(page_title="Treasury Summary FY26-27", layout="wide", initial_sidebar_state="collapsed")
 
-# File Reference
+# File Reference - (We map to the synced file name in the system)
 EXCEL_FILE = "Treasury Income FY26'27 - July26.xlsx"
 
 # ---------------------------------------------------------
 # DYNAMIC DATA INGESTION FROM EXCEL
 # ---------------------------------------------------------
 try:
+    # 1. NEW 'Quarterly' Sheet Parsing
     df_q = pd.read_excel(EXCEL_FILE, sheet_name='Quarterly', header=None)
+    
     def get_q_val(row_idx, col_idx):
         if row_idx < len(df_q) and col_idx < df_q.shape[1]:
             val = df_q.iloc[row_idx, col_idx]
             return float(val) if pd.notna(val) and isinstance(val, (int, float)) else 0.0
         return 0.0
 
+    # Total Income per Quarter (Row index 10)
     inc_q1 = get_q_val(10, 2) / 1e6
     inc_q2 = get_q_val(10, 3) / 1e6
     inc_q3 = get_q_val(10, 4) / 1e6
     inc_q4 = get_q_val(10, 5) / 1e6
     
+    # Margin Breakdown for Q1 (Rows 4, 5, 6, 8, 9 in Pandas index)
     osr_q1 = get_q_val(4, 2) / 1e6
     rpa_q1 = get_q_val(5, 2) / 1e6
     esc_q1 = get_q_val(6, 2) / 1e6
     tdr_q1 = get_q_val(8, 2) / 1e6
     buysell_q1 = get_q_val(9, 2) / 1e6
 
+    # 2. Treasury Pool Sheet Parsing
     df_pool = pd.read_excel(EXCEL_FILE, sheet_name='Treasury Pool', header=None)
+    
     def get_pool_val(row_idx, col_idx):
         if row_idx < len(df_pool) and col_idx < df_pool.shape[1]:
             val = df_pool.iloc[row_idx, col_idx]
             return float(val) if pd.notna(val) and isinstance(val, (int, float)) else 0.0
         return 0.0
 
+    # Getting the pool totals (Row index 11)
     pool_jul = get_pool_val(11, 2) / 1e6
     pool_aug = get_pool_val(11, 3) / 1e6
     pool_sep = get_pool_val(11, 4) / 1e6
     q1_pool = pool_sep if pool_sep > 0 else (pool_aug if pool_aug > 0 else pool_jul)
 
+    # Q1 Latest Pool Breakdown
     lr_funds = get_pool_val(4, 4) / 1e6 if get_pool_val(4, 4) > 0 else get_pool_val(4, 2) / 1e6
     osr_funds = get_pool_val(5, 4) / 1e6 if get_pool_val(5, 4) > 0 else get_pool_val(5, 2) / 1e6
     inv_cdel = get_pool_val(6, 4) / 1e6 if get_pool_val(6, 4) > 0 else get_pool_val(6, 2) / 1e6
@@ -50,10 +58,12 @@ try:
     wv_greenfin = get_pool_val(8, 4) / 1e6 if get_pool_val(8, 4) > 0 else get_pool_val(8, 2) / 1e6
     op_funds = get_pool_val(9, 4) / 1e6 if get_pool_val(9, 4) > 0 else get_pool_val(9, 2) / 1e6
 
+    # 3. MPR Sheet Parsing
     df_mpr = pd.read_excel(EXCEL_FILE, sheet_name='MPR')
     mpr_rate = float(df_mpr.iloc[0]['MPC Rate']) * 100
     next_mpr_date = pd.to_datetime(df_mpr.iloc[1]['MPC Meeting Date']).strftime('%b %d, %Y')
 
+    # 4. Profit Rates Sheet Parsing
     df_rates = pd.read_excel(EXCEL_FILE, sheet_name='Profit Rates')
 
 except Exception as e:
@@ -64,6 +74,7 @@ except Exception as e:
     mpr_rate, next_mpr_date = 11.50, "Sep 14, 2026"
     df_rates = pd.DataFrame()
 
+# Helper to fetch bank profit rates per quarter robustly from Excel (using iloc[-1])
 quarter_months_map = {
     "Q1": [("Jul 2026", 0), ("Aug 2026", 1), ("Sep 2026", 2)],
     "Q2": [("Oct 2026", 3), ("Nov 2026", 4), ("Dec 2026", 5)],
@@ -92,6 +103,7 @@ def get_quarter_rates(q_key):
         })
     return result
 
+# Quarterly Data Mapping Engine 
 quarter_data = {
     "Q1": {
         "period": "Q1 (Jul - Sep 2026)",
@@ -233,21 +245,6 @@ st.markdown("""
     .kpi-lbl { font-size: 15px; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; }
     .kpi-sub { font-size: 13px; font-weight: 700; color: #10B981; }
 
-    /* Streamlit Plotly Chart Customization to act as the unified card container */
-    div[data-testid="stPlotlyChart"] { 
-        background-color: #FFFFFF !important; 
-        border-radius: 16px !important; 
-        border: 1px solid #E2E8F0 !important; 
-        border-top: 5px solid #2563EB !important; 
-        box-shadow: 0 8px 24px rgba(30, 58, 138, 0.12) !important; 
-        padding: 15px !important; 
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    div[data-testid="stPlotlyChart"]:hover {
-        transform: translateY(-3px); 
-        box-shadow: 0 12px 32px rgba(30, 58, 138, 0.25) !important;
-    }
-
     /* Refined Bank Profit Rates Container - Matches Plotly Containers */
     .html-card {
         background-color: #FFFFFF;
@@ -267,8 +264,6 @@ st.markdown("""
     .html-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(30, 58, 138, 0.25); }
     .html-card-title { font-size: 18px; font-weight: 800; color: #0F172A; text-transform: uppercase; letter-spacing: 0.8px; width: 100%; margin-bottom: 16px;}
 
-    .screen-2-header { margin-top: 50px; margin-bottom: 24px; text-align: center; }
-    .screen-2-header h3 { font-size: 25px; font-weight: 900; color: #0F172A; letter-spacing: 1.2px; text-transform: uppercase; margin: 0; }
     div[data-baseweb="select"] > div { border-radius: 12px; font-size: 18px; font-weight: 600; padding: 4px; }
     </style>
 """, unsafe_allow_html=True)
@@ -323,59 +318,7 @@ with st.spinner("Rendering Visualizations..."):
     st.write("")
     st.write("")
 
-    sc1_left, sc1_mid, sc1_cards = st.columns([1.1, 1.3, 0.95], gap="large")
-
-    # --- Donut Chart Card (Title embedded in Plotly) ---
-    with sc1_left:
-        fig_margin = go.Figure(data=[go.Pie(
-            labels=q_ctx['margin_labels'], 
-            values=q_ctx['margin_values'], hole=0.68,
-            marker_colors=[BLUE_ACCENT, '#60A5FA', GREEN_ACCENT, '#34D399', '#93C5FD'], 
-            textinfo='label+percent', 
-            textposition='outside', 
-            marker=dict(line=dict(color='#FFFFFF', width=2))
-        )])
-        fig_margin.update_layout(
-            title=dict(text=f"INCOME MARGIN DISTRIBUTION ({selected_q})", x=0.5, font=dict(size=18, color="#0F172A", family="Arial Black")),
-            annotations=[dict(text=f"Total<br><b style='font-size:26px; color:#0F172A;'>{q_ctx['total_income']:.1f}M</b>", x=0.5, y=0.5, xanchor='center', yanchor='middle', font=CHART_FONT, showarrow=False)],
-            showlegend=False, 
-            margin=dict(t=60, b=25, l=45, r=45), 
-            paper_bgcolor='rgba(0,0,0,0)', 
-            plot_bgcolor='rgba(0,0,0,0)', 
-            height=400, 
-            font=CHART_FONT
-        )
-        st.plotly_chart(fig_margin, use_container_width=True)
-
-    # --- Line Chart Card (Title embedded in Plotly) ---
-    with sc1_mid:
-        fig_trend = go.Figure()
-        fig_trend.add_trace(go.Scatter(
-            x=q_ctx['months'], 
-            y=q_ctx['income_trend'], 
-            name='Total Income', 
-            line=dict(color=BLUE_ACCENT, width=3, shape='spline', smoothing=0.3), 
-            mode='lines+markers', 
-            marker=dict(size=10, color=BLUE_ACCENT)
-        ))
-        fig_trend.update_layout(
-            title=dict(text=f"INCOME TREND ({selected_q})", x=0.5, font=dict(size=18, color="#0F172A", family="Arial Black")),
-            margin=dict(t=60, b=30, l=30, r=30), 
-            paper_bgcolor='rgba(0,0,0,0)', 
-            plot_bgcolor='rgba(0,0,0,0)',
-            showlegend=False, 
-            xaxis=dict(showgrid=False, tickfont=dict(color="#0F172A", size=16)), 
-            yaxis=dict(
-                showgrid=True, gridcolor='#E2E8F0', 
-                tickfont=dict(color="#0F172A", size=16), 
-                zeroline=False,
-                tickformat="d",
-                ticksuffix=" Mns"
-            ), 
-            height=400, 
-            font=CHART_FONT
-        )
-        st.plotly_chart(fig_trend, use_container_width=True)
+    spacer_left, sc1_cards, spacer_right = st.columns([1, 1.5, 1], gap="large")
 
     # --- Right-Side Rate Cards ---
     rates_boxes_html = ""
@@ -394,49 +337,3 @@ with st.spinner("Rendering Visualizations..."):
                 <div style='width: 100%;'>{rates_boxes_html}</div>
             </div>
         """, unsafe_allow_html=True)
-
-    # SCREEN 2: BOTTOM SECTION
-    st.markdown("""
-        <div class="screen-2-header">
-            <h3>Detailed Treasury Portfolio Breakdown</h3>
-        </div>
-    """, unsafe_allow_html=True)
-
-    bot1, bot2, bot3 = st.columns([1, 1, 1.4], gap="large")
-
-    with bot1:
-        fig_treasury = go.Figure(data=[go.Pie(
-            labels=['OSR Funds', 'LR Funds', 'WV Greenfin', 'RPA A/c', 'Inv/CDEL', 'Operational'], 
-            values=[osr_funds, lr_funds, wv_greenfin, rpa_acc, inv_cdel, op_funds], hole=0.60,
-            marker_colors=[BLUE_ACCENT, '#3B82F6', '#60A5FA', '#93C5FD', '#BFDBFE', '#CBD5E1'], textinfo='label', textposition='outside',
-            marker=dict(line=dict(color='#FFFFFF', width=2))
-        )])
-        fig_treasury.update_layout(
-            title=dict(text="TREASURY POOL SPLIT", x=0.5, font=dict(size=18, color="#0F172A", family="Arial Black")),
-            showlegend=False, margin=dict(t=60, b=25, l=25, r=25), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400, font=CHART_FONT)
-        st.plotly_chart(fig_treasury, use_container_width=True)
-
-    with bot2:
-        fig_exp = go.Figure(data=[go.Pie(
-            labels=['OSR Savings', 'RPA Savings', 'Escrow'], values=[osr_q1, rpa_q1, esc_q1] if osr_q1 > 0 else [97.38, 1.15, 1.00], hole=0.60,
-            marker_colors=[GREEN_ACCENT, '#34D399', '#6EE7B7'], textinfo='label', textposition='outside',
-            marker=dict(line=dict(color='#FFFFFF', width=2))
-        )])
-        fig_exp.update_layout(
-            title=dict(text="INCOME TYPE BREAKDOWN", x=0.5, font=dict(size=18, color="#0F172A", family="Arial Black")),
-            showlegend=False, margin=dict(t=60, b=25, l=25, r=25), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400, font=CHART_FONT)
-        st.plotly_chart(fig_exp, use_container_width=True)
-
-    with bot3:
-        fig_bar = go.Figure()
-        categories = ['Operational', 'WV Greenfin', 'RPA A/c', 'Inv/CDEL', 'LR Funds', 'OSR Funds']
-        fig_bar.add_trace(go.Bar(y=categories, x=[op_funds, wv_greenfin, rpa_acc, inv_cdel, lr_funds, osr_funds], name='Actual Pool', orientation='h', marker_color=BLUE_ACCENT))
-        fig_bar.update_layout(
-            title=dict(text="FUND POOL ALLOCATION", x=0.5, font=dict(size=18, color="#0F172A", family="Arial Black")),
-            barmode='group', margin=dict(t=60, b=30, l=10, r=10), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', 
-            legend=dict(yanchor="bottom", y=0.05, xanchor="right", x=0.95, font=dict(color="#0F172A", size=15)), 
-            xaxis=dict(showgrid=True, gridcolor='#E2E8F0', tickfont=dict(color="#0F172A", size=16), ticksuffix="M"), 
-            yaxis=dict(showgrid=False, tickfont=dict(color="#0F172A", size=16)), 
-            height=400, font=CHART_FONT
-        )
-        st.plotly_chart(fig_bar, use_container_width=True)
