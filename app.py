@@ -310,9 +310,26 @@ with st.spinner("Rendering Visualizations..."):
     with bot_col1:
         st.markdown(f"<div class='kpi-card' style='justify-content: center; height: 210px;'><div class='kpi-lbl'>BANK PROFIT RATES ({selected_q})</div>{month_cols_html}</div>", unsafe_allow_html=True)
 
-    # 2. MPR Rate Card
+    # 2. MPR Rate Card (Split into 2 Columns)
+    mpr_split_html = f"""
+    <div style='display: flex; justify-content: space-between; width: 100%; height: 100%; align-items: center;'>
+        <!-- Left: MPR Rate -->
+        <div style='flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 1px solid #E2E8F0; padding-right: 10px;'>
+            <div style='color:#2563EB; font-size: 40px; font-weight: 900; line-height: 1.1;'>{mpr_rate:.2f}%</div>
+            <div style='font-size: 15px; font-weight: 900; color: #1E293B; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 10px;'>MPR RATE</div>
+            <div style='font-size: 13px; font-weight: 700; color: #10B981; margin-top: 4px;'>Next Date: {next_mpr_date}</div>
+        </div>
+        <!-- Right: Benchmark -->
+        <div style='flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding-left: 10px;'>
+            <div style='color:#0F172A; font-size: 40px; font-weight: 900; line-height: 1.1;'>{mpr_rate - 1.5:.2f}%</div>
+            <div style='font-size: 15px; font-weight: 900; color: #2563EB; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 10px;'>BENCHMARK</div>
+            <div style='font-size: 13px; font-weight: 700; color: #10B981; margin-top: 4px;'>MPR - 1.5%</div>
+        </div>
+    </div>
+    """
+
     with bot_col2:
-        st.markdown(f"<div class='kpi-card' style='justify-content: center; height: 210px;'><div class='kpi-val' style='color:#2563EB; font-size: 48px;'>{mpr_rate:.2f}%</div><div class='kpi-lbl' style='font-size: 16px; margin-top: 10px;'>MPR RATE</div><div class='kpi-sub' style='font-size: 14px; margin-top: 5px;'>Next Date: {next_mpr_date}</div></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='kpi-card' style='justify-content: center; height: 210px; padding: 10px;'>{mpr_split_html}</div>", unsafe_allow_html=True)
 
     # 3. PKR Yields Card
     pkr_yields_html = (
