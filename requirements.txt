@@ -1,5 +1,7 @@
 streamlit
 pandas
-numpy
-openpyxl
 plotly
+openpyxl
+requests
+streamlit-lottie
+streamlit-option-menu
