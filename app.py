@@ -185,20 +185,21 @@ st.markdown("""
     /* Adjust Streamlit top padding to prevent banner overlap */
     .block-container { padding-top: 5rem !important; padding-bottom: 3rem !important; padding-left: 2rem !important; padding-right: 2rem !important; max-width: 100% !important; }
 
-    /* SBP Rolling Banner CSS - Text +25% */
+    /* SBP Rolling Banner CSS - Subtle 3D Effect */
     .sbp-marquee {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
-        background-color: #0F4C23; /* SBP Green */
+        background: linear-gradient(180deg, #13612c 0%, #0F4C23 45%, #0a3819 100%); /* 3D Gradient */
         color: #FFFFFF;
         padding: 12px 0;
         overflow: hidden;
         white-space: nowrap;
         z-index: 999999;
+        border-top: 1px solid #1a873e; /* Inner highlight */
         border-bottom: 3px solid #D4AF37; /* SBP Gold */
-        box-shadow: 0 8px 20px rgba(30, 58, 138, 0.15); /* Navy Shadow */
+        box-shadow: 0 6px 15px rgba(0,0,0,0.25), inset 0 2px 4px rgba(255,255,255,0.1); /* 3D Drop and Inset shadow */
     }
     .sbp-marquee a {
         color: #FFFFFF !important;
@@ -225,13 +226,13 @@ st.markdown("""
     .glow-line { height: 4px; flex-grow: 1; max-width: 380px; background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.6), transparent); box-shadow: 0 0 16px rgba(59, 130, 246, 0.6); }
     .header-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 16px 48px; margin: 0 24px; box-shadow: 0 8px 24px rgba(30, 58, 138, 0.15); font-weight: 900; font-size: 32px; color: #000000; letter-spacing: 1.5px; text-transform: uppercase; }
 
-    /* Centered & Scaled Top KPI Cards - Navy Shadow & Text +25% */
+    /* Centered & Scaled Top KPI Cards - Spacing Fixed */
     .kpi-card { 
         background: #FFFFFF; 
         border: 1px solid #E2E8F0; 
-        border-radius: 16px; 
-        padding: 28px 24px; 
-        box-shadow: 0 8px 24px rgba(30, 58, 138, 0.12); /* Navy Shadow */
+        border-radius: 14px; 
+        padding: 20px 16px; 
+        box-shadow: 0 6px 18px rgba(30, 58, 138, 0.08); /* Subtle Navy Shadow */
         height: 100%; 
         display: flex; 
         flex-direction: column; 
@@ -240,11 +241,11 @@ st.markdown("""
         text-align: center; 
         transition: transform 0.2s ease, box-shadow 0.2s ease; 
     }
-    .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(30, 58, 138, 0.25); }
-    .kpi-title { font-size: 18px; font-weight: 800; color: #0F172A; text-transform: uppercase; letter-spacing: 0.8px; width: 100%; }
-    .kpi-value { font-size: 38px; font-weight: 900; color: #0F172A; line-height: 1.2; margin-top: 10px; width: 100%; }
-    .kpi-sub { font-size: 16px; font-weight: 600; color: #64748B; margin-top: 8px; width: 100%; }
-    .kpi-divider { border: 0; border-top: 2px solid #E2E8F0; margin: 12px 0; width: 85%; }
+    .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(30, 58, 138, 0.15); }
+    .kpi-title { font-size: 15px; font-weight: 800; color: #0F172A; text-transform: uppercase; letter-spacing: 0.5px; width: 100%; }
+    .kpi-value { font-size: 32px; font-weight: 900; color: #0F172A; line-height: 1.2; margin-top: 6px; width: 100%; }
+    .kpi-sub { font-size: 14px; font-weight: 600; color: #64748B; margin-top: 4px; width: 100%; }
+    .kpi-divider { border: 0; border-top: 1px solid #E2E8F0; margin: 10px 0; width: 85%; }
 
     /* Unified Card Containers for Header + Chart - Navy Shadow & Text +25% */
     .card {
@@ -338,8 +339,8 @@ with st.spinner("Rendering Visualizations..."):
     q_rates_list = get_quarter_rates(selected_q)
     st.write("")
 
-    # 4 Centered Top KPI Cards (Spacing increased to "large")
-    kpi1, kpi2, kpi3, kpi4 = st.columns(4, gap="large")
+    # 4 Centered Top KPI Cards (Spacing fixed)
+    kpi1, kpi2, kpi3, kpi4 = st.columns(4, gap="medium")
     with kpi1:
         st.markdown(f"<div class='kpi-card'><div class='kpi-title'>Total Income</div><hr class='kpi-divider'><div class='kpi-value'>{q_ctx['total_income']:,.2f} M</div><div class='kpi-sub'>Quarterly Income ({selected_q})</div></div>", unsafe_allow_html=True)
     with kpi2:
