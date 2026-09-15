@@ -148,8 +148,8 @@ if st.session_state.first_load:
     with splash.container():
         st.markdown("""
             <div style='display: flex; justify-content: center; align-items: center; height: 85vh; flex-direction: column; text-align: center; animation: fadeOut 0.5s ease-in 2s forwards;'>
-                <h1 style='font-family: "Courier New", Courier, monospace; color: #000000; font-size: 48px; letter-spacing: 2px; margin-bottom: 12px; font-weight: 900;'>KARANDAAZ TREASURY</h1>
-                <p style='font-family: Verdana, sans-serif; color: #64748B; font-size: 18px; font-weight: 600; letter-spacing: 1px;'>Loading FY26-27 Quarterly Dashboard...</p>
+                <h1 style='color: #000000; font-size: 64px; letter-spacing: 2px; margin-bottom: 12px; font-weight: 900;'>KARANDAAZ TREASURY</h1>
+                <p style='color: #64748B; font-size: 26px; font-weight: 600; letter-spacing: 1px;'>Loading FY26-27 Quarterly Dashboard...</p>
                 <div class="loader"></div>
             </div>
             <style>
@@ -166,7 +166,7 @@ if st.session_state.first_load:
 # 3. Custom CSS Architecture
 st.markdown("""
     <style>
-    * { font-family: 'Verdana', sans-serif !important; box-sizing: border-box; }
+    * { font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif !important; box-sizing: border-box; }
     html, body, .stApp { background-color: #F8FAFC !important; margin: 0 !important; padding: 0 !important; }
     header { visibility: hidden; height: 0; }
     
@@ -210,9 +210,9 @@ st.markdown("""
     
     .header-container { display: flex; align-items: center; justify-content: center; margin-top: 10px !important; margin-bottom: 16px; }
     .glow-line { height: 4px; flex-grow: 1; max-width: 380px; background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.6), transparent); box-shadow: 0 0 16px rgba(59, 130, 246, 0.6); }
-    .header-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 16px 48px; margin: 0 24px; box-shadow: 0 8px 24px rgba(30, 58, 138, 0.15); font-family: 'Courier New', Courier, monospace !important; font-weight: 900; font-size: 36px; color: #000000; letter-spacing: 1.5px; text-transform: uppercase; }
+    .header-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 16px 48px; margin: 0 24px; box-shadow: 0 8px 24px rgba(30, 58, 138, 0.15); font-weight: 900; font-size: 32px; color: #000000; letter-spacing: 1.5px; text-transform: uppercase; }
 
-    /* Centered & Scaled Top KPI Cards (IMAGE 2 STYLE) */
+    /* Centered & Scaled Top KPI Cards */
     .kpi-card { 
         background: #FFFFFF; 
         border: 1px solid #E2E8F0; 
@@ -226,54 +226,34 @@ st.markdown("""
         align-items: center; 
         text-align: center; 
         transition: transform 0.2s ease, box-shadow 0.2s ease; 
-        gap: 8px; /* Slightly tighter gap */
+        gap: 8px;
     }
     .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(30, 58, 138, 0.15); }
-    .kpi-val { font-family: 'Courier New', Courier, monospace !important; font-size: 36px; font-weight: 900; color: #0F172A; line-height: 1.1; margin: 4px 0; }
-    .kpi-lbl { font-size: 14px; font-weight: 900; color: #1E293B; text-transform: uppercase; letter-spacing: 1px; }
+    .kpi-val { font-size: 38px; font-weight: 900; color: #0F172A; line-height: 1.1; margin: 4px 0; }
+    .kpi-lbl { font-size: 15px; font-weight: 900; color: #1E293B; text-transform: uppercase; letter-spacing: 1px; }
     .kpi-sub { font-size: 13px; font-weight: 700; color: #10B981; }
 
-    /* Streamlit Plotly Chart Customization to act as the unified card container */
-    div[data-testid="stPlotlyChart"] { 
-        background-color: #FFFFFF !important; 
-        border-radius: 16px !important; 
-        border: 1px solid #E2E8F0 !important; 
-        border-top: 5px solid #2563EB !important; 
-        box-shadow: 0 8px 24px rgba(30, 58, 138, 0.12) !important; 
-        padding: 15px !important; 
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    div[data-testid="stPlotlyChart"]:hover {
-        transform: translateY(-3px); 
-        box-shadow: 0 12px 32px rgba(30, 58, 138, 0.25) !important;
-    }
-
-    /* Refined Bank Profit Rates Container - Matches Plotly Containers */
+    /* Refined Bank/Table HTML Containers */
     .html-card {
         background-color: #FFFFFF;
         border: 1px solid #E2E8F0;
         border-top: 5px solid #2563EB;
         border-radius: 16px;
-        padding: 24px 20px;
+        padding: 20px;
         box-shadow: 0 8px 24px rgba(30, 58, 138, 0.12);
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
-        align-items: center;
-        text-align: center;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         height: 100%;
     }
     .html-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(30, 58, 138, 0.25); }
-    .html-card-title { font-size: 18px; font-weight: 800; color: #0F172A; text-transform: uppercase; letter-spacing: 0.8px; width: 100%; margin-bottom: 16px;}
 
-    .screen-2-header { margin-top: 50px; margin-bottom: 24px; text-align: center; }
-    .screen-2-header h3 { font-family: 'Courier New', Courier, monospace !important; font-size: 28px; font-weight: 900; color: #0F172A; letter-spacing: 1.2px; text-transform: uppercase; margin: 0; }
     div[data-baseweb="select"] > div { border-radius: 12px; font-size: 18px; font-weight: 600; padding: 4px; }
     </style>
 """, unsafe_allow_html=True)
 
-CHART_FONT = dict(family="Verdana, sans-serif", color="#0F172A", size=12)
+CHART_FONT = dict(family="Segoe UI, Roboto, sans-serif", color="#0F172A", size=15)
 BLUE_ACCENT, GREEN_ACCENT = '#2563EB', '#10B981'
 
 with st.spinner("Rendering Visualizations..."):
@@ -284,8 +264,8 @@ with st.spinner("Rendering Visualizations..."):
             <span>
                 <a href="https://www.sbp.org.pk/our-operations/monetary-policy" target="_blank">
                     <span style="color: #D4AF37; margin-right: 8px;">🏛️ SBP MONETARY POLICY UPDATE:</span>
-                    The current Monetary Policy Rate is <b style="font-family: 'Courier New', Courier, monospace; font-size: 36px;">{mpr_rate:.2f}%</b>. 
-                    Next MPC meeting is scheduled for <b style="font-family: 'Courier New', Courier, monospace; font-size: 36px;">{next_mpr_date}</b>. 
+                    The current Monetary Policy Rate is <b style="color:#D4AF37;">{mpr_rate:.2f}%</b>. 
+                    Next MPC meeting is scheduled for <b style="color:#D4AF37;">{next_mpr_date}</b>. 
                     <em>Summary: The Monetary Policy Committee continues to monitor inflation targets and economic indicators to ensure macroeconomic stability.</em> 
                     &nbsp;&nbsp;🔗 Click here to read the full policy statement on the official SBP website.
                 </a>
@@ -309,7 +289,7 @@ with st.spinner("Rendering Visualizations..."):
     q_ctx = quarter_data[selected_q]
     q_rates_list = get_quarter_rates(selected_q)
 
-    # 4 Centered Top KPI Cards (IMAGE 2 STYLE)
+    # 4 Centered Top KPI Cards
     kpi1, kpi2, kpi3, kpi4 = st.columns(4, gap="medium")
     with kpi1:
         st.markdown(f"<div class='kpi-card'><div class='kpi-lbl'>TOTAL INCOME</div><div class='kpi-val'>{q_ctx['total_income']:,.2f} M</div><div class='kpi-sub'>Quarterly Income ({selected_q})</div></div>", unsafe_allow_html=True)
@@ -338,13 +318,13 @@ with st.spinner("Rendering Visualizations..."):
     mpr_split_html = (
         "<div style='display: flex; justify-content: space-between; width: 100%; height: 100%; align-items: center;'>"
         "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 1px solid #E2E8F0; padding-right: 10px;'>"
-        f"<div style='color:#2563EB; font-family: 'Courier New', Courier, monospace; font-size: 36px; font-weight: 900; line-height: 1.1;'>{mpr_rate:.2f}%</div>"
-        "<div style='font-size: 14px; font-weight: 900; color: #1E293B; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 10px;'>MPR RATE</div>"
+        f"<div style='color:#2563EB; font-size: 40px; font-weight: 900; line-height: 1.1;'>{mpr_rate:.2f}%</div>"
+        "<div style='font-size: 15px; font-weight: 900; color: #1E293B; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 10px;'>MPR RATE</div>"
         f"<div style='font-size: 13px; font-weight: 700; color: #10B981; margin-top: 4px;'>Next Date: {next_mpr_date}</div>"
         "</div>"
         "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding-left: 10px;'>"
-        f"<div style='color:#0F172A; font-family: 'Courier New', Courier, monospace; font-size: 36px; font-weight: 900; line-height: 1.1;'>{mpr_rate - 1.5:.2f}%</div>"
-        "<div style='font-size: 14px; font-weight: 900; color: #2563EB; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 10px;'>BENCHMARK</div>"
+        f"<div style='color:#0F172A; font-size: 40px; font-weight: 900; line-height: 1.1;'>{mpr_rate - 1.5:.2f}%</div>"
+        "<div style='font-size: 15px; font-weight: 900; color: #2563EB; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 10px;'>BENCHMARK</div>"
         "<div style='font-size: 13px; font-weight: 700; color: #10B981; margin-top: 4px;'>MPR - 1.5%</div>"
         "</div></div>"
     )
@@ -355,10 +335,10 @@ with st.spinner("Rendering Visualizations..."):
     # 3. PKR Yields Card
     pkr_yields_html = (
         "<div style='display: flex; justify-content: space-between; width: 100%; gap: 10px; margin-top: 10px; height: 100%;'>"
-        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px 4px; text-align: center;'><div style='font-size: 14px; font-weight: 900; color: #10B981; text-transform: uppercase;'>1M</div><div style='font-family: 'Courier New', Courier, monospace; font-size: 24px; font-weight: 900; color: #0F172A; margin-top: 10px;'>--%</div></div>"
-        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px 4px; text-align: center;'><div style='font-size: 14px; font-weight: 900; color: #10B981; text-transform: uppercase;'>3M</div><div style='font-family: 'Courier New', Courier, monospace; font-size: 24px; font-weight: 900; color: #0F172A; margin-top: 10px;'>--%</div></div>"
-        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px 4px; text-align: center;'><div style='font-size: 14px; font-weight: 900; color: #10B981; text-transform: uppercase;'>6M</div><div style='font-family: 'Courier New', Courier, monospace; font-size: 24px; font-weight: 900; color: #0F172A; margin-top: 10px;'>--%</div></div>"
-        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px 4px; text-align: center;'><div style='font-size: 14px; font-weight: 900; color: #10B981; text-transform: uppercase;'>1Y</div><div style='font-family: 'Courier New', Courier, monospace; font-size: 24px; font-weight: 900; color: #0F172A; margin-top: 10px;'>--%</div></div>"
+        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px 4px; text-align: center;'><div style='font-size: 14px; font-weight: 900; color: #10B981; text-transform: uppercase;'>1M</div><div style='font-size: 20px; font-weight: 900; color: #0F172A; margin-top: 10px;'>--%</div></div>"
+        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px 4px; text-align: center;'><div style='font-size: 14px; font-weight: 900; color: #10B981; text-transform: uppercase;'>3M</div><div style='font-size: 20px; font-weight: 900; color: #0F172A; margin-top: 10px;'>--%</div></div>"
+        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px 4px; text-align: center;'><div style='font-size: 14px; font-weight: 900; color: #10B981; text-transform: uppercase;'>6M</div><div style='font-size: 20px; font-weight: 900; color: #0F172A; margin-top: 10px;'>--%</div></div>"
+        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px 4px; text-align: center;'><div style='font-size: 14px; font-weight: 900; color: #10B981; text-transform: uppercase;'>1Y</div><div style='font-size: 20px; font-weight: 900; color: #0F172A; margin-top: 10px;'>--%</div></div>"
         "</div>"
     )
 
@@ -373,7 +353,7 @@ with st.spinner("Rendering Visualizations..."):
     
     st.markdown(
         "<div style='text-align: left; margin-bottom: 24px;'>"
-        "<h3 style='font-family: \"Courier New\", Courier, monospace !important; font-size: 28px; font-weight: 900; color: #0F172A; letter-spacing: 1.2px; text-transform: uppercase; margin: 0;'>Current Investment Position</h3>"
+        "<h3 style='font-size: 25px; font-weight: 900; color: #0F172A; letter-spacing: 1.2px; text-transform: uppercase; margin: 0;'>Current Investment Position</h3>"
         "<p style='color: #64748B; font-size: 16px; font-weight: 600; margin-top: 4px;'>Instrument-Level Ledger & Portfolio Concentration</p>"
         "</div>", 
         unsafe_allow_html=True
@@ -391,13 +371,6 @@ with st.spinner("Rendering Visualizations..."):
     inv_col1, inv_col2 = st.columns([1, 1.4], gap="large")
 
     with inv_col1:
-        st.markdown("""
-            <div style='background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 24px 20px 0px 20px; box-shadow: 0 6px 16px rgba(30, 58, 138, 0.08);'>
-                <div style='font-size: 18px; font-weight: 900; color: #0F172A; text-transform: uppercase;'>Portfolio Concentration</div>
-                <div style='font-size: 13px; font-weight: 600; color: #64748B; margin-top: 4px;'>% of Gross Investment Portfolio</div>
-            </div>
-        """, unsafe_allow_html=True)
-        
         fig_inv_donut = go.Figure(data=[go.Pie(
             labels=[item["instrument"] for item in investment_data],
             values=[item["value"] for item in investment_data],
@@ -410,11 +383,12 @@ with st.spinner("Rendering Visualizations..."):
         )])
         
         fig_inv_donut.update_layout(
+            title=dict(text="PORTFOLIO CONCENTRATION", x=0.5, font=dict(size=18, color="#0F172A", family="Arial Black")),
             showlegend=False,
-            margin=dict(t=20, b=20, l=40, r=40),
+            margin=dict(t=60, b=25, l=45, r=45),
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
-            height=320,
+            height=400,
             font=CHART_FONT
         )
         
@@ -438,7 +412,7 @@ with st.spinner("Rendering Visualizations..."):
             "<div style='font-size: 18px; font-weight: 900; color: #0F172A; text-transform: uppercase;'>POSITION BY INSTRUMENT</div>"
             "<div style='font-size: 13px; font-weight: 600; color: #64748B; margin-top: 4px; margin-bottom: 20px;'>Market Value & Concentration</div>"
             "<div style='flex-grow: 1; width: 100%; border-radius: 8px; overflow: hidden; border: 1px solid #E2E8F0;'>"
-            "<table style='width: 100%; border-collapse: collapse; font-size: 13px; background: white;'>"
+            "<table style='width: 100%; border-collapse: collapse; font-size: 15px; background: white;'>"
             "<thead><tr style='background-color: #1E293B; color: #FFFFFF;'>"
             "<th style='padding: 14px 16px; text-align: left; font-weight: 800;'>INSTRUMENT</th>"
             "<th style='padding: 14px 16px; text-align: right; font-weight: 800;'>MARKET VALUE (PKR Mns)</th>"
