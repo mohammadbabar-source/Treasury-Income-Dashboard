@@ -345,16 +345,17 @@ with st.spinner("Rendering Visualizations..."):
     with bot_col3:
         st.markdown(f"<div class='kpi-card' style='justify-content: center; height: 210px;'><div class='kpi-lbl'>PKR YIELDS</div>{pkr_yields_html}</div>", unsafe_allow_html=True)
 
+
     # =========================================================
     # NEW SECTION: CURRENT INVESTMENT POSITION
     # =========================================================
     
-    st.markdown("<div style='height: 36px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 48px;'></div>", unsafe_allow_html=True)
     
     st.markdown(
-        "<div style='text-align: left; margin-bottom: 24px;'>"
-        "<h3 style='font-size: 25px; font-weight: 900; color: #0F172A; letter-spacing: 1.2px; text-transform: uppercase; margin: 0;'>Current Investment Position</h3>"
-        "<p style='color: #64748B; font-size: 16px; font-weight: 600; margin-top: 4px;'>Instrument-Level Ledger & Portfolio Concentration</p>"
+        "<div style='text-align: left; margin-bottom: 24px; padding-left: 10px; border-left: 5px solid #2563EB;'>"
+        "<h3 style='font-size: 26px; font-weight: 900; color: #0F172A; letter-spacing: 1.2px; text-transform: uppercase; margin: 0;'>Current Investment Position</h3>"
+        "<p style='color: #64748B; font-size: 16px; font-weight: 600; margin-top: 6px; margin-bottom: 0;'>Instrument-Level Ledger & Portfolio Concentration</p>"
         "</div>", 
         unsafe_allow_html=True
     )
@@ -371,28 +372,33 @@ with st.spinner("Rendering Visualizations..."):
     inv_col1, inv_col2 = st.columns([1, 1.4], gap="large")
 
     with inv_col1:
+        st.markdown(
+            "<div class='html-card' style='padding-bottom: 0px;'>"
+            "<div style='font-size: 18px; font-weight: 900; color: #0F172A; text-transform: uppercase;'>PORTFOLIO CONCENTRATION</div>"
+            "<div style='font-size: 13px; font-weight: 600; color: #64748B; margin-top: 4px;'>% of Gross Investment Portfolio</div>"
+            "</div>", unsafe_allow_html=True
+        )
+        
         fig_inv_donut = go.Figure(data=[go.Pie(
             labels=[item["instrument"] for item in investment_data],
             values=[item["value"] for item in investment_data],
-            hole=0.75,
-            marker_colors=['#0F4C23', '#D4AF37', '#1E293B', '#64748B'],
+            hole=0.7,
+            marker_colors=['#2563EB', '#10B981', '#0F172A', '#64748B'],
             textinfo='label+percent',
             textposition='outside',
             textfont=dict(size=14, weight='bold', color='#0F172A'),
-            marker=dict(line=dict(color='#FFFFFF', width=6))
+            marker=dict(line=dict(color='#FFFFFF', width=4))
         )])
         
         fig_inv_donut.update_layout(
-            title=dict(text="PORTFOLIO CONCENTRATION", x=0.5, font=dict(size=18, color="#0F172A", family="Arial Black")),
             showlegend=False,
-            margin=dict(t=60, b=25, l=45, r=45),
+            margin=dict(t=20, b=20, l=40, r=40),
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
-            height=400,
+            height=320,
             font=CHART_FONT
         )
         
-        # Wrapped identically to standard charts via Plotly object inside Streamlit container
         st.plotly_chart(fig_inv_donut, use_container_width=True)
 
     with inv_col2:
@@ -419,7 +425,7 @@ with st.spinner("Rendering Visualizations..."):
             "<th style='padding: 14px 16px; text-align: right; font-weight: 800;'>CONC. (%)</th>"
             "</tr></thead>"
             f"<tbody>{table_rows}</tbody>"
-            "<tfoot><tr style='background-color: #F1F5F9;'>"
+            "<tfoot><tr style='background-color: #F1F5F9; border-top: 3px solid #1E293B;'>"
             "<td style='padding: 16px 16px; text-align: left; font-weight: 900; color: #0F172A;'>Gross Portfolio</td>"
             f"<td style='padding: 16px 16px; text-align: right; font-weight: 900; color: #0F172A;'>{gross_portfolio_value:,.2f}</td>"
             "<td style='padding: 16px 16px; text-align: right; font-weight: 900; color: #2563EB;'>100.0%</td>"
