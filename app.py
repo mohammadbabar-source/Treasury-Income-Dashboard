@@ -22,7 +22,7 @@ try:
             return float(val) if pd.notna(val) and isinstance(val, (int, float)) else 0.0
         return 0.0
 
-    # Total Income per Quarter (Row index 10 - Total of OSR Table)
+    # Total Income per Quarter (Row index 10)
     inc_q1 = get_q_val(10, 2) / 1e6
     inc_q2 = get_q_val(10, 3) / 1e6
     inc_q3 = get_q_val(10, 4) / 1e6
@@ -160,12 +160,12 @@ if st.session_state.first_load:
     with splash.container():
         st.markdown("""
             <div style='display: flex; justify-content: center; align-items: center; height: 85vh; flex-direction: column; text-align: center; animation: fadeOut 0.5s ease-in 2s forwards;'>
-                <h1 style='color: #000000; font-size: 56px; letter-spacing: 2px; margin-bottom: 12px; font-weight: 900;'>KARANDAAZ TREASURY</h1>
-                <p style='color: #64748B; font-size: 22px; font-weight: 600; letter-spacing: 1px;'>Loading FY26-27 Quarterly Dashboard...</p>
+                <h1 style='color: #000000; font-size: 64px; letter-spacing: 2px; margin-bottom: 12px; font-weight: 900;'>KARANDAAZ TREASURY</h1>
+                <p style='color: #64748B; font-size: 26px; font-weight: 600; letter-spacing: 1px;'>Loading FY26-27 Quarterly Dashboard...</p>
                 <div class="loader"></div>
             </div>
             <style>
-            .loader { border: 5px solid #F1F5F9; border-top: 5px solid #2563EB; border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin-top: 20px;}
+            .loader { border: 5px solid #F1F5F9; border-top: 5px solid #2563EB; border-radius: 50%; width: 55px; height: 55px; animation: spin 1s linear infinite; margin-top: 24px;}
             @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
             @keyframes fadeOut { 0% { opacity: 1; } 100% { opacity: 0; } }
             .stApp { background-color: #FFFFFF; }
@@ -182,7 +182,10 @@ st.markdown("""
     html, body, .stApp { background-color: #F8FAFC !important; margin: 0 !important; padding: 0 !important; }
     header { visibility: hidden; height: 0; }
     
-    /* SBP Rolling Banner CSS */
+    /* Adjust Streamlit top padding to prevent banner overlap */
+    .block-container { padding-top: 5rem !important; padding-bottom: 3rem !important; padding-left: 2rem !important; padding-right: 2rem !important; max-width: 100% !important; }
+
+    /* SBP Rolling Banner CSS - Text +25% */
     .sbp-marquee {
         position: fixed;
         top: 0;
@@ -190,17 +193,17 @@ st.markdown("""
         width: 100%;
         background-color: #0F4C23; /* SBP Green */
         color: #FFFFFF;
-        padding: 10px 0;
+        padding: 12px 0;
         overflow: hidden;
         white-space: nowrap;
         z-index: 999999;
         border-bottom: 3px solid #D4AF37; /* SBP Gold */
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        box-shadow: 0 8px 20px rgba(30, 58, 138, 0.15); /* Navy Shadow */
     }
     .sbp-marquee a {
         color: #FFFFFF !important;
         text-decoration: none;
-        font-size: 15px;
+        font-size: 19px; /* INCREASED */
         font-weight: 500;
         letter-spacing: 0.5px;
     }
@@ -217,21 +220,18 @@ st.markdown("""
         100% { transform: translateX(-100%); }
     }
     
-    /* Adjust Streamlit top padding to prevent banner overlap */
-    .block-container { padding-top: 4rem !important; padding-bottom: 2rem !important; padding-left: 2rem !important; padding-right: 2rem !important; max-width: 100% !important; }
+    /* Top Glowing Header - Text +25% */
+    .header-container { display: flex; align-items: center; justify-content: center; margin-top: 10px !important; margin-bottom: 16px; }
+    .glow-line { height: 4px; flex-grow: 1; max-width: 380px; background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.6), transparent); box-shadow: 0 0 16px rgba(59, 130, 246, 0.6); }
+    .header-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 16px 48px; margin: 0 24px; box-shadow: 0 8px 24px rgba(30, 58, 138, 0.15); font-weight: 900; font-size: 32px; color: #000000; letter-spacing: 1.5px; text-transform: uppercase; }
 
-    /* Top Glowing Header */
-    .header-container { display: flex; align-items: center; justify-content: center; margin-top: 0px !important; margin-bottom: 12px; }
-    .glow-line { height: 3px; flex-grow: 1; max-width: 380px; background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.6), transparent); box-shadow: 0 0 12px rgba(59, 130, 246, 0.6); }
-    .header-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 12px 40px; margin: 0 20px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05); font-weight: 900; font-size: 26px; color: #000000; letter-spacing: 1.5px; text-transform: uppercase; }
-
-    /* Centered & Scaled Top KPI Cards */
+    /* Centered & Scaled Top KPI Cards - Navy Shadow & Text +25% */
     .kpi-card { 
         background: #FFFFFF; 
         border: 1px solid #E2E8F0; 
-        border-radius: 14px; 
-        padding: 22px 18px; 
-        box-shadow: 0 4px 14px rgba(0,0,0,0.03); 
+        border-radius: 16px; 
+        padding: 28px 24px; 
+        box-shadow: 0 8px 24px rgba(30, 58, 138, 0.12); /* Navy Shadow */
         height: 100%; 
         display: flex; 
         flex-direction: column; 
@@ -240,72 +240,73 @@ st.markdown("""
         text-align: center; 
         transition: transform 0.2s ease, box-shadow 0.2s ease; 
     }
-    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.07); }
-    .kpi-title { font-size: 14px; font-weight: 800; color: #0F172A; text-transform: uppercase; letter-spacing: 0.8px; width: 100%; }
-    .kpi-value { font-size: 30px; font-weight: 900; color: #0F172A; line-height: 1.2; margin-top: 8px; width: 100%; }
-    .kpi-sub { font-size: 13px; font-weight: 600; color: #64748B; margin-top: 6px; width: 100%; }
-    .kpi-divider { border: 0; border-top: 1px solid #E2E8F0; margin: 10px 0; width: 85%; }
+    .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(30, 58, 138, 0.25); }
+    .kpi-title { font-size: 18px; font-weight: 800; color: #0F172A; text-transform: uppercase; letter-spacing: 0.8px; width: 100%; }
+    .kpi-value { font-size: 38px; font-weight: 900; color: #0F172A; line-height: 1.2; margin-top: 10px; width: 100%; }
+    .kpi-sub { font-size: 16px; font-weight: 600; color: #64748B; margin-top: 8px; width: 100%; }
+    .kpi-divider { border: 0; border-top: 2px solid #E2E8F0; margin: 12px 0; width: 85%; }
 
-    /* Unified Card Containers for Header + Chart */
+    /* Unified Card Containers for Header + Chart - Navy Shadow & Text +25% */
     .card {
         background: #FFFFFF;
         border: 1px solid #E2E8F0;
-        border-top: 4px solid #2563EB;
-        border-radius: 16px;
-        padding: 20px 22px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+        border-top: 5px solid #2563EB;
+        border-radius: 18px;
+        padding: 24px 26px;
+        box-shadow: 0 8px 24px rgba(30, 58, 138, 0.12); /* Navy Shadow */
         height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,0.08); }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(30, 58, 138, 0.25); }
     
     .card-title {
-        font-size: 15px;
+        font-size: 19px;
         font-weight: 800;
         color: #0F172A;
         text-transform: uppercase;
         letter-spacing: 1px;
         text-align: center;
-        margin-bottom: 12px;
+        margin-bottom: 16px;
         width: 100%;
     }
 
-    /* Refined Bank Profit Rates Container */
+    /* Refined Bank Profit Rates Container - Navy Shadow */
     .rate-card {
         background: #FFFFFF;
         border: 1px solid #E2E8F0;
-        border-top: 4px solid #2563EB;
-        border-radius: 16px;
-        padding: 16px 18px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+        border-top: 5px solid #2563EB;
+        border-radius: 18px;
+        padding: 24px 20px;
+        box-shadow: 0 8px 24px rgba(30, 58, 138, 0.12); /* Navy Shadow */
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
         align-items: center;
         text-align: center;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
+        flex-grow: 1; /* Allows flexible filling of space */
     }
-    .rate-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,0.08); }
-    .rate-card-title { font-size: 14px; font-weight: 800; color: #0F172A; text-transform: uppercase; letter-spacing: 0.8px; width: 100%; }
+    .rate-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(30, 58, 138, 0.25); }
+    .rate-card-title { font-size: 18px; font-weight: 800; color: #0F172A; text-transform: uppercase; letter-spacing: 0.8px; width: 100%; }
 
     div[data-testid="stPlotlyChart"] { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
 
-    .screen-2-header { margin-top: 40px; margin-bottom: 20px; text-align: center; }
-    .screen-2-header h3 { font-size: 20px; font-weight: 900; color: #0F172A; letter-spacing: 1.2px; text-transform: uppercase; margin: 0; }
-    div[data-baseweb="select"] > div { border-radius: 10px; font-size: 14px; font-weight: 600; }
+    .screen-2-header { margin-top: 50px; margin-bottom: 24px; text-align: center; }
+    .screen-2-header h3 { font-size: 25px; font-weight: 900; color: #0F172A; letter-spacing: 1.2px; text-transform: uppercase; margin: 0; }
+    div[data-baseweb="select"] > div { border-radius: 12px; font-size: 18px; font-weight: 600; padding: 4px; }
     </style>
 """, unsafe_allow_html=True)
 
-CHART_FONT = dict(family="Segoe UI, Roboto, sans-serif", color="#0F172A", size=13)
+CHART_FONT = dict(family="Segoe UI, Roboto, sans-serif", color="#0F172A", size=16) # Increased from 13 to 16
 BLUE_ACCENT, GREEN_ACCENT = '#2563EB', '#10B981'
 
 with st.spinner("Rendering Visualizations..."):
-    
+
     # SBP Rolling Banner
-    st.markdown(f'''
+    st.markdown(f"""
         <div class="sbp-marquee">
             <span>
                 <a href="https://www.sbp.org.pk/our-operations/monetary-policy" target="_blank">
@@ -317,7 +318,7 @@ with st.spinner("Rendering Visualizations..."):
                 </a>
             </span>
         </div>
-    ''', unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
     # SCREEN 1: TOP SECTION
     st.markdown("""
@@ -329,7 +330,7 @@ with st.spinner("Rendering Visualizations..."):
     """, unsafe_allow_html=True)
 
     # Quarter Selection Dropdown
-    col_e1, col_date, col_e2 = st.columns([1, 0.25, 1])
+    col_e1, col_date, col_e2 = st.columns([1, 0.3, 1])
     with col_date:
         selected_q = st.selectbox("", ["Q1", "Q2", "Q3", "Q4"], label_visibility="collapsed")
 
@@ -337,21 +338,22 @@ with st.spinner("Rendering Visualizations..."):
     q_rates_list = get_quarter_rates(selected_q)
     st.write("")
 
-    # 4 Centered Top KPI Cards
-    kpi1, kpi2, kpi3, kpi4 = st.columns(4, gap="medium")
+    # 4 Centered Top KPI Cards (Spacing increased to "large")
+    kpi1, kpi2, kpi3, kpi4 = st.columns(4, gap="large")
     with kpi1:
-        st.markdown(f"<div class='kpi-card'><div class='kpi-title'>Total Income</div><hr class='kpi-divider'><div class='kpi-value'>{q_ctx['total_income']:,.2f} PKR Mns</div><div class='kpi-sub'>Quarterly Income ({selected_q})</div></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='kpi-card'><div class='kpi-title'>Total Income</div><hr class='kpi-divider'><div class='kpi-value'>{q_ctx['total_income']:,.2f} M</div><div class='kpi-sub'>Quarterly Income ({selected_q})</div></div>", unsafe_allow_html=True)
     with kpi2:
-        st.markdown(f"<div class='kpi-card'><div class='kpi-title'>Treasury Pool</div><hr class='kpi-divider'><div class='kpi-value'>{q_ctx['treasury_pool']:,.2f} PKR Mns</div><div class='kpi-sub'>Total Allocation ({selected_q})</div></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='kpi-card'><div class='kpi-title'>Treasury Pool</div><hr class='kpi-divider'><div class='kpi-value'>{q_ctx['treasury_pool']:,.2f} M</div><div class='kpi-sub'>Total Allocation ({selected_q})</div></div>", unsafe_allow_html=True)
     with kpi3:
-        st.markdown(f"<div class='kpi-card'><div class='kpi-title'>Forecasted Income</div><hr class='kpi-divider'><div class='kpi-value'>{q_ctx['forecasted_income']:,.2f} PKR Mns</div><div class='kpi-sub'>Forecasted Income for {selected_q}</div></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='kpi-card'><div class='kpi-title'>Forecasted Income</div><hr class='kpi-divider'><div class='kpi-value'>{q_ctx['forecasted_income']:,.2f} M</div><div class='kpi-sub'>Forecasted for {selected_q}</div></div>", unsafe_allow_html=True)
     with kpi4:
         st.markdown(f"<div class='kpi-card'><div class='kpi-title'>Annual Yield</div><hr class='kpi-divider'><div class='kpi-value'>{q_ctx['annual_yield']}</div><div class='kpi-sub'>Weighted Annual Yield</div></div>", unsafe_allow_html=True)
 
     st.write("")
 
     # Screen 1 Charts with Bank Profit Rates (All 3 months) & MhePR Cards
-    sc1_left, sc1_mid, sc1_cards = st.columns([1.1, 1.3, 0.8], gap="medium")
+    # Adjusted column weights to give text cards more breathing room
+    sc1_left, sc1_mid, sc1_cards = st.columns([1.1, 1.3, 0.95], gap="large")
 
     # --- Donut Chart Card ---
     with sc1_left:
@@ -365,12 +367,12 @@ with st.spinner("Rendering Visualizations..."):
             marker=dict(line=dict(color='#FFFFFF', width=2))
         )])
         fig_margin.update_layout(
-            annotations=[dict(text=f"Total<br><b style='font-size:22px; color:#0F172A;'>{q_ctx['total_income']:.1f}M</b>", x=0.5, y=0.5, xanchor='center', yanchor='middle', font=CHART_FONT, showarrow=False)],
+            annotations=[dict(text=f"Total<br><b style='font-size:28px; color:#0F172A;'>{q_ctx['total_income']:.1f}M</b>", x=0.5, y=0.5, xanchor='center', yanchor='middle', font=CHART_FONT, showarrow=False)],
             showlegend=False, 
-            margin=dict(t=20, b=20, l=40, r=40), 
+            margin=dict(t=25, b=25, l=45, r=45), 
             paper_bgcolor='rgba(0,0,0,0)', 
             plot_bgcolor='rgba(0,0,0,0)', 
-            height=310, 
+            height=380, # Increased height to prevent overlap
             font=CHART_FONT
         )
         st.plotly_chart(fig_margin, use_container_width=True)
@@ -387,49 +389,50 @@ with st.spinner("Rendering Visualizations..."):
             name='Total Income', 
             line=dict(color=BLUE_ACCENT, width=3, shape='spline', smoothing=0.3), 
             mode='lines+markers', 
-            marker=dict(size=9, color=BLUE_ACCENT)
+            marker=dict(size=10, color=BLUE_ACCENT)
         ))
         
         fig_trend.update_layout(
-            margin=dict(t=15, b=20, l=20, r=20), 
+            margin=dict(t=20, b=30, l=30, r=30), 
             paper_bgcolor='rgba(0,0,0,0)', 
             plot_bgcolor='rgba(0,0,0,0)',
             showlegend=False, 
-            xaxis=dict(showgrid=False, tickfont=dict(color="#0F172A", size=13)), 
+            xaxis=dict(showgrid=False, tickfont=dict(color="#0F172A", size=16)), 
             yaxis=dict(
                 showgrid=True, gridcolor='#E2E8F0', 
-                tickfont=dict(color="#0F172A", size=13), 
+                tickfont=dict(color="#0F172A", size=16), 
                 zeroline=False,
                 tickformat="d",
-                ticksuffix=" PKR Mns"
+                ticksuffix=" Mns"
             ), 
-            height=310, 
+            height=380, # Increased height
             font=CHART_FONT
         )
         st.plotly_chart(fig_trend, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # --- Right-Side Rate Cards: Profit Rates across all 3 months of Quarter + MhePR ---
+    # --- Right-Side Rate Cards: Fluid heights to prevent text overlap ---
     rates_boxes_html = ""
     for month_info in q_rates_list:
         rates_boxes_html += f"""
-        <div style='background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 6px 10px; margin-bottom: 6px; text-align: left;'>
-            <div style='font-size: 11px; font-weight: 800; color: #2563EB; text-transform: uppercase; letter-spacing: 0.5px;'>{month_info['month']}</div>
-            <div style='font-size: 12px; font-weight: 700; color: #0F172A; margin-top: 2px; line-height: 1.2;'>{month_info['inline']}</div>
+        <div style='background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px 14px; margin-bottom: 10px; text-align: left;'>
+            <div style='font-size: 14px; font-weight: 800; color: #2563EB; text-transform: uppercase; letter-spacing: 0.5px;'>{month_info['month']}</div>
+            <div style='font-size: 15px; font-weight: 700; color: #0F172A; margin-top: 4px; line-height: 1.4;'>{month_info['inline']}</div>
         </div>
         """
 
     with sc1_cards:
+        # Used flex: 1 to make cards scale automatically without hardcoded pixel heights
         st.markdown(f"""
-            <div style='display: flex; flex-direction: column; height: 380px; justify-content: space-between; gap: 12px;'>
-                <div class='rate-card' style='height: 250px;'>
-                    <div class='rate-card-title'>Bank Profit Rates ({selected_q})</div><hr class='kpi-divider' style='margin: 6px 0 8px 0;'>
+            <div style='display: flex; flex-direction: column; height: 100%; min-height: 400px; justify-content: space-between; gap: 16px;'>
+                <div class='rate-card' style='flex: 1.8;'>
+                    <div class='rate-card-title'>Bank Profit Rates ({selected_q})</div><hr class='kpi-divider' style='margin: 8px 0 12px 0;'>
                     <div style='width: 100%;'>{rates_boxes_html}</div>
                 </div>
-                <div class='kpi-card' style='height: 118px; border-top: 4px solid #2563EB;'>
-                    <div class='kpi-title' style='font-size: 13px;'>MhePR</div><hr class='kpi-divider' style='margin: 4px 0;'>
-                    <div class='kpi-value' style='color:#2563EB; font-size: 24px;'>{mpr_rate:.2f}%</div>
-                    <div class='kpi-sub' style='margin-top: 2px;'>Next Date: {next_mpr_date}</div>
+                <div class='kpi-card' style='flex: 1; border-top: 5px solid #2563EB;'>
+                    <div class='kpi-title' style='font-size: 16px;'>MhePR</div><hr class='kpi-divider' style='margin: 6px 0;'>
+                    <div class='kpi-value' style='color:#2563EB; font-size: 30px;'>{mpr_rate:.2f}%</div>
+                    <div class='kpi-sub' style='margin-top: 4px; font-size: 15px;'>Next Date: {next_mpr_date}</div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
@@ -441,7 +444,7 @@ with st.spinner("Rendering Visualizations..."):
         </div>
     """, unsafe_allow_html=True)
 
-    bot1, bot2, bot3 = st.columns([1, 1, 1.4], gap="medium")
+    bot1, bot2, bot3 = st.columns([1, 1, 1.4], gap="large")
 
     with bot1:
         st.markdown(f"<div class='card' style='border-top-color:#10B981;'><div class='card-title'>TREASURY POOL SPLIT</div>", unsafe_allow_html=True)
@@ -451,7 +454,7 @@ with st.spinner("Rendering Visualizations..."):
             marker_colors=[BLUE_ACCENT, '#3B82F6', '#60A5FA', '#93C5FD', '#BFDBFE', '#CBD5E1'], textinfo='label', textposition='outside',
             marker=dict(line=dict(color='#FFFFFF', width=2))
         )])
-        fig_treasury.update_layout(showlegend=False, margin=dict(t=20, b=20, l=20, r=20), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=300, font=CHART_FONT)
+        fig_treasury.update_layout(showlegend=False, margin=dict(t=25, b=25, l=25, r=25), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=380, font=CHART_FONT)
         st.plotly_chart(fig_treasury, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -462,7 +465,7 @@ with st.spinner("Rendering Visualizations..."):
             marker_colors=[GREEN_ACCENT, '#34D399', '#6EE7B7'], textinfo='label', textposition='outside',
             marker=dict(line=dict(color='#FFFFFF', width=2))
         )])
-        fig_exp.update_layout(showlegend=False, margin=dict(t=20, b=20, l=20, r=20), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=300, font=CHART_FONT)
+        fig_exp.update_layout(showlegend=False, margin=dict(t=25, b=25, l=25, r=25), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=380, font=CHART_FONT)
         st.plotly_chart(fig_exp, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -472,11 +475,11 @@ with st.spinner("Rendering Visualizations..."):
         categories = ['Operational', 'WV Greenfin', 'RPA A/c', 'Inv/CDEL', 'LR Funds', 'OSR Funds']
         fig_bar.add_trace(go.Bar(y=categories, x=[op_funds, wv_greenfin, rpa_acc, inv_cdel, lr_funds, osr_funds], name='Actual Pool', orientation='h', marker_color=BLUE_ACCENT))
         fig_bar.update_layout(
-            barmode='group', margin=dict(t=20, b=20, l=10, r=10), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', 
-            legend=dict(yanchor="bottom", y=0.05, xanchor="right", x=0.95, font=dict(color="#0F172A", size=12)), 
-            xaxis=dict(showgrid=True, gridcolor='#E2E8F0', tickfont=dict(color="#0F172A", size=13), ticksuffix="M"), 
-            yaxis=dict(showgrid=False, tickfont=dict(color="#0F172A", size=13)), 
-            height=300, font=CHART_FONT
+            barmode='group', margin=dict(t=25, b=30, l=10, r=10), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', 
+            legend=dict(yanchor="bottom", y=0.05, xanchor="right", x=0.95, font=dict(color="#0F172A", size=15)), 
+            xaxis=dict(showgrid=True, gridcolor='#E2E8F0', tickfont=dict(color="#0F172A", size=16), ticksuffix="M"), 
+            yaxis=dict(showgrid=False, tickfont=dict(color="#0F172A", size=16)), 
+            height=380, font=CHART_FONT
         )
         st.plotly_chart(fig_bar, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
