@@ -226,14 +226,13 @@ st.markdown("""
     .glow-line { height: 4px; flex-grow: 1; max-width: 380px; background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.6), transparent); box-shadow: 0 0 16px rgba(59, 130, 246, 0.6); }
     .header-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 16px 48px; margin: 0 24px; box-shadow: 0 8px 24px rgba(30, 58, 138, 0.15); font-weight: 900; font-size: 32px; color: #000000; letter-spacing: 1.5px; text-transform: uppercase; }
 
-    /* Centered & Scaled Top KPI Cards - Spacing Fixed */
+    /* Centered & Scaled Top KPI Cards - ULTRA COMPACT */
     .kpi-card { 
         background: #FFFFFF; 
         border: 1px solid #E2E8F0; 
-        border-radius: 14px; 
-        padding: 20px 16px; 
+        border-radius: 12px; 
+        padding: 12px 10px; /* Greatly reduced padding */
         box-shadow: 0 6px 18px rgba(30, 58, 138, 0.08); /* Subtle Navy Shadow */
-        height: 100%; 
         display: flex; 
         flex-direction: column; 
         justify-content: center; 
@@ -241,11 +240,11 @@ st.markdown("""
         text-align: center; 
         transition: transform 0.2s ease, box-shadow 0.2s ease; 
     }
-    .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(30, 58, 138, 0.15); }
-    .kpi-title { font-size: 15px; font-weight: 800; color: #0F172A; text-transform: uppercase; letter-spacing: 0.5px; width: 100%; }
-    .kpi-value { font-size: 32px; font-weight: 900; color: #0F172A; line-height: 1.2; margin-top: 6px; width: 100%; }
-    .kpi-sub { font-size: 14px; font-weight: 600; color: #64748B; margin-top: 4px; width: 100%; }
-    .kpi-divider { border: 0; border-top: 1px solid #E2E8F0; margin: 10px 0; width: 85%; }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(30, 58, 138, 0.15); }
+    .kpi-title { font-size: 14px; font-weight: 800; color: #0F172A; text-transform: uppercase; letter-spacing: 0.5px; width: 100%; margin-bottom: 2px; }
+    .kpi-value { font-size: 28px; font-weight: 900; color: #0F172A; line-height: 1.1; margin-top: 2px; width: 100%; }
+    .kpi-sub { font-size: 12px; font-weight: 600; color: #64748B; margin-top: 2px; width: 100%; }
+    .kpi-divider { border: 0; border-top: 1px solid #E2E8F0; margin: 6px 0; width: 85%; }
 
     /* Unified Card Containers for Header + Chart - Navy Shadow & Text +25% */
     .card {
@@ -337,10 +336,9 @@ with st.spinner("Rendering Visualizations..."):
 
     q_ctx = quarter_data[selected_q]
     q_rates_list = get_quarter_rates(selected_q)
-    st.write("")
 
-    # 4 Centered Top KPI Cards (Spacing fixed)
-    kpi1, kpi2, kpi3, kpi4 = st.columns(4, gap="medium")
+    # 4 Centered Top KPI Cards
+    kpi1, kpi2, kpi3, kpi4 = st.columns(4, gap="small")
     with kpi1:
         st.markdown(f"<div class='kpi-card'><div class='kpi-title'>Total Income</div><hr class='kpi-divider'><div class='kpi-value'>{q_ctx['total_income']:,.2f} M</div><div class='kpi-sub'>Quarterly Income ({selected_q})</div></div>", unsafe_allow_html=True)
     with kpi2:
@@ -349,8 +347,6 @@ with st.spinner("Rendering Visualizations..."):
         st.markdown(f"<div class='kpi-card'><div class='kpi-title'>Forecasted Income</div><hr class='kpi-divider'><div class='kpi-value'>{q_ctx['forecasted_income']:,.2f} M</div><div class='kpi-sub'>Forecasted for {selected_q}</div></div>", unsafe_allow_html=True)
     with kpi4:
         st.markdown(f"<div class='kpi-card'><div class='kpi-title'>Annual Yield</div><hr class='kpi-divider'><div class='kpi-value'>{q_ctx['annual_yield']}</div><div class='kpi-sub'>Weighted Annual Yield</div></div>", unsafe_allow_html=True)
-
-    st.write("")
 
     # Screen 1 Charts with Bank Profit Rates (All 3 months) & MhePR Cards
     # Adjusted column weights to give text cards more breathing room
