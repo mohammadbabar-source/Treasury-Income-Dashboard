@@ -181,7 +181,44 @@ st.markdown("""
     * { font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif !important; box-sizing: border-box; }
     html, body, .stApp { background-color: #F8FAFC !important; margin: 0 !important; padding: 0 !important; }
     header { visibility: hidden; height: 0; }
-    .block-container { padding-top: 1rem !important; padding-bottom: 2rem !important; padding-left: 2rem !important; padding-right: 2rem !important; max-width: 100% !important; }
+    
+    /* SBP Rolling Banner CSS */
+    .sbp-marquee {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: #0F4C23; /* SBP Green */
+        color: #FFFFFF;
+        padding: 10px 0;
+        overflow: hidden;
+        white-space: nowrap;
+        z-index: 999999;
+        border-bottom: 3px solid #D4AF37; /* SBP Gold */
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .sbp-marquee a {
+        color: #FFFFFF !important;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+    .sbp-marquee > span {
+        display: inline-block;
+        padding-left: 100%;
+        animation: marquee_scroll 28s linear infinite;
+    }
+    .sbp-marquee:hover > span {
+        animation-play-state: paused;
+    }
+    @keyframes marquee_scroll {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-100%); }
+    }
+    
+    /* Adjust Streamlit top padding to prevent banner overlap */
+    .block-container { padding-top: 4rem !important; padding-bottom: 2rem !important; padding-left: 2rem !important; padding-right: 2rem !important; max-width: 100% !important; }
 
     /* Top Glowing Header */
     .header-container { display: flex; align-items: center; justify-content: center; margin-top: 0px !important; margin-bottom: 12px; }
@@ -207,7 +244,7 @@ st.markdown("""
     .kpi-title { font-size: 14px; font-weight: 800; color: #0F172A; text-transform: uppercase; letter-spacing: 0.8px; width: 100%; }
     .kpi-value { font-size: 30px; font-weight: 900; color: #0F172A; line-height: 1.2; margin-top: 8px; width: 100%; }
     .kpi-sub { font-size: 13px; font-weight: 600; color: #64748B; margin-top: 6px; width: 100%; }
-    .kpi-divider { border: 0; border-top: 1px solid #E2E8F0; margin: 8px 0; width: 85%; }
+    .kpi-divider { border: 0; border-top: 1px solid #E2E8F0; margin: 10px 0; width: 85%; }
 
     /* Unified Card Containers for Header + Chart */
     .card {
@@ -267,6 +304,21 @@ BLUE_ACCENT, GREEN_ACCENT = '#2563EB', '#10B981'
 
 with st.spinner("Rendering Visualizations..."):
     
+    # SBP Rolling Banner
+    st.markdown(f'''
+        <div class="sbp-marquee">
+            <span>
+                <a href="https://www.sbp.org.pk/our-operations/monetary-policy" target="_blank">
+                    <span style="color: #D4AF37; margin-right: 8px;">🏛️ SBP MONETARY POLICY UPDATE:</span>
+                    The current Monetary Policy Rate is <b style="color:#D4AF37;">{mpr_rate:.2f}%</b>. 
+                    Next MPC meeting is scheduled for <b style="color:#D4AF37;">{next_mpr_date}</b>. 
+                    <em>Summary: The Monetary Policy Committee continues to monitor inflation targets and economic indicators to ensure macroeconomic stability.</em> 
+                    &nbsp;&nbsp;🔗 Click here to read the full policy statement on the official SBP website.
+                </a>
+            </span>
+        </div>
+    ''', unsafe_allow_html=True)
+
     # SCREEN 1: TOP SECTION
     st.markdown("""
         <div class="header-container">
