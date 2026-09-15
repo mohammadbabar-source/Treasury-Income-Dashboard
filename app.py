@@ -224,27 +224,26 @@ st.markdown("""
     .glow-line { height: 4px; flex-grow: 1; max-width: 380px; background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.6), transparent); box-shadow: 0 0 16px rgba(59, 130, 246, 0.6); }
     .header-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 16px 48px; margin: 0 24px; box-shadow: 0 8px 24px rgba(30, 58, 138, 0.15); font-weight: 900; font-size: 32px; color: #000000; letter-spacing: 1.5px; text-transform: uppercase; }
 
-    /* Centered & Scaled Top KPI Cards - ULTRA COMPACT */
+    /* Centered & Scaled Top KPI Cards (IMAGE 2 STYLE) */
     .kpi-card { 
         background: #FFFFFF; 
         border: 1px solid #E2E8F0; 
         border-radius: 12px; 
-        padding: 12px 10px; /* Greatly reduced padding */
-        box-shadow: 0 6px 18px rgba(30, 58, 138, 0.08); /* Subtle Navy Shadow */
+        padding: 20px 10px; 
+        box-shadow: 0 6px 16px rgba(30, 58, 138, 0.08); 
+        height: 100%; 
         display: flex; 
         flex-direction: column; 
         justify-content: center; 
         align-items: center; 
         text-align: center; 
         transition: transform 0.2s ease, box-shadow 0.2s ease; 
-        height: 100%;
+        gap: 8px; /* Slightly tighter gap */
     }
-    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(30, 58, 138, 0.15); }
-    .kpi-title { font-size: 14px; font-weight: 800; color: #0F172A; text-transform: uppercase; letter-spacing: 0.5px; width: 100%; margin-bottom: 2px; }
-    .kpi-val { font-size: 28px; font-weight: 900; color: #0F172A; line-height: 1.1; margin-top: 2px; width: 100%; }
-    .kpi-lbl { font-size: 14px; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 6px;}
-    .kpi-sub { font-size: 12px; font-weight: 600; color: #10B981; margin-top: 2px; width: 100%; }
-    .kpi-divider { border: 0; border-top: 1px solid #E2E8F0; margin: 6px 0; width: 85%; }
+    .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(30, 58, 138, 0.15); }
+    .kpi-val { font-size: 38px; font-weight: 900; color: #0F172A; line-height: 1.1; margin: 4px 0; }
+    .kpi-lbl { font-size: 15px; font-weight: 900; color: #1E293B; text-transform: uppercase; letter-spacing: 1px; }
+    .kpi-sub { font-size: 13px; font-weight: 700; color: #10B981; }
 
     div[data-baseweb="select"] > div { border-radius: 12px; font-size: 18px; font-weight: 600; padding: 4px; }
     </style>
@@ -287,41 +286,43 @@ with st.spinner("Rendering Visualizations..."):
     q_rates_list = get_quarter_rates(selected_q)
 
     # 4 Centered Top KPI Cards (IMAGE 2 STYLE)
-    kpi1, kpi2, kpi3, kpi4 = st.columns(4, gap="small")
+    kpi1, kpi2, kpi3, kpi4 = st.columns(4, gap="medium")
     with kpi1:
-        st.markdown(f"<div class='kpi-card'><div class='kpi-val'>{q_ctx['total_income']:,.2f} M</div><div class='kpi-lbl'>Total Income</div><div class='kpi-sub'>Quarterly Income ({selected_q})</div></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='kpi-card'><div class='kpi-lbl'>TOTAL INCOME</div><div class='kpi-val'>{q_ctx['total_income']:,.2f} M</div><div class='kpi-sub'>Quarterly Income ({selected_q})</div></div>", unsafe_allow_html=True)
     with kpi2:
-        st.markdown(f"<div class='kpi-card'><div class='kpi-val'>{q_ctx['treasury_pool']:,.2f} M</div><div class='kpi-lbl'>Treasury Pool</div><div class='kpi-sub'>Total Allocation ({selected_q})</div></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='kpi-card'><div class='kpi-lbl'>TREASURY POOL</div><div class='kpi-val'>{q_ctx['treasury_pool']:,.2f} M</div><div class='kpi-sub'>Total Allocation ({selected_q})</div></div>", unsafe_allow_html=True)
     with kpi3:
-        st.markdown(f"<div class='kpi-card'><div class='kpi-val'>{q_ctx['forecasted_income']:,.2f} M</div><div class='kpi-lbl'>Forecasted Income</div><div class='kpi-sub'>Forecasted for {selected_q}</div></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='kpi-card'><div class='kpi-lbl'>FORECASTED INCOME</div><div class='kpi-val'>{q_ctx['forecasted_income']:,.2f} M</div><div class='kpi-sub'>Forecasted for {selected_q}</div></div>", unsafe_allow_html=True)
     with kpi4:
-        st.markdown(f"<div class='kpi-card'><div class='kpi-val'>{q_ctx['annual_yield']}</div><div class='kpi-lbl'>Annual Yield</div><div class='kpi-sub'>Weighted Annual Yield</div></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='kpi-card'><div class='kpi-lbl'>ANNUAL YIELD</div><div class='kpi-val'>{q_ctx['annual_yield']}</div><div class='kpi-sub'>Weighted Annual Yield</div></div>", unsafe_allow_html=True)
+
+    st.markdown("<div style='height: 25px;'></div>", unsafe_allow_html=True) # Space between rows
 
     bot_col1, bot_col2, bot_col3 = st.columns(3, gap="medium")
 
     # 1. Bank Profit Rates Card (Column View)
-    month_cols_html = "<div style='display: flex; justify-content: space-between; width: 100%; gap: 10px; margin-top: 10px;'>"
+    month_cols_html = "<div style='display: flex; justify-content: space-between; width: 100%; gap: 10px; margin-top: 10px; height: 100%;'>"
     for month_info in q_rates_list:
         rates_br = "<br>".join(month_info['rates'])
-        month_cols_html += f"<div style='flex: 1; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 6px; text-align: center;'><div style='font-size: 13px; font-weight: 800; color: #2563EB; text-transform: uppercase;'>{month_info['month']}</div><div style='font-size: 12px; font-weight: 700; color: #0F172A; margin-top: 8px; line-height: 1.6;'>{rates_br}</div></div>"
+        month_cols_html += f"<div style='flex: 1; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px 8px; text-align: center;'><div style='font-size: 13px; font-weight: 900; color: #2563EB; text-transform: uppercase;'>{month_info['month']}</div><div style='font-size: 13px; font-weight: 700; color: #0F172A; margin-top: 10px; line-height: 1.8;'>{rates_br}</div></div>"
     month_cols_html += "</div>"
 
     with bot_col1:
-        st.markdown(f"<div class='kpi-card' style='justify-content: flex-start;'><div class='kpi-lbl'>Bank Profit Rates ({selected_q})</div>{month_cols_html}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='kpi-card' style='justify-content: center; height: 210px;'><div class='kpi-lbl'>BANK PROFIT RATES ({selected_q})</div>{month_cols_html}</div>", unsafe_allow_html=True)
 
     # 2. MPR Rate Card
     with bot_col2:
-        st.markdown(f"<div class='kpi-card'><div class='kpi-val' style='color:#2563EB;'>{mpr_rate:.2f}%</div><div class='kpi-lbl'>MPR RATE</div><div class='kpi-sub'>Next Date: {next_mpr_date}</div></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='kpi-card' style='justify-content: center; height: 210px;'><div class='kpi-val' style='color:#2563EB; font-size: 48px;'>{mpr_rate:.2f}%</div><div class='kpi-lbl' style='font-size: 16px; margin-top: 10px;'>MPR RATE</div><div class='kpi-sub' style='font-size: 14px; margin-top: 5px;'>Next Date: {next_mpr_date}</div></div>", unsafe_allow_html=True)
 
     # 3. PKR Yields Card
     pkr_yields_html = (
-        "<div style='display: flex; justify-content: space-between; width: 100%; gap: 10px; margin-top: 10px;'>"
-        "<div style='flex: 1; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 4px; text-align: center;'><div style='font-size: 13px; font-weight: 800; color: #10B981; text-transform: uppercase;'>1M</div><div style='font-size: 18px; font-weight: 900; color: #0F172A; margin-top: 8px;'>--%</div></div>"
-        "<div style='flex: 1; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 4px; text-align: center;'><div style='font-size: 13px; font-weight: 800; color: #10B981; text-transform: uppercase;'>3M</div><div style='font-size: 18px; font-weight: 900; color: #0F172A; margin-top: 8px;'>--%</div></div>"
-        "<div style='flex: 1; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 4px; text-align: center;'><div style='font-size: 13px; font-weight: 800; color: #10B981; text-transform: uppercase;'>6M</div><div style='font-size: 18px; font-weight: 900; color: #0F172A; margin-top: 8px;'>--%</div></div>"
-        "<div style='flex: 1; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 4px; text-align: center;'><div style='font-size: 13px; font-weight: 800; color: #10B981; text-transform: uppercase;'>1Y</div><div style='font-size: 18px; font-weight: 900; color: #0F172A; margin-top: 8px;'>--%</div></div>"
+        "<div style='display: flex; justify-content: space-between; width: 100%; gap: 10px; margin-top: 10px; height: 100%;'>"
+        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px 4px; text-align: center;'><div style='font-size: 14px; font-weight: 900; color: #10B981; text-transform: uppercase;'>1M</div><div style='font-size: 20px; font-weight: 900; color: #0F172A; margin-top: 10px;'>--%</div></div>"
+        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px 4px; text-align: center;'><div style='font-size: 14px; font-weight: 900; color: #10B981; text-transform: uppercase;'>3M</div><div style='font-size: 20px; font-weight: 900; color: #0F172A; margin-top: 10px;'>--%</div></div>"
+        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px 4px; text-align: center;'><div style='font-size: 14px; font-weight: 900; color: #10B981; text-transform: uppercase;'>6M</div><div style='font-size: 20px; font-weight: 900; color: #0F172A; margin-top: 10px;'>--%</div></div>"
+        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px 4px; text-align: center;'><div style='font-size: 14px; font-weight: 900; color: #10B981; text-transform: uppercase;'>1Y</div><div style='font-size: 20px; font-weight: 900; color: #0F172A; margin-top: 10px;'>--%</div></div>"
         "</div>"
     )
 
     with bot_col3:
-        st.markdown(f"<div class='kpi-card' style='justify-content: flex-start;'><div class='kpi-lbl'>PKR Yields</div>{pkr_yields_html}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='kpi-card' style='justify-content: center; height: 210px;'><div class='kpi-lbl'>PKR YIELDS</div>{pkr_yields_html}</div>", unsafe_allow_html=True)
