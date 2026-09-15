@@ -248,6 +248,18 @@ st.markdown("""
         height: 100%;
     }
     .html-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(30, 58, 138, 0.25); }
+    
+    /* Animation for the Chart */
+    @keyframes bounceInSpin {
+        0% { transform: scale(0.3) rotate(-90deg); opacity: 0; }
+        60% { transform: scale(1.1) rotate(10deg); opacity: 1; }
+        100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+    
+    .animated-chart-container {
+        animation: bounceInSpin 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        transform-origin: center center;
+    }
 
     div[data-baseweb="select"] > div { border-radius: 12px; font-size: 18px; font-weight: 600; padding: 4px; }
     </style>
@@ -347,78 +359,66 @@ with st.spinner("Rendering Visualizations..."):
 
 
     # =========================================================
-    # NEW SECTION: CURRENT INVESTMENT POSITION (ENHANCED DESIGN)
+    # NEW SECTION: CURRENT INVESTMENT POSITION (CARTOONY & 3D)
     # =========================================================
     
     st.markdown("<div style='height: 48px;'></div>", unsafe_allow_html=True)
     
     st.markdown(
-        "<div style='text-align: left; margin-bottom: 24px; padding-left: 12px; border-left: 5px solid #2563EB;'>"
+        "<div style='text-align: left; margin-bottom: 24px; padding-left: 12px; border-left: 5px solid #FF595E;'>"
         "<h3 style='font-size: 24px; font-weight: 900; color: #0F172A; letter-spacing: 1.2px; text-transform: uppercase; margin: 0;'>Current Investment Position</h3>"
         "<p style='color: #64748B; font-size: 15px; font-weight: 600; margin-top: 4px; margin-bottom: 0;'>Instrument-Level Ledger & Portfolio Concentration</p>"
         "</div>", 
         unsafe_allow_html=True
     )
 
-    # Investment Data Array
+    # Vibrant Cartoony Color Palette
     investment_data = [
-        {"instrument": "Savings Accounts", "value": 450.00, "conc": 45.0, "color": "#2563EB"},
-        {"instrument": "T-Bills", "value": 300.00, "conc": 30.0, "color": "#10B981"},
-        {"instrument": "Buy/Sell", "value": 150.00, "conc": 15.0, "color": "#F59E0B"},
-        {"instrument": "TDRs", "value": 100.00, "conc": 10.0, "color": "#6366F1"}
+        {"instrument": "Savings Accounts", "value": 450.00, "conc": 45.0, "color": "#FF595E"}, # Vibrant Coral/Red
+        {"instrument": "T-Bills", "value": 300.00, "conc": 30.0, "color": "#8AC926"}, # Lime Green
+        {"instrument": "Buy/Sell", "value": 150.00, "conc": 15.0, "color": "#1982C4"}, # Bright Blue
+        {"instrument": "TDRs", "value": 100.00, "conc": 10.0, "color": "#FFCA3A"}  # Sunny Yellow
     ]
     gross_portfolio_value = sum(item["value"] for item in investment_data)
 
     inv_col1, inv_col2 = st.columns([1, 1.35], gap="large")
 
-    # LEFT COLUMN: ENHANCED DONUT CHART
+    # LEFT COLUMN: 3D ANIMATED DONUT CHART
     with inv_col1:
-        # Donut Hole Center Text Display
-        center_text_html = f"<span style='font-size:11px; font-weight:800; color:#64748B; letter-spacing:1px;'>GROSS TOTAL</span><br><b style='font-size:22px; color:#0F172A;'>{gross_portfolio_value:,.1f}M</b>"
-
-        fig_inv_donut = go.Figure(data=[go.Pie(
-            labels=[item["instrument"] for item in investment_data],
-            values=[item["value"] for item in investment_data],
-            hole=0.72,
-            marker_colors=[item["color"] for item in investment_data],
-            textinfo='percent',
-            textposition='inside',
-            insidetextorientation='horizontal',
-            textfont=dict(size=13, weight='bold', color='#FFFFFF'),
-            hovertemplate="<b>%{label}</b><br>Market Value: <b>PKR %{value:,.2f} M</b><br>Share: <b>%{percent}</b><extra></extra>",
-            marker=dict(line=dict(color='#FFFFFF', width=3))
-        )])
-        
-        fig_inv_donut.update_layout(
-            showlegend=True,
-            legend=dict(
-                orientation="h",
-                yanchor="bottom", y=-0.22,
-                xanchor="center", x=0.5,
-                font=dict(size=13, color="#475569", weight="bold")
-            ),
-            annotations=[dict(
-                text=center_text_html,
-                x=0.5, y=0.5,
-                showarrow=False,
-                align="center"
-            )],
-            margin=dict(t=10, b=40, l=15, r=15),
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)',
-            height=340
-        )
-        
         st.markdown(
-            "<div class='html-card' style='height: 100%; justify-content: space-between;'>"
-            "<div>"
+            "<div class='html-card' style='padding-bottom: 0px; border-top: 5px solid #FF595E;'>"
             "<div style='font-size: 17px; font-weight: 900; color: #0F172A; text-transform: uppercase; letter-spacing: 0.5px;'>PORTFOLIO CONCENTRATION</div>"
             "<div style='font-size: 13px; font-weight: 600; color: #64748B; margin-top: 2px; margin-bottom: 12px;'>% Share of Gross Investment Portfolio</div>"
-            "</div>"
             "</div>", 
             unsafe_allow_html=True
         )
+        
+        fig_inv_donut = go.Figure(data=[go.Pie(
+            labels=[item["instrument"] for item in investment_data],
+            values=[item["value"] for item in investment_data],
+            hole=0.55, # Smaller hole makes slices look chunkier
+            pull=[0.08, 0.08, 0.08, 0.08], # Explodes the slices outward for a 3D effect
+            marker_colors=[item["color"] for item in investment_data],
+            textinfo='label+percent', # Shows both name and % outside
+            textposition='outside', # Prevents text overlap by placing labels outside with leader lines
+            insidetextorientation='horizontal',
+            textfont=dict(size=14, weight='bold', color='#0F172A', family="Arial"),
+            hovertemplate="<b>%{label}</b><br>Market Value: <b>PKR %{value:,.2f} M</b><br>Share: <b>%{percent}</b><extra></extra>",
+            marker=dict(line=dict(color='#FFFFFF', width=4)) # Thick white borders for cartoony look
+        )])
+        
+        fig_inv_donut.update_layout(
+            showlegend=False, # Legend hidden since labels are drawn outside the slices
+            margin=dict(t=40, b=40, l=40, r=40), # Added extra margin so outside text isn't cut off
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            height=380
+        )
+        
+        # Wrapping chart in the animation div
+        st.markdown("<div class='animated-chart-container'>", unsafe_allow_html=True)
         st.plotly_chart(fig_inv_donut, use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
     # RIGHT COLUMN: COLOR-MATCHED FINANCIAL TABLE
     with inv_col2:
@@ -427,30 +427,30 @@ with st.spinner("Rendering Visualizations..."):
             table_rows += (
                 "<tr class='inv-row'>"
                 f"<td style='padding: 14px 16px; border-bottom: 1px solid #F1F5F9; text-align: left; font-weight: 700; color: #0F172A;'>"
-                f"<span style='display:inline-block; width:10px; height:10px; border-radius:50%; background-color:{item['color']}; margin-right:10px;'></span>"
+                f"<span style='display:inline-block; width:12px; height:12px; border-radius:50%; background-color:{item['color']}; margin-right:12px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);'></span>"
                 f"{item['instrument']}</td>"
                 f"<td style='padding: 14px 16px; border-bottom: 1px solid #F1F5F9; text-align: right; font-weight: 700; color: #1E293B;'>{item['value']:,.2f} M</td>"
-                f"<td style='padding: 14px 16px; border-bottom: 1px solid #F1F5F9; text-align: right; font-weight: 800; color: #2563EB;'>{item['conc']:.1f}%</td>"
+                f"<td style='padding: 14px 16px; border-bottom: 1px solid #F1F5F9; text-align: right; font-weight: 900; color: {item['color']};'>{item['conc']:.1f}%</td>"
                 "</tr>"
             )
             
         table_html = (
-            "<style>.inv-row { transition: background-color 0.15s ease; } .inv-row:hover { background-color: #F8FAFC; }</style>"
-            "<div class='html-card' style='height: 100%;'>"
+            "<style>.inv-row { transition: transform 0.2s ease, background-color 0.2s ease; } .inv-row:hover { background-color: #F8FAFC; transform: scale(1.01); }</style>"
+            "<div class='html-card' style='height: 100%; border-top: 5px solid #FF595E;'>"
             "<div style='font-size: 17px; font-weight: 900; color: #0F172A; text-transform: uppercase; letter-spacing: 0.5px;'>POSITION BY INSTRUMENT</div>"
             "<div style='font-size: 13px; font-weight: 600; color: #64748B; margin-top: 2px; margin-bottom: 20px;'>Market Value & Concentration Breakdown</div>"
-            "<div style='flex-grow: 1; width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid #E2E8F0;'>"
+            "<div style='flex-grow: 1; width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid #E2E8F0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);'>"
             "<table style='width: 100%; border-collapse: collapse; font-size: 14px; background: white;'>"
             "<thead><tr style='background-color: #1E293B; color: #FFFFFF; font-size: 13px; letter-spacing: 0.5px;'>"
-            "<th style='padding: 14px 16px; text-align: left; font-weight: 800;'>INSTRUMENT</th>"
-            "<th style='padding: 14px 16px; text-align: right; font-weight: 800;'>MARKET VALUE (PKR Mns)</th>"
-            "<th style='padding: 14px 16px; text-align: right; font-weight: 800;'>CONC. (%)</th>"
+            "<th style='padding: 16px; text-align: left; font-weight: 800;'>INSTRUMENT</th>"
+            "<th style='padding: 16px; text-align: right; font-weight: 800;'>MARKET VALUE (PKR Mns)</th>"
+            "<th style='padding: 16px; text-align: right; font-weight: 800;'>CONC. (%)</th>"
             "</tr></thead>"
             f"<tbody>{table_rows}</tbody>"
-            "<tfoot><tr style='background-color: #F8FAFC; border-top: 2px solid #1E293B;'>"
-            "<td style='padding: 16px 16px; text-align: left; font-weight: 900; color: #0F172A;'>Gross Portfolio</td>"
-            f"<td style='padding: 16px 16px; text-align: right; font-weight: 900; color: #0F172A;'>{gross_portfolio_value:,.2f} M</td>"
-            "<td style='padding: 16px 16px; text-align: right; font-weight: 900; color: #2563EB;'>100.0%</td>"
+            "<tfoot><tr style='background-color: #F8FAFC; border-top: 3px solid #1E293B;'>"
+            "<td style='padding: 18px 16px; text-align: left; font-weight: 900; color: #0F172A;'>Gross Portfolio</td>"
+            f"<td style='padding: 18px 16px; text-align: right; font-weight: 900; color: #0F172A;'>{gross_portfolio_value:,.2f} M</td>"
+            "<td style='padding: 18px 16px; text-align: right; font-weight: 900; color: #0F172A;'>100.0%</td>"
             "</tr></tfoot>"
             "</table></div></div>"
         )
