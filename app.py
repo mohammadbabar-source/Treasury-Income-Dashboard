@@ -37,8 +37,8 @@ if logo_b64:
     splash_logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" style="width: 475px; max-width: 90%; margin: 0 auto 20px auto; padding: 0; border: none !important; outline: none !important; box-shadow: none !important; background: transparent !important; display: block;">'
     header_logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" alt="Logo" style="height: 48px; border: none !important; outline: none !important; box-shadow: none !important; background: transparent !important; object-fit: contain; margin: 0; padding: 0;">'
 else:
-    splash_logo_html = '<div style="color: #FFFFFF; font-size: 55px; font-weight: 700; margin-bottom: 20px; font-family: \'Chivo\', sans-serif; letter-spacing: 2px;">KARANDAAZ PAKISTAN</div>'
-    header_logo_html = '<span style="color: #f68b1e; font-size: 29px; font-weight: 700; margin-right: 8px;">KRN</span>'
+    splash_logo_html = '<div style="color: #FFFFFF; font-size: 42px; font-weight: 700; margin-bottom: 20px; font-family: \'Chivo\', sans-serif; letter-spacing: 2px;">KARANDAAZ PAKISTAN</div>'
+    header_logo_html = '<span style="color: #f68b1e; font-size: 22px; font-weight: 700; margin-right: 8px;">KRN</span>'
 
 # ---------------------------------------------------------
 # SESSION STATE CONTROL FOR FIRST-TIME SPLASH LOAD
@@ -180,7 +180,7 @@ quarter_data = {
 }
 
 # ---------------------------------------------------------
-# GLOBAL STYLING ARCHITECTURE (+30% TEXT SIZES)
+# GLOBAL STYLING ARCHITECTURE
 # ---------------------------------------------------------
 st.markdown(clean_html("""
 <style>
@@ -195,7 +195,7 @@ header { visibility: hidden; height: 0; }
     padding-left: 2rem !important; padding-right: 2rem !important; max-width: 100% !important; 
 }
 
-/* SBP Rolling Banner (+30% Font Size) */
+/* SBP Rolling Banner */
 .sbp-marquee {
     position: fixed; top: 0; left: 0; width: 100%;
     background: #0f6286; color: #FFFFFF; padding: 11px 0;
@@ -206,7 +206,7 @@ header { visibility: hidden; height: 0; }
 .sbp-marquee > span { display: inline-block; padding-left: 100%; animation: marquee_scroll 28s linear infinite; }
 @keyframes marquee_scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-/* Header Component (+30% Font Size) */
+/* Header Component */
 .header-container { display: flex; align-items: center; justify-content: center; margin-top: 10px !important; margin-bottom: 16px; }
 .glow-line { height: 2px; flex-grow: 1; max-width: 380px; background: transparent; }
 .header-card { 
@@ -216,7 +216,7 @@ header { visibility: hidden; height: 0; }
     display: flex; align-items: center; gap: 16px; 
 }
 
-/* KPI Cards (+30% Font Size) */
+/* KPI Cards */
 .kpi-card { 
     background: #0f6286; border-radius: 16px; padding: 32px 16px; 
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); height: 100%; 
@@ -227,7 +227,7 @@ header { visibility: hidden; height: 0; }
 .kpi-lbl { font-size: 18px; font-weight: 700; color: #f68b1e; text-transform: uppercase; }
 .kpi-sub { font-size: 18px; font-weight: 400; color: #ffffff; opacity: 0.9; }
 
-/* HTML Container Cards (+30% Font Size) */
+/* HTML Container Cards */
 .html-card {
     background-color: #0f6286; border-radius: 16px; padding: 32px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); display: flex;
@@ -239,7 +239,7 @@ div[data-baseweb="select"] > div { border-radius: 8px; font-size: 21px; font-wei
 """), unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# ANIMATED SPLASH SCREEN (CONFIGURED TO 7 SECONDS, +30% TEXT)
+# ANIMATED SPLASH SCREEN (CONFIGURED TO 7 SECONDS)
 # ---------------------------------------------------------
 if is_first_load:
     splash_placeholder = st.empty()
@@ -402,7 +402,7 @@ with st.spinner("Rendering Visualizations..."):
 
     bot_col1, bot_col2, bot_col3 = st.columns(3, gap="medium")
 
-    # 1. Bank Profit Rates Card (+30% Font Size)
+    # 1. Bank Profit Rates Card
     month_cols_html = "<div style='display: flex; justify-content: space-between; width: 100%; gap: 10px; margin-top: 10px; height: 100%;'>"
     for month_info in q_rates_list:
         rates_br = "<br>".join(month_info['rates'])
@@ -411,7 +411,7 @@ with st.spinner("Rendering Visualizations..."):
     with bot_col1:
         st.markdown(clean_html(f"<div class='kpi-card' style='justify-content: center; height: 210px;'><div class='kpi-lbl'>BANK PROFIT RATES ({selected_q})</div>{month_cols_html}</div>"), unsafe_allow_html=True)
 
-    # 2. MPR Rate Card (+30% Font Size)
+    # 2. MPR Rate Card
     mpr_split_html = (
         "<div style='display: flex; justify-content: space-between; width: 100%; height: 100%; align-items: center;'>"
         "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 1px solid rgba(255,255,255,0.2); padding-right: 10px;'>"
@@ -428,7 +428,7 @@ with st.spinner("Rendering Visualizations..."):
     with bot_col2:
         st.markdown(clean_html(f"<div class='kpi-card' style='justify-content: center; height: 210px; padding: 10px;'>{mpr_split_html}</div>"), unsafe_allow_html=True)
 
-    # 3. PKR Yields Card (+30% Font Size)
+    # 3. PKR Yields Card
     pkr_yields_html = (
         "<div style='display: flex; justify-content: space-between; width: 100%; gap: 10px; margin-top: 10px; height: 100%;'>"
         "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: rgba(0,0,0,0.1); border-radius: 8px; padding: 14px 4px; text-align: center;'><div style='font-size: 18px; font-weight: 700; color: #f68b1e; text-transform: uppercase;'>1M</div><div style='font-size: 23px; font-weight: 700; color: #FFFFFF; margin-top: 8px;'>--%</div></div>"
@@ -441,7 +441,7 @@ with st.spinner("Rendering Visualizations..."):
         st.markdown(clean_html(f"<div class='kpi-card' style='justify-content: center; height: 210px;'><div class='kpi-lbl'>PKR YIELDS</div>{pkr_yields_html}</div>"), unsafe_allow_html=True)
 
     # =========================================================
-    # SECTION: CURRENT INVESTMENT POSITION (+30% Font Size)
+    # SECTION: CURRENT INVESTMENT POSITION
     # =========================================================
     st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
     
@@ -465,7 +465,7 @@ with st.spinner("Rendering Visualizations..."):
 
     inv_col1, inv_col2 = st.columns([1, 1.35], gap="large")
 
-    # LEFT COLUMN: DONUT CHART (+30% Font Size)
+    # LEFT COLUMN: DONUT CHART
     with inv_col1:
         st.markdown(
             clean_html(
@@ -496,7 +496,7 @@ with st.spinner("Rendering Visualizations..."):
         )
         st.plotly_chart(fig_inv_donut, use_container_width=True)
 
-    # RIGHT COLUMN: FINANCIAL TABLE (+30% Font Size)
+    # RIGHT COLUMN: FINANCIAL TABLE
     with inv_col2:
         table_rows = ""
         for item in investment_data:
@@ -531,3 +531,50 @@ with st.spinner("Rendering Visualizations..."):
             "</table></div></div>"
         )
         st.markdown(clean_html(table_html), unsafe_allow_html=True)
+
+    # =========================================================
+    # NEW SECTION: KEY ECONOMIC INDICATORS
+    # =========================================================
+    st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
+    
+    st.markdown(
+        clean_html(
+            "<div style='background-color: #0f6286; border-radius: 16px; padding: 32px; text-align: left; margin-bottom: 24px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); font-family: \"Chivo\", sans-serif;'>"
+            "<h3 style='color: #ffffff; font-size: 34px; font-weight: 700; margin: 0; line-height: 1.2;'>Key Economic Indicators <span style='color: #f68b1e; font-weight: 400;'>&rarr;</span></h3>"
+            "<p style='color: #ffffff; font-size: 21px; font-weight: 400; line-height: 1.5; margin-top: 12px; margin-bottom: 0;'>Macroeconomic Trends & Market Intelligence</p>"
+            "</div>"
+        ), 
+        unsafe_allow_html=True
+    )
+
+    econ_col1, econ_col2 = st.columns([1, 1], gap="large")
+
+    # LEFT BOX: ECONOMIC OUTLOOK & INFLATION
+    with econ_col1:
+        st.markdown(
+            clean_html(
+                "<div class='html-card' style='font-family: \"Chivo\", sans-serif;'>"
+                "<div style='font-size: 31px; font-weight: 700; color: #ffffff; line-height: 1.2;'>Economic Outlook & Inflation <span style='color:#f68b1e; font-weight: 400;'>&rarr;</span></div>"
+                "<div style='font-size: 21px; font-weight: 400; color: #ffffff; line-height: 1.6; margin-top: 18px;'>"
+                "Headline CPI inflation continues its disinflationary trajectory supported by high base effects, prudent monetary policy, and easing commodity prices. "
+                "Current expectations point toward stable price levels over upcoming quarters, providing the State Bank with sufficient policy space to consider targeted monetary easing while ensuring fiscal stability."
+                "</div>"
+                "</div>"
+            ), 
+            unsafe_allow_html=True
+        )
+
+    # RIGHT BOX: FISCAL DYNAMICS & FX RESERVES
+    with econ_col2:
+        st.markdown(
+            clean_html(
+                "<div class='html-card' style='font-family: \"Chivo\", sans-serif;'>"
+                "<div style='font-size: 31px; font-weight: 700; color: #ffffff; line-height: 1.2;'>Fiscal Dynamics & FX Reserves <span style='color:#f68b1e; font-weight: 400;'>&rarr;</span></div>"
+                "<div style='font-size: 21px; font-weight: 400; color: #ffffff; line-height: 1.6; margin-top: 18px;'>"
+                "Foreign exchange reserves maintain a healthy trajectory backed by stable worker remittance inflows, multilateral credit disbursements, and moderate current account pressures. "
+                "Primary fiscal balances remain aligned with budgetary targets, keeping short-term money market liquidity balanced across institutional allocations."
+                "</div>"
+                "</div>"
+            ), 
+            unsafe_allow_html=True
+        )
