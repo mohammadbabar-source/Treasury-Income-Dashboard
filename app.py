@@ -497,7 +497,7 @@ with st.spinner("Rendering Visualizations..."):
 
     inv_col1, inv_col2 = st.columns([1, 1.35], gap="large")
 
-    # LEFT COLUMN: DONUT CHART (REVERTED BACK TO PREVIOUS OUTSIDE TEAL LABELS)
+    # LEFT COLUMN: DONUT CHART
     with inv_col1:
         st.markdown(
             clean_html(
@@ -568,7 +568,7 @@ with st.spinner("Rendering Visualizations..."):
         st.markdown(clean_html(table_html), unsafe_allow_html=True)
 
     # =========================================================
-    # SECTION: PKRV ANALYSIS
+    # SECTION: PKRV ANALYSIS (THICKER PROMINENT LINES: WIDTH=5, MARKERS=9)
     # =========================================================
     st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
     
@@ -594,8 +594,8 @@ with st.spinner("Rendering Visualizations..."):
                     y=df_pkrv_chart[tenor],
                     mode='lines+markers',
                     name=f'{tenor} PKRV',
-                    line=dict(color=pkrv_colors[tenor], width=3),
-                    marker=dict(size=6),
+                    line=dict(color=pkrv_colors[tenor], width=5), # Thicker Prominent Lines
+                    marker=dict(size=9),                         # Larger Markers
                     hovertemplate=f"<b>{tenor} PKRV Yield</b><br>Date: %{{x|%b %d, %Y}}<br>Yield: <b>%{{y:.2f}}%</b><extra></extra>"
                 )
             )
