@@ -336,13 +336,13 @@ with st.spinner("Rendering Visualizations..."):
     st.markdown("""
         <div class="intro-card">
           <div class="intro-header">
-            <h2 class="intro-title">Karandaaz Capital</h2>
+            <h2 class="intro-title">Karandaaz Digital</h2>
             <svg class="intro-arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </div>
           <p class="intro-body">
-            Provides wholesale structured credit and equity-linked direct growth capital investments in micro, small and mid-size enterprises that have the potential to contribute to sustainable growth and employment generation in Pakistan.
+            Focuses on expanding the access to digital financial services in Pakistan by working across the ecosystem with all stakeholders in the following work areas: digital public infrastructure, payment systems, policy and regulation, seeding innovation, experimentation and solutions development, and scale and outreach.
           </p>
         </div>
     """, unsafe_allow_html=True)
