@@ -250,7 +250,39 @@ header { visibility: hidden; height: 0; }
     display: flex; align-items: center; gap: 16px; 
 }
 
-/* KPI Cards */
+/* TOP 4 WHITE KPI CARDS WITH PULSING LIGHT BLUE BORDER */
+.top-kpi-card { 
+    background: #FFFFFF !important; 
+    border-radius: 16px; 
+    padding: 32px 16px; 
+    height: 100%; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+    text-align: center; 
+    border: 2.5px solid #76C4E3;
+    animation: pulseLightBlue 2.5s ease-in-out infinite;
+    transition: transform 0.2s ease;
+}
+.top-kpi-card:hover { transform: translateY(-2px); }
+
+@keyframes pulseLightBlue {
+    0%, 100% {
+        border-color: #76C4E3;
+        box-shadow: 0 0 10px rgba(118, 196, 227, 0.35);
+    }
+    50% {
+        border-color: #0f6286;
+        box-shadow: 0 0 20px rgba(118, 196, 227, 0.8);
+    }
+}
+
+.top-kpi-val { font-size: 42px; font-weight: 700; color: #0f6286 !important; line-height: 1.1; margin: 4px 0; }
+.top-kpi-lbl { font-size: 18px; font-weight: 700; color: #0f6286 !important; text-transform: uppercase; }
+.top-kpi-sub { font-size: 18px; font-weight: 400; color: #0f6286 !important; opacity: 0.85; }
+
+/* STANDARD KPI CARDS (BOTTOM ROW) */
 .kpi-card { 
     background: #0f6286; border-radius: 16px; padding: 32px 16px; 
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); height: 100%; 
@@ -419,16 +451,16 @@ with st.spinner("Rendering Visualizations..."):
     q_ctx = quarter_data[selected_q]
     q_rates_list = get_quarter_rates(selected_q)
 
-    # 4 Centered Top KPI Cards
+    # 4 Centered Top KPI Cards (WHITE BACKGROUND, PULSING LIGHT BLUE BORDER, TEAL BLUE TEXT)
     kpi1, kpi2, kpi3, kpi4 = st.columns(4, gap="medium")
     with kpi1:
-        st.markdown(clean_html(f"<div class='kpi-card'><div class='kpi-lbl'>TOTAL INCOME</div><div class='kpi-val'>{q_ctx['total_income']:,.2f} M</div><div class='kpi-sub'>Quarterly Income ({selected_q})</div></div>"), unsafe_allow_html=True)
+        st.markdown(clean_html(f"<div class='top-kpi-card'><div class='top-kpi-lbl'>TOTAL INCOME</div><div class='top-kpi-val'>{q_ctx['total_income']:,.2f} M</div><div class='top-kpi-sub'>Quarterly Income ({selected_q})</div></div>"), unsafe_allow_html=True)
     with kpi2:
-        st.markdown(clean_html(f"<div class='kpi-card'><div class='kpi-lbl'>TREASURY POOL</div><div class='kpi-val'>{q_ctx['treasury_pool']:,.2f} M</div><div class='kpi-sub'>Total Allocation ({selected_q})</div></div>"), unsafe_allow_html=True)
+        st.markdown(clean_html(f"<div class='top-kpi-card'><div class='top-kpi-lbl'>TREASURY POOL</div><div class='top-kpi-val'>{q_ctx['treasury_pool']:,.2f} M</div><div class='top-kpi-sub'>Total Allocation ({selected_q})</div></div>"), unsafe_allow_html=True)
     with kpi3:
-        st.markdown(clean_html(f"<div class='kpi-card'><div class='kpi-lbl'>FORECASTED INCOME</div><div class='kpi-val'>{q_ctx['forecasted_income']:,.2f} M</div><div class='kpi-sub'>Forecasted for {selected_q}</div></div>"), unsafe_allow_html=True)
+        st.markdown(clean_html(f"<div class='top-kpi-card'><div class='top-kpi-lbl'>FORECASTED INCOME</div><div class='top-kpi-val'>{q_ctx['forecasted_income']:,.2f} M</div><div class='top-kpi-sub'>Forecasted for {selected_q}</div></div>"), unsafe_allow_html=True)
     with kpi4:
-        st.markdown(clean_html(f"<div class='kpi-card'><div class='kpi-lbl'>ANNUAL YIELD</div><div class='kpi-val'>{q_ctx['annual_yield']}</div><div class='kpi-sub'>Weighted Annual Yield</div></div>"), unsafe_allow_html=True)
+        st.markdown(clean_html(f"<div class='top-kpi-card'><div class='top-kpi-lbl'>ANNUAL YIELD</div><div class='top-kpi-val'>{q_ctx['annual_yield']}</div><div class='top-kpi-sub'>Weighted Annual Yield</div></div>"), unsafe_allow_html=True)
     
     st.markdown("<div style='height: 24px;'></div>", unsafe_allow_html=True)
 
@@ -568,7 +600,7 @@ with st.spinner("Rendering Visualizations..."):
         st.markdown(clean_html(table_html), unsafe_allow_html=True)
 
     # =========================================================
-    # SECTION: PKRV ANALYSIS (THICKER PROMINENT LINES: WIDTH=5, MARKERS=9)
+    # SECTION: PKRV ANALYSIS
     # =========================================================
     st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
     
@@ -594,8 +626,8 @@ with st.spinner("Rendering Visualizations..."):
                     y=df_pkrv_chart[tenor],
                     mode='lines+markers',
                     name=f'{tenor} PKRV',
-                    line=dict(color=pkrv_colors[tenor], width=5), # Thicker Prominent Lines
-                    marker=dict(size=9),                         # Larger Markers
+                    line=dict(color=pkrv_colors[tenor], width=5),
+                    marker=dict(size=9),
                     hovertemplate=f"<b>{tenor} PKRV Yield</b><br>Date: %{{x|%b %d, %Y}}<br>Yield: <b>%{{y:.2f}}%</b><extra></extra>"
                 )
             )
