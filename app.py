@@ -485,7 +485,7 @@ with st.spinner("Rendering Visualizations..."):
 
     inv_col1, inv_col2 = st.columns([1, 1.35], gap="large")
 
-    # LEFT COLUMN: DONUT CHART
+    # LEFT COLUMN: DONUT CHART (EXPLICIT WHITE LEGENDS & LABELS ON DEEP TEAL)
     with inv_col1:
         st.markdown(
             clean_html(
@@ -505,14 +505,25 @@ with st.spinner("Rendering Visualizations..."):
             textposition='outside', 
             textinfo='label+percent',
             texttemplate="<b>%{label}</b><br>PKR %{value:,.1f} M<br>(%{percent})",
-            textfont=dict(size=18, color='#0f6286', family="Chivo, sans-serif"),
+            textfont=dict(size=18, color='#FFFFFF', family="Chivo, sans-serif"),
             hovertemplate="<b>%{label}</b><br>Market Value: <b>PKR %{value:,.2f} M</b><br>Share: <b>%{percent}</b><extra></extra>",
             marker=dict(line=dict(color='#0f6286', width=2)) 
         )])
         
         fig_inv_donut.update_layout(
-            showlegend=False, margin=dict(t=50, b=50, l=100, r=100), 
-            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=450 
+            showlegend=True,
+            legend=dict(
+                orientation="h",
+                yanchor="top",
+                y=-0.05,
+                xanchor="center",
+                x=0.5,
+                font=dict(size=16, color='#FFFFFF', family="Chivo, sans-serif")
+            ),
+            margin=dict(t=40, b=60, l=80, r=80), 
+            paper_bgcolor='#0f6286',
+            plot_bgcolor='#0f6286',
+            height=480 
         )
         st.plotly_chart(fig_inv_donut, use_container_width=True)
 
@@ -553,7 +564,7 @@ with st.spinner("Rendering Visualizations..."):
         st.markdown(clean_html(table_html), unsafe_allow_html=True)
 
     # =========================================================
-    # NEW SECTION: PKRV ANALYSIS (LINE GRAPH STARTING JUNE 30, 2026)
+    # SECTION: PKRV ANALYSIS (EXPLICIT WHITE LEGENDS & LABELS ON DEEP TEAL)
     # =========================================================
     st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
     
@@ -607,19 +618,22 @@ with st.spinner("Rendering Visualizations..."):
             y=1.03,
             xanchor="right",
             x=1,
-            font=dict(size=18, color='#FFFFFF', family="Chivo, sans-serif")
+            font=dict(size=18, color='#FFFFFF', family="Chivo, sans-serif"),
+            bgcolor='rgba(0,0,0,0.2)',
+            bordercolor='rgba(255,255,255,0.2)',
+            borderwidth=1
         ),
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='#0f6286',
+        plot_bgcolor='#0b4a66',
         height=500,
-        margin=dict(l=40, r=40, t=50, b=40)
+        margin=dict(l=50, r=50, t=60, b=50)
     )
 
     st.markdown(
         clean_html(
-            "<div class='html-card' style='font-family: \"Chivo\", sans-serif; padding-bottom: 20px;'>"
+            "<div class='html-card' style='font-family: \"Chivo\", sans-serif; padding-bottom: 20px; border-bottom-left-radius: 0; border-bottom-right-radius: 0;'>"
             "<div style='font-size: 31px; font-weight: 700; color: #ffffff; line-height: 1.2;'>Quarterly PKRV Yield Movement <span style='color:#f68b1e; font-weight: 400;'>&rarr;</span></div>"
-            "<div style='font-size: 21px; font-weight: 400; color: #ffffff; line-height: 1.6; margin-top: 10px; margin-bottom: 20px;'>Daily Secondary Market Rates across 1M, 3M, 6M, and 12M Tenors starting June 30, 2026</div>"
+            "<div style='font-size: 21px; font-weight: 400; color: #ffffff; line-height: 1.6; margin-top: 10px;'>Daily Secondary Market Rates across 1M, 3M, 6M, and 12M Tenors starting June 30, 2026</div>"
             "</div>"
         ), 
         unsafe_allow_html=True
