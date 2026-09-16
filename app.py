@@ -15,14 +15,13 @@ EXCEL_FILE = "Treasury Income FY26'27 - July26.xlsx"
 LOGO_FILE = "krn logo.jpg"
 
 def get_base64_image(file_path):
-    if os.path.exists(file_path):
+    try:
         with open(file_path, "rb") as f:
             return base64.b64encode(f.read()).decode()
-    return ""
+    except Exception:
+        return ""
 
 logo_b64 = get_base64_image(LOGO_FILE)
-splash_logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" alt="Karandaaz Logo" class="splash-logo">' if logo_b64 else '<div style="color: #FFFFFF; font-size: 28px; font-weight: 700; margin-bottom: 20px;">KARANDAAZ PAKISTAN</div>'
-header_logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" alt="Logo" style="height: 35px; border-radius: 4px; object-fit: contain;">' if logo_b64 else ''
 
 # ---------------------------------------------------------
 # SESSION STATE CONTROL FOR FIRST-TIME SPLASH LOAD
@@ -164,243 +163,111 @@ quarter_data = {
 }
 
 # ---------------------------------------------------------
-# CUSTOM CSS ARCHITECTURE & STYLING
+# CUSTOM CSS ARCHITECTURE (NO INDENTATION TO AVOID MARKDOWN BUGS)
 # ---------------------------------------------------------
-block_animation_css = "animation: pageFadeIn 0.8s ease-out 3.5s both !important;" if is_first_load else ""
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Chivo:wght@400;700&display=swap');
 
-st.markdown(f"""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Chivo:wght@400;700&display=swap');
+* { font-family: 'Chivo', sans-serif !important; box-sizing: border-box; }
+html, body, .stApp { background-color: #F5F7F9 !important; margin: 0 !important; padding: 0 !important; }
+header { visibility: hidden; height: 0; }
 
-    /* Clean, modern sans-serif stack utilizing Chivo */
-    * {{ font-family: 'Chivo', sans-serif !important; box-sizing: border-box; }}
-    
-    /* Background & Structural Colors */
-    html, body, .stApp {{ background-color: #F5F7F9 !important; margin: 0 !important; padding: 0 !important; }}
-    header {{ visibility: hidden; height: 0; }}
-    
-    /* Smooth fade-in for the main dashboard content */
-    @keyframes pageFadeIn {{
-        0% {{ opacity: 0; transform: translateY(15px); }}
-        100% {{ opacity: 1; transform: translateY(0); }}
-    }}
-    .block-container {{ 
-        padding-top: 5rem !important; padding-bottom: 3rem !important; padding-left: 2rem !important; padding-right: 2rem !important; max-width: 100% !important; 
-        {block_animation_css}
-    }}
+.block-container { 
+    padding-top: 5rem !important; padding-bottom: 3rem !important; 
+    padding-left: 2rem !important; padding-right: 2rem !important; max-width: 100% !important; 
+}
 
-    /* SBP Rolling Banner CSS */
-    .sbp-marquee {{
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background: #0f6286; 
-        color: #FFFFFF;
-        padding: 11px 0;
-        overflow: hidden;
-        white-space: nowrap;
-        z-index: 999999;
-        border-bottom: 3px solid #f68b1e; 
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }}
-    .sbp-marquee a {{
-        color: #FFFFFF !important;
-        text-decoration: none;
-        font-size: 16px; 
-        font-weight: normal;
-    }}
-    .sbp-marquee > span {{
-        display: inline-block;
-        padding-left: 100%;
-        animation: marquee_scroll 28s linear infinite;
-    }}
-    .sbp-marquee:hover > span {{
-        animation-play-state: paused;
-    }}
-    @keyframes marquee_scroll {{
-        0% {{ transform: translateX(0); }}
-        100% {{ transform: translateX(-100%); }}
-    }}
-    
-    .header-container {{ display: flex; align-items: center; justify-content: center; margin-top: 10px !important; margin-bottom: 16px; }}
-    .glow-line {{ height: 2px; flex-grow: 1; max-width: 380px; background: transparent; }}
-    .header-card {{ 
-        background: #0f6286; 
-        border-radius: 16px; 
-        padding: 16px 48px; 
-        margin: 0 24px; 
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); 
-        font-weight: 700; 
-        font-size: 26px; 
-        color: #FFFFFF; 
-        display: flex; 
-        align-items: center; 
-        gap: 16px; 
-    }}
+/* SBP Banner */
+.sbp-marquee {
+    position: fixed; top: 0; left: 0; width: 100%;
+    background: #0f6286; color: #FFFFFF; padding: 11px 0;
+    overflow: hidden; white-space: nowrap; z-index: 999999;
+    border-bottom: 3px solid #f68b1e; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.sbp-marquee a { color: #FFFFFF !important; text-decoration: none; font-size: 16px; }
+.sbp-marquee > span { display: inline-block; padding-left: 100%; animation: marquee_scroll 28s linear infinite; }
+@keyframes marquee_scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-    /* Deep Teal KPI Cards */
-    .kpi-card {{ 
-        background: #0f6286; 
-        border-radius: 16px; 
-        padding: 32px 16px; 
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); 
-        height: 100%; 
-        display: flex; 
-        flex-direction: column; 
-        justify-content: center; 
-        align-items: center; 
-        text-align: center; 
-        transition: transform 0.2s ease, box-shadow 0.2s ease; 
-        gap: 6px;
-        border: none;
-    }}
-    .kpi-card:hover {{ transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12); }}
-    .kpi-val {{ font-size: 32px; font-weight: 700; color: #FFFFFF; line-height: 1.1; margin: 4px 0; }}
-    .kpi-lbl {{ font-size: 14px; font-weight: 700; color: #f68b1e; text-transform: uppercase; }}
-    .kpi-sub {{ font-size: 14px; font-weight: 400; color: #ffffff; opacity: 0.9; }}
+/* Fixed Header Card - No Indentation in Python String */
+.header-container { display: flex; align-items: center; justify-content: center; margin-top: 10px !important; margin-bottom: 16px; }
+.glow-line { height: 2px; flex-grow: 1; max-width: 380px; background: transparent; }
+.header-card { 
+    background: #0f6286; border-radius: 16px; padding: 16px 48px; 
+    margin: 0 24px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); 
+    font-weight: 700; font-size: 26px; color: #FFFFFF; 
+    display: flex; align-items: center; gap: 16px; 
+}
 
-    /* Deep Teal HTML Containers */
-    .html-card {{
-        background-color: #0f6286;
-        border-radius: 16px;
-        padding: 32px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        text-align: left;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        height: 100%;
-        border: none;
-    }}
-    .html-card:hover {{ transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12); }}
-    
-    div[data-baseweb="select"] > div {{ border-radius: 8px; font-size: 16px; font-weight: 700; padding: 4px; border: 1px solid #0f6286 !important; color: #333333; }}
-    </style>
+/* KPI Cards */
+.kpi-card { 
+    background: #0f6286; border-radius: 16px; padding: 32px 16px; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); height: 100%; 
+    display: flex; flex-direction: column; justify-content: center; 
+    align-items: center; text-align: center; border: none;
+}
+.kpi-val { font-size: 32px; font-weight: 700; color: #FFFFFF; line-height: 1.1; margin: 4px 0; }
+.kpi-lbl { font-size: 14px; font-weight: 700; color: #f68b1e; text-transform: uppercase; }
+.kpi-sub { font-size: 14px; font-weight: 400; color: #ffffff; opacity: 0.9; }
+
+/* HTML Container Cards */
+.html-card {
+    background-color: #0f6286; border-radius: 16px; padding: 32px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); display: flex;
+    flex-direction: column; justify-content: flex-start; text-align: left;
+    height: 100%; border: none;
+}
+div[data-baseweb="select"] > div { border-radius: 8px; font-size: 16px; font-weight: 700; padding: 4px; border: 1px solid #0f6286 !important; color: #333333; }
+</style>
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# ANIMATED SPLASH SCREEN (ONLY RENDERS ON FIRST LOAD)
+# NEW ANIMATED SPLASH SCREEN (WORKS WITHOUT CLICKING)
 # ---------------------------------------------------------
 if is_first_load:
-    st.markdown(f"""
-        <div class="splash-screen">
-            <!-- Base64 Encoded Logo -->
-            {splash_logo_html}
-            
-            <!-- Dashboard Header Text -->
-            <h1 class="splash-title">Karandaaz Pakistan Treasury Dashboard</h1>
-            <p class="splash-subtitle">Establishing Secure Connection & Loading Financial Models...</p>
-            
-            <!-- High-Tech Orbital Loader -->
-            <div class="orbital-loader">
-                <div class="inner-orbit"></div>
-                <div class="outer-orbit"></div>
-                <div class="core"></div>
-            </div>
-        </div>
+    splash_placeholder = st.empty()
+    
+    with splash_placeholder.container():
         
-        <style>
-        /* Splash Screen Container */
-        .splash-screen {{
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            height: 100vh;
-            width: 100vw;
-            background-color: #0f6286;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 9999999;
-            animation: fadeOutSplash 0.8s ease-in 3.5s forwards;
-        }}
+        # HTML generated flush-left so Markdown doesn't break it
+        splash_html = f"""
+<div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; background-color: #0f6286; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999999;">
+    
+    <img src="data:image/jpeg;base64,{logo_b64}" style="width: 280px; margin-bottom: 30px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
+    
+    <h1 style="color: #FFFFFF; font-size: 44px; margin-bottom: 12px; font-weight: 700; font-family: 'Chivo', sans-serif; text-align: center;">Karandaaz Pakistan Treasury Dashboard</h1>
+    <p style="color: #f68b1e; font-size: 20px; font-weight: 400; margin-bottom: 45px; font-family: 'Chivo', sans-serif; text-align: center;">Loading secure financial models...</p>
+    
+    <div class="data-wave">
+        <div class="wave-bar bar-1"></div>
+        <div class="wave-bar bar-2"></div>
+        <div class="wave-bar bar-3"></div>
+        <div class="wave-bar bar-4"></div>
+        <div class="wave-bar bar-5"></div>
+    </div>
+</div>
 
-        .splash-logo {{
-            width: 250px;
-            margin-bottom: 30px;
-            border-radius: 8px;
-            animation: pulseLogo 2s ease-in-out infinite;
-        }}
-
-        .splash-title {{
-            color: #FFFFFF;
-            font-size: 44px;
-            letter-spacing: 1px;
-            margin-bottom: 12px;
-            font-weight: 700;
-            font-family: 'Chivo', sans-serif;
-            text-align: center;
-        }}
-
-        .splash-subtitle {{
-            color: #f68b1e;
-            font-size: 18px;
-            font-weight: 400;
-            letter-spacing: 0.5px;
-            margin-bottom: 40px;
-            font-family: 'Chivo', sans-serif;
-            text-align: center;
-        }}
-
-        /* --- HIGH-TECH ORBITAL LOADER --- */
-        .orbital-loader {{
-            position: relative;
-            width: 120px;
-            height: 120px;
-        }}
-
-        .outer-orbit {{
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            border-radius: 50%;
-            border: 4px solid transparent;
-            border-top-color: #f68b1e;
-            border-bottom-color: #f68b1e;
-            animation: spinOuter 1.5s linear infinite;
-            box-shadow: 0 0 20px rgba(246, 139, 30, 0.4);
-        }}
-
-        .inner-orbit {{
-            position: absolute;
-            top: 15px; left: 15px;
-            width: 90px; height: 90px;
-            border-radius: 50%;
-            border: 3px solid transparent;
-            border-left-color: #76C4E3;
-            border-right-color: #76C4E3;
-            animation: spinInner 1s linear infinite reverse;
-        }}
-
-        .core {{
-            position: absolute;
-            top: 45px; left: 45px;
-            width: 30px; height: 30px;
-            background-color: #FFFFFF;
-            border-radius: 50%;
-            box-shadow: 0 0 20px #FFFFFF, 0 0 40px #76C4E3;
-            animation: pulseCore 1.5s ease-in-out infinite alternate;
-        }}
-
-        @keyframes spinOuter {{ 0% {{ transform: rotate(0deg); }} 100% {{ transform: rotate(360deg); }} }}
-        @keyframes spinInner {{ 0% {{ transform: rotate(0deg); }} 100% {{ transform: rotate(360deg); }} }}
-        @keyframes pulseCore {{ 0% {{ transform: scale(0.8); opacity: 0.8; }} 100% {{ transform: scale(1.2); opacity: 1; }} }}
-
-        @keyframes pulseLogo {{ 
-            0% {{ transform: scale(0.98); opacity: 0.9; }} 
-            50% {{ transform: scale(1.02); opacity: 1; filter: drop-shadow(0 0 15px rgba(246, 139, 30, 0.4));}} 
-            100% {{ transform: scale(0.98); opacity: 0.9; }} 
-        }}
-
-        @keyframes fadeOutSplash {{ 
-            0% {{ opacity: 1; visibility: visible; }} 
-            100% {{ opacity: 0; visibility: hidden; pointer-events: none; display: none; }} 
-        }}
-        </style>
-    """, unsafe_allow_html=True)
+<style>
+.data-wave {{ display: flex; align-items: center; gap: 8px; }}
+.wave-bar {{ width: 10px; height: 50px; background-color: #f68b1e; border-radius: 6px; animation: waveAnim 1s ease-in-out infinite; }}
+.bar-1 {{ animation-delay: 0.0s; }}
+.bar-2 {{ animation-delay: 0.1s; background-color: #76C4E3; }}
+.bar-3 {{ animation-delay: 0.2s; background-color: #FFFFFF; height: 65px; }}
+.bar-4 {{ animation-delay: 0.3s; background-color: #76C4E3; }}
+.bar-5 {{ animation-delay: 0.4s; }}
+@keyframes waveAnim {{
+    0%, 100% {{ transform: scaleY(0.3); opacity: 0.6; }}
+    50% {{ transform: scaleY(1); opacity: 1; box-shadow: 0 0 15px rgba(255,255,255,0.4); }}
+}}
+</style>
+        """
+        st.markdown(splash_html, unsafe_allow_html=True)
+        
+        # Streamlit waits for exactly 3.5 seconds
+        time.sleep(3.5)
+    
+    # Safely clears the splash screen completely, revealing the dashboard underneath.
+    splash_placeholder.empty()
 
 # ---------------------------------------------------------
 # MAIN DASHBOARD CONTENT
@@ -411,29 +278,29 @@ with st.spinner("Rendering Visualizations..."):
 
     # SBP Rolling Banner
     st.markdown(f"""
-        <div class="sbp-marquee">
-            <span>
-                <a href="https://www.sbp.org.pk/our-operations/monetary-policy" target="_blank">
-                    <span style="color: #f68b1e; margin-right: 8px; font-weight: 700;">SBP MONETARY POLICY UPDATE:</span>
-                    The current Monetary Policy Rate is <b style="color:#FFFFFF;">{mpr_rate:.2f}%</b>. 
-                    Next MPC meeting is scheduled for <b style="color:#FFFFFF;">{next_mpr_date}</b>. 
-                    <span style="color:#FFFFFF; opacity:0.9;">Summary: The Monetary Policy Committee continues to monitor inflation targets and economic indicators.</span> 
-                    &nbsp;&nbsp;Click here to read the full policy statement on the official SBP website.
-                </a>
-            </span>
-        </div>
+<div class="sbp-marquee">
+    <span>
+        <a href="https://www.sbp.org.pk/our-operations/monetary-policy" target="_blank">
+            <span style="color: #f68b1e; margin-right: 8px; font-weight: 700;">SBP MONETARY POLICY UPDATE:</span>
+            The current Monetary Policy Rate is <b style="color:#FFFFFF;">{mpr_rate:.2f}%</b>. 
+            Next MPC meeting is scheduled for <b style="color:#FFFFFF;">{next_mpr_date}</b>. 
+            <span style="color:#FFFFFF; opacity:0.9;">Summary: The Monetary Policy Committee continues to monitor inflation targets and economic indicators.</span> 
+            &nbsp;&nbsp;Click here to read the full policy statement on the official SBP website.
+        </a>
+    </span>
+</div>
     """, unsafe_allow_html=True)
 
-    # SCREEN 1: TOP SECTION (With Base64 Encoded Logo Inside Header)
+    # SCREEN 1: TOP SECTION (Fixed HTML indentation)
     st.markdown(f"""
-        <div class="header-container">
-            <div class="glow-line"></div>
-            <div class="header-card">
-                {header_logo_html}
-                Treasury Portfolio Summary (FY26-27)
-            </div>
-            <div class="glow-line"></div>
-        </div>
+<div class="header-container">
+    <div class="glow-line"></div>
+    <div class="header-card">
+        <img src="data:image/jpeg;base64,{logo_b64}" alt="" style="height: 35px; border-radius: 4px; object-fit: contain;">
+        Treasury Portfolio Summary (FY26-27)
+    </div>
+    <div class="glow-line"></div>
+</div>
     """, unsafe_allow_html=True)
 
     col_e1, col_date, col_e2 = st.columns([1, 0.3, 1])
@@ -464,7 +331,6 @@ with st.spinner("Rendering Visualizations..."):
         rates_br = "<br>".join(month_info['rates'])
         month_cols_html += f"<div style='flex: 1; background: rgba(0,0,0,0.1); border-radius: 8px; padding: 14px 6px; text-align: center;'><div style='font-size: 14px; font-weight: 700; color: #f68b1e; text-transform: uppercase;'>{month_info['month']}</div><div style='font-size: 16px; font-weight: 400; color: #FFFFFF; margin-top: 8px; line-height: 1.6;'>{rates_br}</div></div>"
     month_cols_html += "</div>"
-
     with bot_col1:
         st.markdown(f"<div class='kpi-card' style='justify-content: center; height: 210px;'><div class='kpi-lbl'>BANK PROFIT RATES ({selected_q})</div>{month_cols_html}</div>", unsafe_allow_html=True)
 
@@ -482,7 +348,6 @@ with st.spinner("Rendering Visualizations..."):
         "<div style='font-size: 14px; font-weight: 400; color: #ffffff; opacity: 0.9; margin-top: 4px;'>MPR - 1.5%</div>"
         "</div></div>"
     )
-
     with bot_col2:
         st.markdown(f"<div class='kpi-card' style='justify-content: center; height: 210px; padding: 10px;'>{mpr_split_html}</div>", unsafe_allow_html=True)
 
@@ -495,15 +360,12 @@ with st.spinner("Rendering Visualizations..."):
         "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: rgba(0,0,0,0.1); border-radius: 8px; padding: 14px 4px; text-align: center;'><div style='font-size: 14px; font-weight: 700; color: #f68b1e; text-transform: uppercase;'>1Y</div><div style='font-size: 18px; font-weight: 700; color: #FFFFFF; margin-top: 8px;'>--%</div></div>"
         "</div>"
     )
-
     with bot_col3:
         st.markdown(f"<div class='kpi-card' style='justify-content: center; height: 210px;'><div class='kpi-lbl'>PKR YIELDS</div>{pkr_yields_html}</div>", unsafe_allow_html=True)
-
 
     # =========================================================
     # SECTION: CURRENT INVESTMENT POSITION
     # =========================================================
-    
     st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
     
     st.markdown(
@@ -534,7 +396,6 @@ with st.spinner("Rendering Visualizations..."):
             unsafe_allow_html=True
         )
         
-        # PLOTLY PIE CHART: Forced labels outside with generous margin space
         fig_inv_donut = go.Figure(data=[go.Pie(
             labels=[item["instrument"] for item in investment_data],
             values=[item["value"] for item in investment_data],
@@ -549,13 +410,9 @@ with st.spinner("Rendering Visualizations..."):
         )])
         
         fig_inv_donut.update_layout(
-            showlegend=False,
-            margin=dict(t=50, b=50, l=100, r=100), 
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)',
-            height=450 
+            showlegend=False, margin=dict(t=50, b=50, l=100, r=100), 
+            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=450 
         )
-        
         st.plotly_chart(fig_inv_donut, use_container_width=True)
 
     # RIGHT COLUMN: FINANCIAL TABLE
