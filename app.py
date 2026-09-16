@@ -397,17 +397,16 @@ with st.spinner("Rendering Visualizations..."):
             hole=0.62,
             pull=[0.02, 0.02, 0.02, 0.02],
             marker_colors=[item["color"] for item in investment_data],
-            textinfo='label+percent',
-            textposition='outside',
-            insidetextorientation='horizontal',
-            textfont=dict(size=14, weight='bold', color='#FFFFFF', family="Inter, Roboto, Helvetica Neue, sans-serif"),
+            textposition='outside', # Prevents overlap by placing text outside with sleek leader lines
+            texttemplate="<b>%{label}</b><br>%{value:,.1f} M (%{percent})", # Shows both Market Value and %
+            textfont=dict(size=13, color='#FFFFFF', family="Chivo, sans-serif"),
             hovertemplate="<b>%{label}</b><br>Market Value: <b>PKR %{value:,.2f} M</b><br>Share: <b>%{percent}</b><extra></extra>",
             marker=dict(line=dict(color='#0f6286', width=2)) 
         )])
         
         fig_inv_donut.update_layout(
             showlegend=False,
-            margin=dict(t=30, b=30, l=40, r=40),
+            margin=dict(t=40, b=40, l=60, r=60), # Widened margins so outside text labels don't get cut off
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
             height=370
