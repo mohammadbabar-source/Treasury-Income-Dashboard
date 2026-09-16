@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 import time
-import textwrap
+import base64
+import os
 
 # 1. Page Configuration MUST be the first Streamlit command
 st.set_page_config(page_title="Karandaaz Treasury Summary FY26-27", layout="wide", initial_sidebar_state="collapsed")
@@ -11,36 +12,34 @@ st.set_page_config(page_title="Karandaaz Treasury Summary FY26-27", layout="wide
 # HELPER TO PREVENT STREAMLIT MARKDOWN CODE-BLOCK BUGS
 # ---------------------------------------------------------
 def clean_html(html_str):
-    """Strips all leading/trailing whitespace from every line to ensure Markdown never turns HTML into a code block."""
+    """Strips all leading/trailing whitespace from every line so Markdown never converts HTML to code blocks."""
     return "\n".join([line.strip() for line in html_str.splitlines() if line.strip()])
 
 # ---------------------------------------------------------
-# SELF-CONTAINED EMBEDDED SVG LOGOS (NO DISK FILES REQUIRED)
+# BASE64 IMAGE ENCODER FOR UPLOADED GITHUB LOGO
 # ---------------------------------------------------------
-SPLASH_LOGO_HTML = """
-<div style="display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 25px;">
-    <svg width="56" height="56" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100" height="100" rx="22" fill="#f68b1e"/>
-        <path d="M25 75L50 25L75 75" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="50" cy="58" r="9" fill="#FFFFFF"/>
-    </svg>
-    <div style="text-align: left;">
-        <div style="color: #FFFFFF; font-size: 32px; font-weight: 700; font-family: 'Chivo', sans-serif; letter-spacing: 1.5px; line-height: 1;">KARANDAAZ</div>
-        <div style="color: #f68b1e; font-size: 15px; font-weight: 700; font-family: 'Chivo', sans-serif; letter-spacing: 4px; margin-top: 5px;">PAKISTAN</div>
-    </div>
-</div>
-"""
+EXCEL_FILE = "Treasury Income FY26'27 - July26.xlsx"
+LOGO_FILE = "krn logo.jpg"
 
-HEADER_LOGO_HTML = """
-<div style="display: flex; align-items: center; gap: 10px;">
-    <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100" height="100" rx="20" fill="#f68b1e"/>
-        <path d="M25 75L50 25L75 75" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="50" cy="58" r="9" fill="#FFFFFF"/>
-    </svg>
-    <span style="color: #FFFFFF; font-size: 22px; font-weight: 700; font-family: 'Chivo', sans-serif; letter-spacing: 1px;">KARANDAAZ</span>
-</div>
-"""
+def get_base64_logo():
+    if os.path.exists(LOGO_FILE):
+        with open(LOGO_FILE, "rb") as f:
+            return base64.b64encode(f.read()).decode()
+    # Search fallback in case of uppercase/lowercase filename differences
+    for file in os.listdir('.'):
+        if any(term in file.lower() for term in ['krn', 'logo']) and file.lower().endswith(('.jpg', '.jpeg', '.png')):
+            with open(file, "rb") as f:
+                return base64.b64encode(f.read()).decode()
+    return None
+
+logo_b64 = get_base64_logo()
+
+if logo_b64:
+    splash_logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" style="width: 250px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 8px 25px rgba(0,0,0,0.3);">'
+    header_logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" alt="Logo" style="height: 38px; border-radius: 4px; object-fit: contain;">'
+else:
+    splash_logo_html = '<div style="color: #FFFFFF; font-size: 32px; font-weight: 700; margin-bottom: 20px; font-family: \'Chivo\', sans-serif;">KARANDAAZ PAKISTAN</div>'
+    header_logo_html = '<span style="color: #f68b1e; font-size: 20px; font-weight: 700; margin-right: 8px;">KRN</span>'
 
 # ---------------------------------------------------------
 # SESSION STATE CONTROL FOR FIRST-TIME SPLASH LOAD
@@ -54,8 +53,6 @@ else:
 # ---------------------------------------------------------
 # DYNAMIC DATA INGESTION FROM EXCEL
 # ---------------------------------------------------------
-EXCEL_FILE = "Treasury Income FY26'27 - July26.xlsx"
-
 try:
     df_q = pd.read_excel(EXCEL_FILE, sheet_name='Quarterly', header=None)
     def get_q_val(row_idx, col_idx):
@@ -251,7 +248,7 @@ if is_first_load:
     with splash_placeholder.container():
         splash_content = clean_html(f"""
         <div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; background-color: #0f6286; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999999;">
-            {SPLASH_LOGO_HTML}
+            {splash_logo_html}
             <h1 style="color: #FFFFFF; font-size: 42px; margin-bottom: 12px; font-weight: 700; font-family: 'Chivo', sans-serif; text-align: center;">Karandaaz Pakistan Treasury Dashboard</h1>
             <p style="color: #f68b1e; font-size: 18px; font-weight: 400; margin-bottom: 40px; font-family: 'Chivo', sans-serif; text-align: center;">Loading secure financial models...</p>
             <div class="data-wave">
@@ -308,7 +305,7 @@ with st.spinner("Rendering Visualizations..."):
     <div class="header-container">
         <div class="glow-line"></div>
         <div class="header-card">
-            {HEADER_LOGO_HTML}
+            {header_logo_html}
             Treasury Portfolio Summary (FY26-27)
         </div>
         <div class="glow-line"></div>
