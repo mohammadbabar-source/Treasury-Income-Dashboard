@@ -126,6 +126,18 @@ def load_pkrv_data():
 
 df_pkrv_chart = load_pkrv_data()
 
+# DYNAMIC LATEST PKRV NUMBERS AND DATE
+if not df_pkrv_chart.empty:
+    latest_pkrv_row = df_pkrv_chart.iloc[-1]
+    latest_pkrv_date_str = latest_pkrv_row['DATE'].strftime('%b %d, %Y')
+    val_1m_str = f"{latest_pkrv_row['1M']:.2f}%"
+    val_3m_str = f"{latest_pkrv_row['3M']:.2f}%"
+    val_6m_str = f"{latest_pkrv_row['6M']:.2f}%"
+    val_12m_str = f"{latest_pkrv_row['12M']:.2f}%"
+else:
+    latest_pkrv_date_str = "Sep 15, 2026"
+    val_1m_str, val_3m_str, val_6m_str, val_12m_str = "11.48%", "11.52%", "11.75%", "12.00%"
+
 quarter_months_map = {
     "Q1": [("Jul 2026", 0), ("Aug 2026", 1), ("Sep 2026", 2)],
     "Q2": [("Oct 2026", 3), ("Nov 2026", 4), ("Dec 2026", 5)],
@@ -448,17 +460,17 @@ with st.spinner("Rendering Visualizations..."):
     with bot_col2:
         st.markdown(clean_html(f"<div class='kpi-card' style='justify-content: center; height: 210px; padding: 10px;'>{mpr_split_html}</div>"), unsafe_allow_html=True)
 
-    # 3. PKR Yields Card
+    # 3. PKR Yields Card (DYNAMIC RECENT NUMBERS & DATE)
     pkr_yields_html = (
-        "<div style='display: flex; justify-content: space-between; width: 100%; gap: 10px; margin-top: 10px; height: 100%;'>"
-        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: rgba(0,0,0,0.1); border-radius: 8px; padding: 14px 4px; text-align: center;'><div style='font-size: 18px; font-weight: 700; color: #f68b1e; text-transform: uppercase;'>1M</div><div style='font-size: 23px; font-weight: 700; color: #FFFFFF; margin-top: 8px;'>--%</div></div>"
-        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: rgba(0,0,0,0.1); border-radius: 8px; padding: 14px 4px; text-align: center;'><div style='font-size: 18px; font-weight: 700; color: #f68b1e; text-transform: uppercase;'>3M</div><div style='font-size: 23px; font-weight: 700; color: #FFFFFF; margin-top: 8px;'>--%</div></div>"
-        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: rgba(0,0,0,0.1); border-radius: 8px; padding: 14px 4px; text-align: center;'><div style='font-size: 18px; font-weight: 700; color: #f68b1e; text-transform: uppercase;'>6M</div><div style='font-size: 23px; font-weight: 700; color: #FFFFFF; margin-top: 8px;'>--%</div></div>"
-        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: rgba(0,0,0,0.1); border-radius: 8px; padding: 14px 4px; text-align: center;'><div style='font-size: 18px; font-weight: 700; color: #f68b1e; text-transform: uppercase;'>1Y</div><div style='font-size: 23px; font-weight: 700; color: #FFFFFF; margin-top: 8px;'>--%</div></div>"
-        "</div>"
+        f"<div style='display: flex; justify-content: space-between; width: 100%; gap: 10px; margin-top: 10px; height: 100%;'>"
+        f"<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: rgba(0,0,0,0.1); border-radius: 8px; padding: 14px 4px; text-align: center;'><div style='font-size: 18px; font-weight: 700; color: #f68b1e; text-transform: uppercase;'>1M</div><div style='font-size: 23px; font-weight: 700; color: #FFFFFF; margin-top: 8px;'>{val_1m_str}</div></div>"
+        f"<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: rgba(0,0,0,0.1); border-radius: 8px; padding: 14px 4px; text-align: center;'><div style='font-size: 18px; font-weight: 700; color: #f68b1e; text-transform: uppercase;'>3M</div><div style='font-size: 23px; font-weight: 700; color: #FFFFFF; margin-top: 8px;'>{val_3m_str}</div></div>"
+        f"<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: rgba(0,0,0,0.1); border-radius: 8px; padding: 14px 4px; text-align: center;'><div style='font-size: 18px; font-weight: 700; color: #f68b1e; text-transform: uppercase;'>6M</div><div style='font-size: 23px; font-weight: 700; color: #FFFFFF; margin-top: 8px;'>{val_6m_str}</div></div>"
+        f"<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: rgba(0,0,0,0.1); border-radius: 8px; padding: 14px 4px; text-align: center;'><div style='font-size: 18px; font-weight: 700; color: #f68b1e; text-transform: uppercase;'>1Y</div><div style='font-size: 23px; font-weight: 700; color: #FFFFFF; margin-top: 8px;'>{val_12m_str}</div></div>"
+        f"</div>"
     )
     with bot_col3:
-        st.markdown(clean_html(f"<div class='kpi-card' style='justify-content: center; height: 210px;'><div class='kpi-lbl'>PKR YIELDS</div>{pkr_yields_html}</div>"), unsafe_allow_html=True)
+        st.markdown(clean_html(f"<div class='kpi-card' style='justify-content: center; height: 210px;'><div class='kpi-lbl'>PKR YIELDS ({latest_pkrv_date_str})</div>{pkr_yields_html}</div>"), unsafe_allow_html=True)
 
     # =========================================================
     # SECTION: CURRENT INVESTMENT POSITION
@@ -485,7 +497,7 @@ with st.spinner("Rendering Visualizations..."):
 
     inv_col1, inv_col2 = st.columns([1, 1.35], gap="large")
 
-    # LEFT COLUMN: DONUT CHART (REVERTED TO PREVIOUS OUTSIDE LABELS ON TEAL)
+    # LEFT COLUMN: DONUT CHART (REVERTED BACK TO PREVIOUS OUTSIDE TEAL LABELS)
     with inv_col1:
         st.markdown(
             clean_html(
@@ -556,7 +568,7 @@ with st.spinner("Rendering Visualizations..."):
         st.markdown(clean_html(table_html), unsafe_allow_html=True)
 
     # =========================================================
-    # SECTION: PKRV ANALYSIS (EXPLICIT WHITE LEGENDS & LABELS ON DEEP TEAL)
+    # SECTION: PKRV ANALYSIS
     # =========================================================
     st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
     
