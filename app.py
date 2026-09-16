@@ -485,7 +485,7 @@ with st.spinner("Rendering Visualizations..."):
 
     inv_col1, inv_col2 = st.columns([1, 1.35], gap="large")
 
-    # LEFT COLUMN: DONUT CHART (EXPLICIT WHITE LEGENDS & LABELS ON DEEP TEAL)
+    # LEFT COLUMN: DONUT CHART (REVERTED TO PREVIOUS OUTSIDE LABELS ON TEAL)
     with inv_col1:
         st.markdown(
             clean_html(
@@ -505,25 +505,17 @@ with st.spinner("Rendering Visualizations..."):
             textposition='outside', 
             textinfo='label+percent',
             texttemplate="<b>%{label}</b><br>PKR %{value:,.1f} M<br>(%{percent})",
-            textfont=dict(size=18, color='#FFFFFF', family="Chivo, sans-serif"),
+            textfont=dict(size=18, color='#0f6286', family="Chivo, sans-serif"),
             hovertemplate="<b>%{label}</b><br>Market Value: <b>PKR %{value:,.2f} M</b><br>Share: <b>%{percent}</b><extra></extra>",
             marker=dict(line=dict(color='#0f6286', width=2)) 
         )])
         
         fig_inv_donut.update_layout(
-            showlegend=True,
-            legend=dict(
-                orientation="h",
-                yanchor="top",
-                y=-0.05,
-                xanchor="center",
-                x=0.5,
-                font=dict(size=16, color='#FFFFFF', family="Chivo, sans-serif")
-            ),
-            margin=dict(t=40, b=60, l=80, r=80), 
-            paper_bgcolor='#0f6286',
-            plot_bgcolor='#0f6286',
-            height=480 
+            showlegend=False, 
+            margin=dict(t=50, b=50, l=100, r=100), 
+            paper_bgcolor='rgba(0,0,0,0)', 
+            plot_bgcolor='rgba(0,0,0,0)', 
+            height=450 
         )
         st.plotly_chart(fig_inv_donut, use_container_width=True)
 
