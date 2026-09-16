@@ -391,25 +391,27 @@ with st.spinner("Rendering Visualizations..."):
             unsafe_allow_html=True
         )
         
+        # PLOTLY PIE CHART MODIFIED: Forced labels outside with generous margin space
         fig_inv_donut = go.Figure(data=[go.Pie(
             labels=[item["instrument"] for item in investment_data],
             values=[item["value"] for item in investment_data],
             hole=0.62,
             pull=[0.02, 0.02, 0.02, 0.02],
             marker_colors=[item["color"] for item in investment_data],
-            textposition='outside', # Prevents overlap by placing text outside with sleek leader lines
-            texttemplate="<b>%{label}</b><br>%{value:,.1f} M (%{percent})", # Shows both Market Value and %
-            textfont=dict(size=13, color='#FFFFFF', family="Chivo, sans-serif"),
+            textposition='outside', # explicitly sets text outside 
+            textinfo='label+percent',
+            texttemplate="<b>%{label}</b><br>%{value:,.1f} M<br>(%{percent})", # sleek text template showing amount and %
+            textfont=dict(size=12, color='#FFFFFF', family="Chivo, sans-serif"),
             hovertemplate="<b>%{label}</b><br>Market Value: <b>PKR %{value:,.2f} M</b><br>Share: <b>%{percent}</b><extra></extra>",
             marker=dict(line=dict(color='#0f6286', width=2)) 
         )])
         
         fig_inv_donut.update_layout(
             showlegend=False,
-            margin=dict(t=40, b=40, l=60, r=60), # Widened margins so outside text labels don't get cut off
+            margin=dict(t=50, b=50, l=80, r=80), # SIGNIFICANTLY increased margins to give outside labels room to breathe
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
-            height=370
+            height=420 # slightly taller container so top/bottom floating text isn't cut off
         )
         
         st.markdown("<div class='animated-chart-container'>", unsafe_allow_html=True)
