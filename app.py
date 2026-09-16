@@ -140,7 +140,7 @@ quarter_data = {
 }
 
 # ---------------------------------------------------------
-# CUSTOM CSS ARCHITECTURE
+# CUSTOM CSS ARCHITECTURE & STYLING
 # ---------------------------------------------------------
 st.markdown("""
     <style>
@@ -153,14 +153,14 @@ st.markdown("""
     html, body, .stApp { background-color: #F5F7F9 !important; margin: 0 !important; padding: 0 !important; }
     header { visibility: hidden; height: 0; }
     
-    /* Smooth fade-in for the main dashboard content after loading */
+    /* Smooth fade-in for the main dashboard content */
     @keyframes pageFadeIn {
         0% { opacity: 0; transform: translateY(15px); }
         100% { opacity: 1; transform: translateY(0); }
     }
     .block-container { 
         padding-top: 5rem !important; padding-bottom: 3rem !important; padding-left: 2rem !important; padding-right: 2rem !important; max-width: 100% !important; 
-        animation: pageFadeIn 1s ease-out 5.2s both !important; /* Timed to match the 5s loader */
+        animation: pageFadeIn 0.8s ease-out 3.5s both !important;
     }
 
     /* SBP Rolling Banner CSS */
@@ -255,109 +255,132 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# ANIMATED SPLASH SCREEN (5-SECOND LOADER)
+# ANIMATED SPLASH SCREEN (PURE CSS - NO CLICKING REQUIRED)
 # ---------------------------------------------------------
-if 'first_load' not in st.session_state:
-    st.session_state.first_load = True
-
-if st.session_state.first_load:
-    splash = st.empty()
-    with splash.container():
-        st.markdown("""
-            <div style='display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; text-align: center; background-color: #0f6286; animation: fadeOut 0.8s ease-in 4.5s forwards; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999999;'>
-                
-                <!-- Logo with glowing pulse -->
-                <img src="krn logo.jpg" alt="Karandaaz Logo" style="width: 250px; margin-bottom: 30px; border-radius: 8px; animation: pulseLogo 2s ease-in-out infinite;" onerror="this.style.display='none'">
-                
-                <!-- Headings -->
-                <h1 style='color: #FFFFFF; font-size: 48px; letter-spacing: 1px; margin-bottom: 12px; font-weight: 700; font-family: "Chivo", sans-serif;'>Karandaaz Treasury Portfolio</h1>
-                <p style='color: #f68b1e; font-size: 20px; font-weight: 400; letter-spacing: 0.5px; margin-bottom: 40px; font-family: "Chivo", sans-serif;'>Initializing Financial Models & Data...</p>
-                
-                <!-- Animated Financial Bar Chart Loader -->
-                <div class="chart-loader">
-                    <div class="bar bar1"></div>
-                    <div class="bar bar2"></div>
-                    <div class="bar bar3"></div>
-                    <div class="bar bar4"></div>
-                    <div class="bar bar5"></div>
-                </div>
-                
-                <!-- Sleek Progress Bar -->
-                <div class="progress-container">
-                    <div class="progress-bar"></div>
-                </div>
-                
-            </div>
-            
-            <style>
-            /* Financial Bar Chart Animation */
-            .chart-loader {
-                display: flex;
-                align-items: flex-end;
-                gap: 8px;
-                height: 60px;
-                margin-bottom: 30px;
-            }
-            .bar {
-                width: 12px;
-                background-color: #f68b1e;
-                border-radius: 4px 4px 0 0;
-                animation: growBar 1s ease-in-out infinite alternate;
-                transform-origin: bottom;
-            }
-            .bar1 { height: 30%; animation-delay: 0.0s; }
-            .bar2 { height: 60%; animation-delay: 0.2s; }
-            .bar3 { height: 100%; animation-delay: 0.4s; }
-            .bar4 { height: 50%; animation-delay: 0.6s; }
-            .bar5 { height: 80%; animation-delay: 0.8s; }
-
-            @keyframes growBar {
-                0% { transform: scaleY(0.3); opacity: 0.7; }
-                100% { transform: scaleY(1); opacity: 1; box-shadow: 0 0 10px rgba(246, 139, 30, 0.6); }
-            }
-
-            /* Progress Bar Animation */
-            .progress-container {
-                width: 320px;
-                height: 6px;
-                background-color: rgba(255, 255, 255, 0.15);
-                border-radius: 6px;
-                overflow: hidden;
-                position: relative;
-            }
-            .progress-bar {
-                width: 0%;
-                height: 100%;
-                background-color: #f68b1e;
-                animation: loadProgress 4.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
-            }
-
-            @keyframes loadProgress {
-                0% { width: 0%; }
-                30% { width: 45%; }
-                70% { width: 80%; }
-                100% { width: 100%; }
-            }
-
-            /* Logo & Fade Out Keyframes */
-            @keyframes pulseLogo { 
-                0% { transform: scale(0.98); opacity: 0.9; } 
-                50% { transform: scale(1.02); opacity: 1; filter: drop-shadow(0 0 15px rgba(246, 139, 30, 0.4));} 
-                100% { transform: scale(0.98); opacity: 0.9; } 
-            }
-            @keyframes fadeOut { 
-                0% { opacity: 1; visibility: visible; } 
-                100% { opacity: 0; visibility: hidden; } 
-            }
-            </style>
-        """, unsafe_allow_html=True)
+st.markdown("""
+    <div class="splash-screen">
+        <!-- Logo -->
+        <img src="krn logo.jpg" alt="Karandaaz Logo" class="splash-logo" onerror="this.style.display='none'">
         
-        # Pause for 5 seconds to let the animation play fully
-        time.sleep(5.0)
+        <!-- Dashboard Header Text -->
+        <h1 class="splash-title">Karandaaz Pakistan Treasury Dashboard</h1>
+        <p class="splash-subtitle">Establishing Secure Connection & Loading Financial Models...</p>
         
-    splash.empty()
-    st.session_state.first_load = False
+        <!-- High-Tech Orbital Loader -->
+        <div class="orbital-loader">
+            <div class="inner-orbit"></div>
+            <div class="outer-orbit"></div>
+            <div class="core"></div>
+        </div>
+    </div>
+    
+    <style>
+    /* Splash Screen Container */
+    .splash-screen {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        height: 100vh;
+        width: 100vw;
+        background-color: #0f6286;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 9999999;
+        /* Automatic fade out after 3.5 seconds */
+        animation: fadeOutSplash 0.8s ease-in 3.5s forwards;
+    }
 
+    .splash-logo {
+        width: 250px;
+        margin-bottom: 30px;
+        border-radius: 8px;
+        animation: pulseLogo 2s ease-in-out infinite;
+    }
+
+    .splash-title {
+        color: #FFFFFF;
+        font-size: 44px;
+        letter-spacing: 1px;
+        margin-bottom: 12px;
+        font-weight: 700;
+        font-family: 'Chivo', sans-serif;
+        text-align: center;
+    }
+
+    .splash-subtitle {
+        color: #f68b1e;
+        font-size: 18px;
+        font-weight: 400;
+        letter-spacing: 0.5px;
+        margin-bottom: 40px;
+        font-family: 'Chivo', sans-serif;
+        text-align: center;
+    }
+
+    /* --- HIGH-TECH ORBITAL LOADER --- */
+    .orbital-loader {
+        position: relative;
+        width: 120px;
+        height: 120px;
+    }
+
+    /* Outer Ring */
+    .outer-orbit {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        border-radius: 50%;
+        border: 4px solid transparent;
+        border-top-color: #f68b1e;
+        border-bottom-color: #f68b1e;
+        animation: spinOuter 1.5s linear infinite;
+        box-shadow: 0 0 20px rgba(246, 139, 30, 0.4);
+    }
+
+    /* Inner Ring */
+    .inner-orbit {
+        position: absolute;
+        top: 15px; left: 15px;
+        width: 90px; height: 90px;
+        border-radius: 50%;
+        border: 3px solid transparent;
+        border-left-color: #76C4E3;
+        border-right-color: #76C4E3;
+        animation: spinInner 1s linear infinite reverse;
+    }
+
+    /* Center Glowing Core */
+    .core {
+        position: absolute;
+        top: 45px; left: 45px;
+        width: 30px; height: 30px;
+        background-color: #FFFFFF;
+        border-radius: 50%;
+        box-shadow: 0 0 20px #FFFFFF, 0 0 40px #76C4E3;
+        animation: pulseCore 1.5s ease-in-out infinite alternate;
+    }
+
+    /* Loader Keyframes */
+    @keyframes spinOuter { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes spinInner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes pulseCore { 0% { transform: scale(0.8); opacity: 0.8; } 100% { transform: scale(1.2); opacity: 1; } }
+
+    /* Logo Pulse */
+    @keyframes pulseLogo { 
+        0% { transform: scale(0.98); opacity: 0.9; } 
+        50% { transform: scale(1.02); opacity: 1; filter: drop-shadow(0 0 15px rgba(246, 139, 30, 0.4));} 
+        100% { transform: scale(0.98); opacity: 0.9; } 
+    }
+
+    /* Fade Out - pointer-events: none ensures full interaction without clicking */
+    @keyframes fadeOutSplash { 
+        0% { opacity: 1; visibility: visible; } 
+        100% { opacity: 0; visibility: hidden; pointer-events: none; display: none; } 
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # MAIN DASHBOARD CONTENT
@@ -458,7 +481,7 @@ with st.spinner("Rendering Visualizations..."):
 
 
     # =========================================================
-    # NEW SECTION: CURRENT INVESTMENT POSITION
+    # SECTION: CURRENT INVESTMENT POSITION
     # =========================================================
     
     st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
@@ -491,15 +514,15 @@ with st.spinner("Rendering Visualizations..."):
             unsafe_allow_html=True
         )
         
-        # PLOTLY PIE CHART MODIFIED: Forced labels outside with generous margin space
+        # PLOTLY PIE CHART: Forced labels outside with generous margin space
         fig_inv_donut = go.Figure(data=[go.Pie(
             labels=[item["instrument"] for item in investment_data],
             values=[item["value"] for item in investment_data],
             hole=0.62,
             marker_colors=[item["color"] for item in investment_data],
-            textposition='outside', # explicitly sets text outside 
+            textposition='outside', 
             textinfo='label+percent',
-            texttemplate="<b>%{label}</b><br>PKR %{value:,.1f} M<br>(%{percent})", # sleek text template showing amount and %
+            texttemplate="<b>%{label}</b><br>PKR %{value:,.1f} M<br>(%{percent})",
             textfont=dict(size=14, color='#FFFFFF', family="Chivo, sans-serif"),
             hovertemplate="<b>%{label}</b><br>Market Value: <b>PKR %{value:,.2f} M</b><br>Share: <b>%{percent}</b><extra></extra>",
             marker=dict(line=dict(color='#0f6286', width=2)) 
@@ -507,10 +530,10 @@ with st.spinner("Rendering Visualizations..."):
         
         fig_inv_donut.update_layout(
             showlegend=False,
-            margin=dict(t=50, b=50, l=100, r=100), # Expanded margins significantly to prevent clipping of outside labels
+            margin=dict(t=50, b=50, l=100, r=100), 
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
-            height=450 # Height expanded to ensure text fits comfortably outside the donut
+            height=450 
         )
         
         st.plotly_chart(fig_inv_donut, use_container_width=True)
