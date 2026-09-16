@@ -12,7 +12,7 @@ st.set_page_config(page_title="Karandaaz Treasury Summary FY26-27", layout="wide
 # HELPER TO PREVENT STREAMLIT MARKDOWN CODE-BLOCK BUGS
 # ---------------------------------------------------------
 def clean_html(html_str):
-    """Strips all leading/trailing whitespace from every line so Markdown never converts HTML to code blocks."""
+    """Strips leading/trailing whitespace from every line so Markdown never converts HTML to code blocks."""
     return "\n".join([line.strip() for line in html_str.splitlines() if line.strip()])
 
 # ---------------------------------------------------------
@@ -25,7 +25,6 @@ def get_base64_logo():
     if os.path.exists(LOGO_FILE):
         with open(LOGO_FILE, "rb") as f:
             return base64.b64encode(f.read()).decode()
-    # Search fallback in case of uppercase/lowercase filename differences
     for file in os.listdir('.'):
         if any(term in file.lower() for term in ['krn', 'logo']) and file.lower().endswith(('.jpg', '.jpeg', '.png')):
             with open(file, "rb") as f:
@@ -34,11 +33,12 @@ def get_base64_logo():
 
 logo_b64 = get_base64_logo()
 
+# Zero box-shadow, zero borders, zero background wrappers for smooth integration
 if logo_b64:
-    splash_logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" style="width: 360px; max-width: 90%; margin: 0 0 10px 0; padding: 0; border-radius: 8px; box-shadow: 0 8px 25px rgba(0,0,0,0.3);">'
-    header_logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" alt="Logo" style="height: 48px; border-radius: 4px; object-fit: contain; margin: 0; padding: 0;">'
+    splash_logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" style="width: 380px; max-width: 90%; margin: 0 auto 20px auto; padding: 0; border: none !important; outline: none !important; box-shadow: none !important; background: transparent !important; display: block;">'
+    header_logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" alt="Logo" style="height: 48px; border: none !important; outline: none !important; box-shadow: none !important; background: transparent !important; object-fit: contain; margin: 0; padding: 0;">'
 else:
-    splash_logo_html = '<div style="color: #FFFFFF; font-size: 36px; font-weight: 700; margin-bottom: 15px; font-family: \'Chivo\', sans-serif;">KARANDAAZ PAKISTAN</div>'
+    splash_logo_html = '<div style="color: #FFFFFF; font-size: 38px; font-weight: 700; margin-bottom: 20px; font-family: \'Chivo\', sans-serif; letter-spacing: 2px;">KARANDAAZ PAKISTAN</div>'
     header_logo_html = '<span style="color: #f68b1e; font-size: 22px; font-weight: 700; margin-right: 8px;">KRN</span>'
 
 # ---------------------------------------------------------
@@ -240,36 +240,106 @@ div[data-baseweb="select"] > div { border-radius: 8px; font-size: 16px; font-wei
 """), unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# ANIMATED SPLASH SCREEN (FIRST VISIT ONLY)
+# ANIMATED SPLASH SCREEN (HIGH-TECH 3D QUANTUM LOADER)
 # ---------------------------------------------------------
 if is_first_load:
     splash_placeholder = st.empty()
     
     with splash_placeholder.container():
         splash_content = clean_html(f"""
-        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; background-color: #0f6286; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999999; padding: 0; margin: 0;">
+        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; background-color: #0f6286; position: fixed; top: 0; left: 0; width: 100vw; z-index: 9999999; padding: 0; margin: 0; overflow: hidden;">
+            
+            <!-- Seamless Integrated Logo -->
             {splash_logo_html}
-            <h1 style="color: #FFFFFF; font-size: 42px; margin-top: 10px; margin-bottom: 35px; font-weight: 700; font-family: 'Chivo', sans-serif; text-align: center;">Karandaaz Pakistan Treasury Dashboard</h1>
-            <div class="data-wave">
-                <div class="wave-bar bar-1"></div>
-                <div class="wave-bar bar-2"></div>
-                <div class="wave-bar bar-3"></div>
-                <div class="wave-bar bar-4"></div>
-                <div class="wave-bar bar-5"></div>
+            
+            <h1 style="color: #FFFFFF; font-size: 40px; margin-top: 10px; margin-bottom: 35px; font-weight: 700; font-family: 'Chivo', sans-serif; text-align: center; letter-spacing: 0.5px;">Karandaaz Pakistan Treasury Dashboard</h1>
+            
+            <!-- Cool 3D Quantum Particle Radar Loader -->
+            <div class="quantum-loader">
+                <div class="ring outer-ring"></div>
+                <div class="ring middle-ring"></div>
+                <div class="ring inner-ring"></div>
+                <div class="core-glow"></div>
+                <div class="particle p1"></div>
+                <div class="particle p2"></div>
+                <div class="particle p3"></div>
             </div>
+            
+            <div style="color: #f68b1e; font-size: 14px; font-weight: 700; font-family: 'Chivo', sans-serif; letter-spacing: 3px; margin-top: 30px; text-transform: uppercase; animation: textPulse 1.5s ease-in-out infinite;">SYNCING PORTFOLIO DATA...</div>
         </div>
+        
         <style>
-        .data-wave {{ display: flex; align-items: center; gap: 8px; }}
-        .wave-bar {{ width: 10px; height: 45px; background-color: #f68b1e; border-radius: 6px; animation: waveAnim 1s ease-in-out infinite; }}
-        .bar-1 {{ animation-delay: 0.0s; }}
-        .bar-2 {{ animation-delay: 0.1s; background-color: #76C4E3; }}
-        .bar-3 {{ animation-delay: 0.2s; background-color: #FFFFFF; height: 60px; }}
-        .bar-4 {{ animation-delay: 0.3s; background-color: #76C4E3; }}
-        .bar-5 {{ animation-delay: 0.4s; }}
-        @keyframes waveAnim {{
-            0%, 100% {{ transform: scaleY(0.3); opacity: 0.6; }}
-            50% {{ transform: scaleY(1); opacity: 1; box-shadow: 0 0 15px rgba(255,255,255,0.4); }}
+        .quantum-loader {{
+            position: relative;
+            width: 110px;
+            height: 110px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 800px;
         }}
+
+        .ring {{
+            position: absolute;
+            border-radius: 50%;
+            border: 3px solid transparent;
+        }}
+
+        .outer-ring {{
+            width: 100%;
+            height: 100%;
+            border-top-color: #f68b1e;
+            border-bottom-color: #f68b1e;
+            animation: spinClockwise 1.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+            filter: drop-shadow(0 0 10px rgba(246, 139, 30, 0.6));
+        }}
+
+        .middle-ring {{
+            width: 75%;
+            height: 75%;
+            border-left-color: #76C4E3;
+            border-right-color: #76C4E3;
+            animation: spinCounterClockwise 1.2s linear infinite;
+            filter: drop-shadow(0 0 8px rgba(118, 196, 227, 0.8));
+        }}
+
+        .inner-ring {{
+            width: 50%;
+            height: 50%;
+            border-top-color: #FFFFFF;
+            animation: spinClockwise 0.9s ease-in-out infinite;
+        }}
+
+        .core-glow {{
+            width: 18px;
+            height: 18px;
+            background-color: #FFFFFF;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #FFFFFF, 0 0 30px #f68b1e, 0 0 45px #76C4E3;
+            animation: pulseCore 1.2s ease-in-out infinite alternate;
+        }}
+
+        .particle {{
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: #f68b1e;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #f68b1e;
+        }}
+
+        .p1 {{ top: 10%; left: 50%; animation: floatParticle1 2s ease-in-out infinite; }}
+        .p2 {{ bottom: 15%; left: 20%; animation: floatParticle2 2.2s ease-in-out infinite; }}
+        .p3 {{ top: 40%; right: 10%; animation: floatParticle3 1.8s ease-in-out infinite; }}
+
+        @keyframes spinClockwise {{ 0% {{ transform: rotate(0deg) rotateX(20deg); }} 100% {{ transform: rotate(360deg) rotateX(20deg); }} }}
+        @keyframes spinCounterClockwise {{ 0% {{ transform: rotate(0deg) rotateY(20deg); }} 100% {{ transform: rotate(-360deg) rotateY(20deg); }} }}
+        @keyframes pulseCore {{ 0% {{ transform: scale(0.7); opacity: 0.6; }} 100% {{ transform: scale(1.3); opacity: 1; }} }}
+        @keyframes textPulse {{ 0%, 100% {{ opacity: 0.5; }} 50% {{ opacity: 1; }} }}
+        
+        @keyframes floatParticle1 {{ 0%, 100% {{ transform: translateY(0) scale(1); }} 50% {{ transform: translateY(-12px) scale(1.5); }} }}
+        @keyframes floatParticle2 {{ 0%, 100% {{ transform: translateX(0) scale(1); }} 50% {{ transform: translateX(12px) scale(1.3); }} }}
+        @keyframes floatParticle3 {{ 0%, 100% {{ transform: translateY(0) scale(1); }} 50% {{ transform: translateY(10px) scale(0.8); }} }}
         </style>
         """)
         st.markdown(splash_content, unsafe_allow_html=True)
