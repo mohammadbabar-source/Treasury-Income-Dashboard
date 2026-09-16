@@ -248,12 +248,10 @@ if is_first_load:
         splash_content = clean_html(f"""
         <div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; background-color: #0f6286; position: fixed; top: 0; left: 0; width: 100vw; z-index: 9999999; padding: 0; margin: 0; overflow: hidden;">
             
-            <!-- Seamless Integrated Scaled-Up Logo -->
             {splash_logo_html}
             
             <h1 style="color: #FFFFFF; font-size: 52px; margin-top: 10px; margin-bottom: 35px; font-weight: 700; font-family: 'Chivo', sans-serif; text-align: center; letter-spacing: 0.5px;">Karandaaz Pakistan Treasury Dashboard</h1>
             
-            <!-- 3D Quantum Particle Radar Loader -->
             <div class="quantum-loader">
                 <div class="ring outer-ring"></div>
                 <div class="ring middle-ring"></div>
@@ -533,7 +531,7 @@ with st.spinner("Rendering Visualizations..."):
         st.markdown(clean_html(table_html), unsafe_allow_html=True)
 
     # =========================================================
-    # NEW SECTION: KEY ECONOMIC INDICATORS
+    # SECTION: KEY ECONOMIC INDICATORS
     # =========================================================
     st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
     
@@ -549,15 +547,19 @@ with st.spinner("Rendering Visualizations..."):
 
     econ_col1, econ_col2 = st.columns([1, 1], gap="large")
 
-    # LEFT BOX: ECONOMIC OUTLOOK & INFLATION
+    # LEFT BOX: ECONOMIC OUTLOOK & INFLATION (SUMMARIZED WITH HYPERLINKS)
     with econ_col1:
         st.markdown(
             clean_html(
                 "<div class='html-card' style='font-family: \"Chivo\", sans-serif;'>"
                 "<div style='font-size: 31px; font-weight: 700; color: #ffffff; line-height: 1.2;'>Economic Outlook & Inflation <span style='color:#f68b1e; font-weight: 400;'>&rarr;</span></div>"
                 "<div style='font-size: 21px; font-weight: 400; color: #ffffff; line-height: 1.6; margin-top: 18px;'>"
-                "Headline CPI inflation continues its disinflationary trajectory supported by high base effects, prudent monetary policy, and easing commodity prices. "
-                "Current expectations point toward stable price levels over upcoming quarters, providing the State Bank with sufficient policy space to consider targeted monetary easing while ensuring fiscal stability."
+                "&bull; <b>Headline CPI Inflation:</b> Pakistan's CPI inflation rose to <b>11.1% YoY in August 2026</b> (up from 9.2% in July), driven by rural inflation at 12.2% and urban inflation at 10.4%.<br><br>"
+                "&bull; <b>Finance Division Projection:</b> Inflation is projected to remain elevated between <b>10–11%</b> due to global energy and commodity pressures, alongside risks from private-sector credit contraction and climate developments.<br><br>"
+                "&bull; <b>External Sector Balance:</b> Strong export growth and sustained remittance inflows continue to narrow the current account deficit and mitigate external balance of payments risks.<br><br>"
+                "<span style='font-size: 19px; color: #f68b1e; font-weight: 700;'>Read Full Source Articles:</span><br>"
+                "&bull; <a href='https://www.brecorder.com/news/40437417' target='_blank' style='color: #76C4E3; text-decoration: underline;'>Business Recorder: August Inflation Report (11.1%)</a><br>"
+                "&bull; <a href='https://www.brecorder.com/news/40437339/august-economic-outlook-inflation-expected-to-remain-elevated-at-10-11pc' target='_blank' style='color: #76C4E3; text-decoration: underline;'>Business Recorder: Economic Update & Outlook</a>"
                 "</div>"
                 "</div>"
             ), 
