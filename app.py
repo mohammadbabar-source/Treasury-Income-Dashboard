@@ -142,8 +142,10 @@ quarter_data = {
 # 3. Custom CSS Architecture
 st.markdown("""
     <style>
-    /* Clean, modern sans-serif stack as requested */
-    * { font-family: 'Inter', 'Roboto', 'Helvetica Neue', sans-serif !important; box-sizing: border-box; }
+    @import url('https://fonts.googleapis.com/css2?family=Chivo:wght@400;700&display=swap');
+
+    /* Clean, modern sans-serif stack utilizing Chivo */
+    * { font-family: 'Chivo', sans-serif !important; box-sizing: border-box; }
     
     /* Background & Structural Colors */
     html, body, .stApp { background-color: #F5F7F9 !important; margin: 0 !important; padding: 0 !important; }
@@ -209,7 +211,7 @@ st.markdown("""
     .kpi-lbl { font-size: 14px; font-weight: 700; color: #f68b1e; text-transform: uppercase; }
     .kpi-sub { font-size: 14px; font-weight: 400; color: #ffffff; opacity: 0.9; }
 
-    /* Deep Teal HTML Containers (Generous 32px padding, left-aligned) */
+    /* Deep Teal HTML Containers */
     .html-card {
         background-color: #0f6286;
         border-radius: 16px;
@@ -262,7 +264,7 @@ if st.session_state.first_load:
     splash.empty()
     st.session_state.first_load = False
 
-CHART_FONT = dict(family="Inter, Roboto, Helvetica Neue, sans-serif", color="#FFFFFF", size=14)
+CHART_FONT = dict(family="Chivo, sans-serif", color="#FFFFFF", size=14)
 
 with st.spinner("Rendering Visualizations..."):
 
@@ -360,11 +362,11 @@ with st.spinner("Rendering Visualizations..."):
     
     st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
     
-    # Text card with Deep Teal #0f6286, 16px radius, 32px padding, left aligned text
+    # Fully Styled Text Card for Current Investment Position matching your specifications
     st.markdown(
-        "<div style='background-color: #0f6286; border-radius: 16px; padding: 32px; text-align: left; margin-bottom: 24px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);'>"
+        "<div style='background-color: #0f6286; border-radius: 16px; padding: 32px; text-align: left; margin-bottom: 24px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); font-family: \"Chivo\", sans-serif;'>"
         "<h3 style='color: #ffffff; font-size: 26px; font-weight: 700; margin: 0; line-height: 1.2;'>Current Investment Position <span style='color: #f68b1e; font-weight: 400;'>&rarr;</span></h3>"
-        "<p style='color: #ffffff; font-size: 16px; font-weight: 400; line-height: 1.6; margin-top: 12px; margin-bottom: 0;'>Instrument-Level Ledger & Portfolio Concentration</p>"
+        "<p style='color: #ffffff; font-size: 16px; font-weight: 400; line-height: 1.5; margin-top: 12px; margin-bottom: 0;'>Instrument-Level Ledger & Portfolio Concentration</p>"
         "</div>", 
         unsafe_allow_html=True
     )
@@ -382,7 +384,7 @@ with st.spinner("Rendering Visualizations..."):
     # LEFT COLUMN: DONUT CHART
     with inv_col1:
         st.markdown(
-            "<div class='html-card' style='padding-bottom: 0px;'>"
+            "<div class='html-card' style='padding-bottom: 0px; font-family: \"Chivo\", sans-serif;'>"
             "<div style='font-size: 24px; font-weight: 700; color: #ffffff; line-height: 1.2;'>Portfolio Concentration <span style='color:#f68b1e; font-weight: 400;'>&rarr;</span></div>"
             "<div style='font-size: 16px; font-weight: 400; color: #ffffff; line-height: 1.6; margin-top: 12px; margin-bottom: 10px;'>% Share of Gross Investment Portfolio</div>"
             "</div>", 
@@ -431,7 +433,7 @@ with st.spinner("Rendering Visualizations..."):
             
         table_html = (
             "<style>.inv-row { transition: background-color 0.2s ease; } .inv-row:hover { background-color: rgba(0,0,0,0.1); }</style>"
-            "<div class='html-card' style='height: 100%;'>"
+            "<div class='html-card' style='height: 100%; font-family: \"Chivo\", sans-serif;'>"
             "<div style='font-size: 24px; font-weight: 700; color: #ffffff; line-height: 1.2;'>Position by Instrument <span style='color:#f68b1e; font-weight: 400;'>&rarr;</span></div>"
             "<div style='font-size: 16px; font-weight: 400; color: #ffffff; line-height: 1.6; margin-top: 12px; margin-bottom: 18px;'>Market Value & Concentration Breakdown</div>"
             "<div style='flex-grow: 1; width: 100%; border-radius: 8px; overflow: hidden;'>"
