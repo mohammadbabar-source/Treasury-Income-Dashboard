@@ -35,11 +35,11 @@ def get_base64_logo():
 logo_b64 = get_base64_logo()
 
 if logo_b64:
-    splash_logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" style="width: 250px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 8px 25px rgba(0,0,0,0.3);">'
-    header_logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" alt="Logo" style="height: 38px; border-radius: 4px; object-fit: contain;">'
+    splash_logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" style="width: 360px; max-width: 90%; margin: 0 0 10px 0; padding: 0; border-radius: 8px; box-shadow: 0 8px 25px rgba(0,0,0,0.3);">'
+    header_logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" alt="Logo" style="height: 48px; border-radius: 4px; object-fit: contain; margin: 0; padding: 0;">'
 else:
-    splash_logo_html = '<div style="color: #FFFFFF; font-size: 32px; font-weight: 700; margin-bottom: 20px; font-family: \'Chivo\', sans-serif;">KARANDAAZ PAKISTAN</div>'
-    header_logo_html = '<span style="color: #f68b1e; font-size: 20px; font-weight: 700; margin-right: 8px;">KRN</span>'
+    splash_logo_html = '<div style="color: #FFFFFF; font-size: 36px; font-weight: 700; margin-bottom: 15px; font-family: \'Chivo\', sans-serif;">KARANDAAZ PAKISTAN</div>'
+    header_logo_html = '<span style="color: #f68b1e; font-size: 22px; font-weight: 700; margin-right: 8px;">KRN</span>'
 
 # ---------------------------------------------------------
 # SESSION STATE CONTROL FOR FIRST-TIME SPLASH LOAD
@@ -211,7 +211,7 @@ header { visibility: hidden; height: 0; }
 .header-container { display: flex; align-items: center; justify-content: center; margin-top: 10px !important; margin-bottom: 16px; }
 .glow-line { height: 2px; flex-grow: 1; max-width: 380px; background: transparent; }
 .header-card { 
-    background: #0f6286; border-radius: 16px; padding: 16px 48px; 
+    background: #0f6286; border-radius: 16px; padding: 14px 40px; 
     margin: 0 24px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); 
     font-weight: 700; font-size: 26px; color: #FFFFFF; 
     display: flex; align-items: center; gap: 16px; 
@@ -247,10 +247,9 @@ if is_first_load:
     
     with splash_placeholder.container():
         splash_content = clean_html(f"""
-        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; background-color: #0f6286; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999999;">
+        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; background-color: #0f6286; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999999; padding: 0; margin: 0;">
             {splash_logo_html}
-            <h1 style="color: #FFFFFF; font-size: 42px; margin-bottom: 12px; font-weight: 700; font-family: 'Chivo', sans-serif; text-align: center;">Karandaaz Pakistan Treasury Dashboard</h1>
-            <p style="color: #f68b1e; font-size: 18px; font-weight: 400; margin-bottom: 40px; font-family: 'Chivo', sans-serif; text-align: center;">Loading secure financial models...</p>
+            <h1 style="color: #FFFFFF; font-size: 42px; margin-top: 10px; margin-bottom: 35px; font-weight: 700; font-family: 'Chivo', sans-serif; text-align: center;">Karandaaz Pakistan Treasury Dashboard</h1>
             <div class="data-wave">
                 <div class="wave-bar bar-1"></div>
                 <div class="wave-bar bar-2"></div>
