@@ -139,7 +139,7 @@ quarter_data = {
     }
 }
 
-# 2. Splash Screen (Karandaaz Executive Branding)
+# 2. Splash Screen (Karandaaz Teal & Taupe Branding)
 if 'first_load' not in st.session_state:
     st.session_state.first_load = True
 
@@ -148,15 +148,15 @@ if st.session_state.first_load:
     with splash.container():
         st.markdown("""
             <div style='display: flex; justify-content: center; align-items: center; height: 85vh; flex-direction: column; text-align: center; animation: fadeOut 0.5s ease-in 2s forwards;'>
-                <h1 style='color: #006837; font-size: 58px; letter-spacing: 2px; margin-bottom: 8px; font-weight: 900;'>KARANDAAZ PAKISTAN</h1>
-                <p style='color: #C59B27; font-size: 22px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;'>Treasury Management & Intelligence Dashboard</p>
+                <h1 style='color: #007982; font-size: 58px; letter-spacing: 3px; margin-bottom: 8px; font-weight: 900; text-transform: uppercase;'>Karandaaz Pakistan</h1>
+                <p style='color: #8A7E77; font-size: 22px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;'>Treasury Management Dashboard</p>
                 <div class="loader"></div>
             </div>
             <style>
-            .loader { border: 4px solid #F1F5F9; border-top: 4px solid #006837; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-top: 28px;}
+            .loader { border: 4px solid #EAEBEB; border-top: 4px solid #007982; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-top: 28px;}
             @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
             @keyframes fadeOut { 0% { opacity: 1; } 100% { opacity: 0; } }
-            .stApp { background-color: #FFFFFF; }
+            .stApp { background-color: #FAFAFA; }
             </style>
         """, unsafe_allow_html=True)
         time.sleep(2.4)
@@ -167,31 +167,32 @@ if st.session_state.first_load:
 st.markdown("""
     <style>
     * { font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif !important; box-sizing: border-box; }
-    html, body, .stApp { background-color: #F8FAFC !important; margin: 0 !important; padding: 0 !important; }
-    header { visibility: hidden; height: 0; }
     
+    /* Background & Structural Colors */
+    html, body, .stApp { background-color: #F4F6F6 !important; margin: 0 !important; padding: 0 !important; }
+    header { visibility: hidden; height: 0; }
     .block-container { padding-top: 5rem !important; padding-bottom: 3rem !important; padding-left: 2rem !important; padding-right: 2rem !important; max-width: 100% !important; }
 
-    /* SBP Rolling Banner CSS - Karandaaz Deep Green & Gold */
+    /* SBP Rolling Banner CSS - Karandaaz Teal Gradient */
     .sbp-marquee {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
-        background: linear-gradient(180deg, #00522B 0%, #006837 50%, #004D28 100%); 
+        background: linear-gradient(180deg, #00666d 0%, #007982 50%, #005a61 100%); 
         color: #FFFFFF;
         padding: 11px 0;
         overflow: hidden;
         white-space: nowrap;
         z-index: 999999;
-        border-top: 1px solid #008748; 
-        border-bottom: 3px solid #C59B27; 
-        box-shadow: 0 4px 12px rgba(0,104,55,0.25);
+        border-top: 1px solid #0098a3; 
+        border-bottom: 3px solid #8A7E77; 
+        box-shadow: 0 4px 12px rgba(0, 121, 130, 0.25);
     }
     .sbp-marquee a {
         color: #FFFFFF !important;
         text-decoration: none;
-        font-size: 18px; 
+        font-size: 17px; 
         font-weight: 500;
         letter-spacing: 0.5px;
     }
@@ -209,17 +210,17 @@ st.markdown("""
     }
     
     .header-container { display: flex; align-items: center; justify-content: center; margin-top: 10px !important; margin-bottom: 16px; }
-    .glow-line { height: 3px; flex-grow: 1; max-width: 380px; background: linear-gradient(90deg, transparent, rgba(0, 104, 55, 0.4), transparent); }
-    .header-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-top: 4px solid #006837; border-radius: 12px; padding: 16px 48px; margin: 0 24px; box-shadow: 0 4px 20px rgba(0, 104, 55, 0.08); font-weight: 800; font-size: 28px; color: #006837; letter-spacing: 1.2px; text-transform: uppercase; }
+    .glow-line { height: 2px; flex-grow: 1; max-width: 380px; background: linear-gradient(90deg, transparent, rgba(0, 121, 130, 0.3), transparent); }
+    .header-card { background: #FFFFFF; border: 1px solid #EAEBEB; border-top: 4px solid #007982; border-radius: 12px; padding: 16px 48px; margin: 0 24px; box-shadow: 0 4px 20px rgba(0, 121, 130, 0.05); font-weight: 800; font-size: 26px; color: #007982; letter-spacing: 1.5px; text-transform: uppercase; }
 
     /* Executive Top KPI Cards */
     .kpi-card { 
         background: #FFFFFF; 
-        border: 1px solid #E2E8F0; 
-        border-top: 4px solid #006837;
+        border: 1px solid #EAEBEB; 
+        border-top: 4px solid #007982;
         border-radius: 12px; 
-        padding: 20px 10px; 
-        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04); 
+        padding: 22px 10px; 
+        box-shadow: 0 4px 14px rgba(47, 51, 54, 0.04); 
         height: 100%; 
         display: flex; 
         flex-direction: column; 
@@ -229,26 +230,26 @@ st.markdown("""
         transition: transform 0.2s ease, box-shadow 0.2s ease; 
         gap: 6px;
     }
-    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 104, 55, 0.12); }
-    .kpi-val { font-size: 36px; font-weight: 900; color: #0F172A; line-height: 1.1; margin: 4px 0; }
-    .kpi-lbl { font-size: 14px; font-weight: 800; color: #334155; text-transform: uppercase; letter-spacing: 0.8px; }
-    .kpi-sub { font-size: 13px; font-weight: 700; color: #006837; }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 121, 130, 0.1); }
+    .kpi-val { font-size: 34px; font-weight: 900; color: #2F3336; line-height: 1.1; margin: 4px 0; }
+    .kpi-lbl { font-size: 13px; font-weight: 800; color: #8A7E77; text-transform: uppercase; letter-spacing: 1px; }
+    .kpi-sub { font-size: 12px; font-weight: 700; color: #007982; }
 
     /* Executive HTML Containers */
     .html-card {
         background-color: #FFFFFF;
-        border: 1px solid #E2E8F0;
-        border-top: 4px solid #006837;
-        border-radius: 14px;
+        border: 1px solid #EAEBEB;
+        border-top: 4px solid #007982;
+        border-radius: 12px;
         padding: 20px;
-        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+        box-shadow: 0 4px 16px rgba(47, 51, 54, 0.04);
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         height: 100%;
     }
-    .html-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0, 104, 55, 0.12); }
+    .html-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0, 121, 130, 0.08); }
     
     /* Clean Professional Fade Animation */
     @keyframes fadeInSmooth {
@@ -260,12 +261,13 @@ st.markdown("""
         animation: fadeInSmooth 0.8s ease-out forwards;
     }
 
-    div[data-baseweb="select"] > div { border-radius: 10px; font-size: 17px; font-weight: 600; padding: 4px; border-color: #006837 !important; }
+    div[data-baseweb="select"] > div { border-radius: 8px; font-size: 16px; font-weight: 600; padding: 4px; border-color: #007982 !important; color: #2F3336; }
     </style>
 """, unsafe_allow_html=True)
 
-CHART_FONT = dict(family="Segoe UI, Roboto, sans-serif", color="#0F172A", size=14)
-KARANDAAZ_GREEN, KARANDAAZ_GOLD = '#006837', '#C59B27'
+CHART_FONT = dict(family="Segoe UI, Roboto, sans-serif", color="#2F3336", size=13)
+KARANDAAZ_TEAL = '#007982'
+KARANDAAZ_TAUPE = '#8A7E77'
 
 with st.spinner("Rendering Visualizations..."):
 
@@ -274,10 +276,10 @@ with st.spinner("Rendering Visualizations..."):
         <div class="sbp-marquee">
             <span>
                 <a href="https://www.sbp.org.pk/our-operations/monetary-policy" target="_blank">
-                    <span style="color: #C59B27; margin-right: 8px;">🏛️ SBP MONETARY POLICY UPDATE:</span>
-                    The current Monetary Policy Rate is <b style="color:#C59B27;">{mpr_rate:.2f}%</b>. 
-                    Next MPC meeting is scheduled for <b style="color:#C59B27;">{next_mpr_date}</b>. 
-                    <em>Summary: The Monetary Policy Committee continues to monitor inflation targets and economic indicators to ensure macroeconomic stability.</em> 
+                    <span style="color: #E2DBD6; margin-right: 8px; font-weight: 800;">🏛️ SBP MONETARY POLICY UPDATE:</span>
+                    The current Monetary Policy Rate is <b style="color:#FFFFFF;">{mpr_rate:.2f}%</b>. 
+                    Next MPC meeting is scheduled for <b style="color:#FFFFFF;">{next_mpr_date}</b>. 
+                    <em style="color:#E2DBD6;">Summary: The Monetary Policy Committee continues to monitor inflation targets and economic indicators.</em> 
                     &nbsp;&nbsp;🔗 Click here to read the full policy statement on the official SBP website.
                 </a>
             </span>
@@ -311,7 +313,7 @@ with st.spinner("Rendering Visualizations..."):
     with kpi4:
         st.markdown(f"<div class='kpi-card'><div class='kpi-lbl'>ANNUAL YIELD</div><div class='kpi-val'>{q_ctx['annual_yield']}</div><div class='kpi-sub'>Weighted Annual Yield</div></div>", unsafe_allow_html=True)
     
-    st.markdown("<div style='height: 25px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 24px;'></div>", unsafe_allow_html=True)
 
     bot_col1, bot_col2, bot_col3 = st.columns(3, gap="medium")
 
@@ -319,7 +321,7 @@ with st.spinner("Rendering Visualizations..."):
     month_cols_html = "<div style='display: flex; justify-content: space-between; width: 100%; gap: 10px; margin-top: 10px; height: 100%;'>"
     for month_info in q_rates_list:
         rates_br = "<br>".join(month_info['rates'])
-        month_cols_html += f"<div style='flex: 1; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px 6px; text-align: center;'><div style='font-size: 12px; font-weight: 900; color: #006837; text-transform: uppercase;'>{month_info['month']}</div><div style='font-size: 13px; font-weight: 700; color: #0F172A; margin-top: 8px; line-height: 1.7;'>{rates_br}</div></div>"
+        month_cols_html += f"<div style='flex: 1; background: #F9FAFA; border: 1px solid #EAEBEB; border-radius: 8px; padding: 14px 6px; text-align: center;'><div style='font-size: 12px; font-weight: 800; color: #007982; text-transform: uppercase;'>{month_info['month']}</div><div style='font-size: 13px; font-weight: 600; color: #2F3336; margin-top: 8px; line-height: 1.7;'>{rates_br}</div></div>"
     month_cols_html += "</div>"
 
     with bot_col1:
@@ -328,15 +330,15 @@ with st.spinner("Rendering Visualizations..."):
     # 2. MPR Rate Card
     mpr_split_html = (
         "<div style='display: flex; justify-content: space-between; width: 100%; height: 100%; align-items: center;'>"
-        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 1px solid #E2E8F0; padding-right: 10px;'>"
-        f"<div style='color:#006837; font-size: 38px; font-weight: 900; line-height: 1.1;'>{mpr_rate:.2f}%</div>"
-        "<div style='font-size: 14px; font-weight: 900; color: #1E293B; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 8px;'>MPR RATE</div>"
-        f"<div style='font-size: 12px; font-weight: 700; color: #C59B27; margin-top: 4px;'>Next Date: {next_mpr_date}</div>"
+        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 1px solid #EAEBEB; padding-right: 10px;'>"
+        f"<div style='color:#007982; font-size: 38px; font-weight: 900; line-height: 1.1;'>{mpr_rate:.2f}%</div>"
+        "<div style='font-size: 13px; font-weight: 800; color: #8A7E77; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 8px;'>MPR RATE</div>"
+        f"<div style='font-size: 12px; font-weight: 700; color: #2F3336; margin-top: 4px;'>Next Date: {next_mpr_date}</div>"
         "</div>"
         "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding-left: 10px;'>"
-        f"<div style='color:#0F172A; font-size: 38px; font-weight: 900; line-height: 1.1;'>{mpr_rate - 1.5:.2f}%</div>"
-        "<div style='font-size: 14px; font-weight: 900; color: #006837; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 8px;'>BENCHMARK</div>"
-        "<div style='font-size: 12px; font-weight: 700; color: #006837; margin-top: 4px;'>MPR - 1.5%</div>"
+        f"<div style='color:#2F3336; font-size: 38px; font-weight: 900; line-height: 1.1;'>{mpr_rate - 1.5:.2f}%</div>"
+        "<div style='font-size: 13px; font-weight: 800; color: #8A7E77; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 8px;'>BENCHMARK</div>"
+        "<div style='font-size: 12px; font-weight: 700; color: #007982; margin-top: 4px;'>MPR - 1.5%</div>"
         "</div></div>"
     )
 
@@ -346,10 +348,10 @@ with st.spinner("Rendering Visualizations..."):
     # 3. PKR Yields Card
     pkr_yields_html = (
         "<div style='display: flex; justify-content: space-between; width: 100%; gap: 10px; margin-top: 10px; height: 100%;'>"
-        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px 4px; text-align: center;'><div style='font-size: 13px; font-weight: 900; color: #006837; text-transform: uppercase;'>1M</div><div style='font-size: 18px; font-weight: 900; color: #0F172A; margin-top: 8px;'>--%</div></div>"
-        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px 4px; text-align: center;'><div style='font-size: 13px; font-weight: 900; color: #006837; text-transform: uppercase;'>3M</div><div style='font-size: 18px; font-weight: 900; color: #0F172A; margin-top: 8px;'>--%</div></div>"
-        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px 4px; text-align: center;'><div style='font-size: 13px; font-weight: 900; color: #006837; text-transform: uppercase;'>6M</div><div style='font-size: 18px; font-weight: 900; color: #0F172A; margin-top: 8px;'>--%</div></div>"
-        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px 4px; text-align: center;'><div style='font-size: 13px; font-weight: 900; color: #006837; text-transform: uppercase;'>1Y</div><div style='font-size: 18px; font-weight: 900; color: #0F172A; margin-top: 8px;'>--%</div></div>"
+        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: #F9FAFA; border: 1px solid #EAEBEB; border-radius: 8px; padding: 14px 4px; text-align: center;'><div style='font-size: 13px; font-weight: 800; color: #8A7E77; text-transform: uppercase;'>1M</div><div style='font-size: 18px; font-weight: 900; color: #007982; margin-top: 8px;'>--%</div></div>"
+        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: #F9FAFA; border: 1px solid #EAEBEB; border-radius: 8px; padding: 14px 4px; text-align: center;'><div style='font-size: 13px; font-weight: 800; color: #8A7E77; text-transform: uppercase;'>3M</div><div style='font-size: 18px; font-weight: 900; color: #007982; margin-top: 8px;'>--%</div></div>"
+        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: #F9FAFA; border: 1px solid #EAEBEB; border-radius: 8px; padding: 14px 4px; text-align: center;'><div style='font-size: 13px; font-weight: 800; color: #8A7E77; text-transform: uppercase;'>6M</div><div style='font-size: 18px; font-weight: 900; color: #007982; margin-top: 8px;'>--%</div></div>"
+        "<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: #F9FAFA; border: 1px solid #EAEBEB; border-radius: 8px; padding: 14px 4px; text-align: center;'><div style='font-size: 13px; font-weight: 800; color: #8A7E77; text-transform: uppercase;'>1Y</div><div style='font-size: 18px; font-weight: 900; color: #007982; margin-top: 8px;'>--%</div></div>"
         "</div>"
     )
 
@@ -361,22 +363,22 @@ with st.spinner("Rendering Visualizations..."):
     # NEW SECTION: CURRENT INVESTMENT POSITION (KARANDAAZ PALETTE)
     # =========================================================
     
-    st.markdown("<div style='height: 48px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
     
     st.markdown(
-        "<div style='text-align: left; margin-bottom: 24px; padding-left: 12px; border-left: 5px solid #006837;'>"
-        "<h3 style='font-size: 23px; font-weight: 900; color: #0F172A; letter-spacing: 1px; text-transform: uppercase; margin: 0;'>Current Investment Position</h3>"
-        "<p style='color: #64748B; font-size: 15px; font-weight: 600; margin-top: 4px; margin-bottom: 0;'>Instrument-Level Ledger & Portfolio Concentration</p>"
+        "<div style='text-align: left; margin-bottom: 20px; padding-left: 12px; border-left: 4px solid #007982;'>"
+        "<h3 style='font-size: 22px; font-weight: 800; color: #2F3336; letter-spacing: 1px; text-transform: uppercase; margin: 0;'>Current Investment Position</h3>"
+        "<p style='color: #8A7E77; font-size: 14px; font-weight: 600; margin-top: 4px; margin-bottom: 0;'>Instrument-Level Ledger & Portfolio Concentration</p>"
         "</div>", 
         unsafe_allow_html=True
     )
 
-    # Professional Executive Palette (Karandaaz Greens, Gold, and Slate Gray)
+    # Professional Karandaaz Palette extracted from Logo
     investment_data = [
-        {"instrument": "Savings Accounts", "value": 450.00, "conc": 45.0, "color": "#006837"}, # Karandaaz Deep Green
-        {"instrument": "T-Bills", "value": 300.00, "conc": 30.0, "color": "#16A34A"},          # Emerald Green
-        {"instrument": "Buy/Sell", "value": 150.00, "conc": 15.0, "color": "#C59B27"},         # Karandaaz Accent Gold
-        {"instrument": "TDRs", "value": 100.00, "conc": 10.0, "color": "#475569"}              # Executive Slate Gray
+        {"instrument": "Savings Accounts", "value": 450.00, "conc": 45.0, "color": "#007982"}, # Karandaaz Teal
+        {"instrument": "T-Bills", "value": 300.00, "conc": 30.0, "color": "#8A7E77"},          # Karandaaz Taupe
+        {"instrument": "Buy/Sell", "value": 150.00, "conc": 15.0, "color": "#004C52"},         # Dark Teal Accent
+        {"instrument": "TDRs", "value": 100.00, "conc": 10.0, "color": "#B5ACA6"}              # Light Taupe Accent
     ]
     gross_portfolio_value = sum(item["value"] for item in investment_data)
 
@@ -385,9 +387,9 @@ with st.spinner("Rendering Visualizations..."):
     # LEFT COLUMN: EXECUTIVE DONUT CHART
     with inv_col1:
         st.markdown(
-            "<div class='html-card' style='padding-bottom: 0px; border-top: 4px solid #006837;'>"
-            "<div style='font-size: 16px; font-weight: 900; color: #0F172A; text-transform: uppercase; letter-spacing: 0.5px;'>PORTFOLIO CONCENTRATION</div>"
-            "<div style='font-size: 13px; font-weight: 600; color: #64748B; margin-top: 2px; margin-bottom: 10px;'>% Share of Gross Investment Portfolio</div>"
+            "<div class='html-card' style='padding-bottom: 0px; border-top: 4px solid #007982;'>"
+            "<div style='font-size: 14px; font-weight: 800; color: #8A7E77; text-transform: uppercase; letter-spacing: 1px;'>PORTFOLIO CONCENTRATION</div>"
+            "<div style='font-size: 13px; font-weight: 600; color: #2F3336; margin-top: 4px; margin-bottom: 10px;'>% Share of Gross Investment Portfolio</div>"
             "</div>", 
             unsafe_allow_html=True
         )
@@ -401,7 +403,7 @@ with st.spinner("Rendering Visualizations..."):
             textinfo='label+percent',
             textposition='outside',
             insidetextorientation='horizontal',
-            textfont=dict(size=13, weight='bold', color='#0F172A', family="Segoe UI, sans-serif"),
+            textfont=dict(size=12, weight='bold', color='#2F3336', family="Segoe UI, sans-serif"),
             hovertemplate="<b>%{label}</b><br>Market Value: <b>PKR %{value:,.2f} M</b><br>Share: <b>%{percent}</b><extra></extra>",
             marker=dict(line=dict(color='#FFFFFF', width=2))
         )])
@@ -424,31 +426,31 @@ with st.spinner("Rendering Visualizations..."):
         for item in investment_data:
             table_rows += (
                 "<tr class='inv-row'>"
-                f"<td style='padding: 14px 16px; border-bottom: 1px solid #F1F5F9; text-align: left; font-weight: 700; color: #0F172A;'>"
+                f"<td style='padding: 15px 16px; border-bottom: 1px solid #F0F4F4; text-align: left; font-weight: 700; color: #2F3336;'>"
                 f"<span style='display:inline-block; width:10px; height:10px; border-radius:50%; background-color:{item['color']}; margin-right:12px;'></span>"
                 f"{item['instrument']}</td>"
-                f"<td style='padding: 14px 16px; border-bottom: 1px solid #F1F5F9; text-align: right; font-weight: 700; color: #1E293B;'>{item['value']:,.2f} M</td>"
-                f"<td style='padding: 14px 16px; border-bottom: 1px solid #F1F5F9; text-align: right; font-weight: 900; color: {item['color']};'>{item['conc']:.1f}%</td>"
+                f"<td style='padding: 15px 16px; border-bottom: 1px solid #F0F4F4; text-align: right; font-weight: 600; color: #2F3336;'>{item['value']:,.2f} M</td>"
+                f"<td style='padding: 15px 16px; border-bottom: 1px solid #F0F4F4; text-align: right; font-weight: 800; color: {item['color']};'>{item['conc']:.1f}%</td>"
                 "</tr>"
             )
             
         table_html = (
-            "<style>.inv-row { transition: background-color 0.2s ease; } .inv-row:hover { background-color: #F8FAFC; }</style>"
-            "<div class='html-card' style='height: 100%; border-top: 4px solid #006837;'>"
-            "<div style='font-size: 16px; font-weight: 900; color: #0F172A; text-transform: uppercase; letter-spacing: 0.5px;'>POSITION BY INSTRUMENT</div>"
-            "<div style='font-size: 13px; font-weight: 600; color: #64748B; margin-top: 2px; margin-bottom: 18px;'>Market Value & Concentration Breakdown</div>"
-            "<div style='flex-grow: 1; width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid #E2E8F0; box-shadow: 0 2px 8px rgba(0,0,0,0.03);'>"
-            "<table style='width: 100%; border-collapse: collapse; font-size: 14px; background: white;'>"
-            "<thead><tr style='background-color: #0F2E1B; color: #FFFFFF; font-size: 13px; letter-spacing: 0.5px;'>"
-            "<th style='padding: 15px 16px; text-align: left; font-weight: 800;'>INSTRUMENT</th>"
-            "<th style='padding: 15px 16px; text-align: right; font-weight: 800;'>MARKET VALUE (PKR Mns)</th>"
-            "<th style='padding: 15px 16px; text-align: right; font-weight: 800;'>CONC. (%)</th>"
+            "<style>.inv-row { transition: background-color 0.2s ease; } .inv-row:hover { background-color: #F9FAFA; }</style>"
+            "<div class='html-card' style='height: 100%; border-top: 4px solid #007982;'>"
+            "<div style='font-size: 14px; font-weight: 800; color: #8A7E77; text-transform: uppercase; letter-spacing: 1px;'>POSITION BY INSTRUMENT</div>"
+            "<div style='font-size: 13px; font-weight: 600; color: #2F3336; margin-top: 4px; margin-bottom: 18px;'>Market Value & Concentration Breakdown</div>"
+            "<div style='flex-grow: 1; width: 100%; border-radius: 8px; overflow: hidden; border: 1px solid #EAEBEB; box-shadow: 0 2px 8px rgba(47, 51, 54, 0.02);'>"
+            "<table style='width: 100%; border-collapse: collapse; font-size: 13px; background: white;'>"
+            "<thead><tr style='background-color: #007982; color: #FFFFFF; font-size: 12px; letter-spacing: 0.8px; text-transform: uppercase;'>"
+            "<th style='padding: 14px 16px; text-align: left; font-weight: 700;'>INSTRUMENT</th>"
+            "<th style='padding: 14px 16px; text-align: right; font-weight: 700;'>MARKET VALUE (PKR Mns)</th>"
+            "<th style='padding: 14px 16px; text-align: right; font-weight: 700;'>CONC. (%)</th>"
             "</tr></thead>"
             f"<tbody>{table_rows}</tbody>"
-            "<tfoot><tr style='background-color: #F8FAFC; border-top: 2px solid #0F2E1B;'>"
-            "<td style='padding: 16px 16px; text-align: left; font-weight: 900; color: #0F172A;'>Gross Portfolio</td>"
-            f"<td style='padding: 16px 16px; text-align: right; font-weight: 900; color: #0F172A;'>{gross_portfolio_value:,.2f} M</td>"
-            "<td style='padding: 16px 16px; text-align: right; font-weight: 900; color: #006837;'>100.0%</td>"
+            "<tfoot><tr style='background-color: #F4F6F6; border-top: 2px solid #007982;'>"
+            "<td style='padding: 16px 16px; text-align: left; font-weight: 800; color: #2F3336;'>Gross Portfolio</td>"
+            f"<td style='padding: 16px 16px; text-align: right; font-weight: 800; color: #2F3336;'>{gross_portfolio_value:,.2f} M</td>"
+            "<td style='padding: 16px 16px; text-align: right; font-weight: 900; color: #007982;'>100.0%</td>"
             "</tr></tfoot>"
             "</table></div></div>"
         )
