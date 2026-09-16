@@ -7,3 +7,4 @@ streamlit-lottie
 streamlit-option-menu
 beautifulsoup4
 pdfplumber
+google-genai
