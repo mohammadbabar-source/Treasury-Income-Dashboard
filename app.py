@@ -150,7 +150,16 @@ st.markdown("""
     /* Background & Structural Colors */
     html, body, .stApp { background-color: #F5F7F9 !important; margin: 0 !important; padding: 0 !important; }
     header { visibility: hidden; height: 0; }
-    .block-container { padding-top: 5rem !important; padding-bottom: 3rem !important; padding-left: 2rem !important; padding-right: 2rem !important; max-width: 100% !important; }
+    
+    /* Smooth fade-in for the main dashboard content after loading */
+    @keyframes pageFadeIn {
+        0% { opacity: 0; transform: translateY(15px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .block-container { 
+        padding-top: 5rem !important; padding-bottom: 3rem !important; padding-left: 2rem !important; padding-right: 2rem !important; max-width: 100% !important; 
+        animation: pageFadeIn 1s ease-out 2.8s both !important;
+    }
 
     /* SBP Rolling Banner CSS */
     .sbp-marquee {
@@ -188,7 +197,19 @@ st.markdown("""
     
     .header-container { display: flex; align-items: center; justify-content: center; margin-top: 10px !important; margin-bottom: 16px; }
     .glow-line { height: 2px; flex-grow: 1; max-width: 380px; background: transparent; }
-    .header-card { background: #0f6286; border-radius: 16px; padding: 16px 48px; margin: 0 24px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); font-weight: 700; font-size: 26px; color: #FFFFFF; }
+    .header-card { 
+        background: #0f6286; 
+        border-radius: 16px; 
+        padding: 16px 48px; 
+        margin: 0 24px; 
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); 
+        font-weight: 700; 
+        font-size: 26px; 
+        color: #FFFFFF; 
+        display: flex; 
+        align-items: center; 
+        gap: 16px; 
+    }
 
     /* Deep Teal KPI Cards */
     .kpi-card { 
@@ -227,16 +248,6 @@ st.markdown("""
     }
     .html-card:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12); }
     
-    /* Clean Professional Fade Animation */
-    @keyframes fadeInSmooth {
-        0% { opacity: 0; transform: translateY(6px); }
-        100% { opacity: 1; transform: translateY(0); }
-    }
-    
-    .animated-chart-container {
-        animation: fadeInSmooth 0.8s ease-out forwards;
-    }
-
     div[data-baseweb="select"] > div { border-radius: 8px; font-size: 16px; font-weight: 700; padding: 4px; border: 1px solid #0f6286 !important; color: #333333; }
     </style>
 """, unsafe_allow_html=True)
@@ -249,18 +260,20 @@ if st.session_state.first_load:
     splash = st.empty()
     with splash.container():
         st.markdown("""
-            <div style='display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; text-align: center; background-color: #0f6286; animation: fadeOut 0.5s ease-in 2s forwards; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999999;'>
-                <h1 style='color: #FFFFFF; font-size: 58px; letter-spacing: 1px; margin-bottom: 8px; font-weight: 700;'>Karandaaz Capital</h1>
-                <p style='color: #f68b1e; font-size: 22px; font-weight: 400; letter-spacing: 0.5px;'>Treasury Management Dashboard</p>
+            <div style='display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; text-align: center; background-color: #0f6286; animation: fadeOut 0.8s ease-in 2.5s forwards; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999999;'>
+                <img src="krn logo.jpg" alt="Karandaaz Logo" style="width: 250px; margin-bottom: 24px; border-radius: 8px; animation: pulseLogo 1.5s ease-in-out infinite;" onerror="this.style.display='none'">
+                <h1 style='color: #FFFFFF; font-size: 52px; letter-spacing: 1px; margin-bottom: 8px; font-weight: 700;'>Karandaaz Pakistan - Treasury Portfolio, FY26-27</h1>
+                <p style='color: #f68b1e; font-size: 22px; font-weight: 400; letter-spacing: 0.5px;'>Initializing Dashboard & Financial Models...</p>
                 <div class="loader"></div>
             </div>
             <style>
             .loader { border: 4px solid rgba(255,255,255,0.2); border-top: 4px solid #f68b1e; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-top: 28px;}
+            @keyframes pulseLogo { 0% { transform: scale(0.97); opacity: 0.9; } 50% { transform: scale(1.03); opacity: 1; } 100% { transform: scale(0.97); opacity: 0.9; } }
             @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-            @keyframes fadeOut { 0% { opacity: 1; visibility: hidden; } 100% { opacity: 0; visibility: hidden; } }
+            @keyframes fadeOut { 0% { opacity: 1; visibility: visible; } 100% { opacity: 0; visibility: hidden; } }
             </style>
         """, unsafe_allow_html=True)
-        time.sleep(2.4)
+        time.sleep(3.0)
     splash.empty()
     st.session_state.first_load = False
 
@@ -283,11 +296,14 @@ with st.spinner("Rendering Visualizations..."):
         </div>
     """, unsafe_allow_html=True)
 
-    # SCREEN 1: TOP SECTION
+    # SCREEN 1: TOP SECTION (With Logo Inside)
     st.markdown("""
         <div class="header-container">
             <div class="glow-line"></div>
-            <div class="header-card">Treasury Portfolio Summary (FY26-27)</div>
+            <div class="header-card">
+                <img src="krn logo.jpg" alt="Logo" style="height: 35px; border-radius: 4px; object-fit: contain;" onerror="this.style.display='none'">
+                Treasury Portfolio Summary (FY26-27)
+            </div>
             <div class="glow-line"></div>
         </div>
     """, unsafe_allow_html=True)
@@ -362,7 +378,6 @@ with st.spinner("Rendering Visualizations..."):
     
     st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
     
-    # Fully Styled Text Card for Current Investment Position matching your specifications
     st.markdown(
         "<div style='background-color: #0f6286; border-radius: 16px; padding: 32px; text-align: left; margin-bottom: 24px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); font-family: \"Chivo\", sans-serif;'>"
         "<h3 style='color: #ffffff; font-size: 26px; font-weight: 700; margin: 0; line-height: 1.2;'>Current Investment Position <span style='color: #f68b1e; font-weight: 400;'>&rarr;</span></h3>"
@@ -396,27 +411,24 @@ with st.spinner("Rendering Visualizations..."):
             labels=[item["instrument"] for item in investment_data],
             values=[item["value"] for item in investment_data],
             hole=0.62,
-            pull=[0.02, 0.02, 0.02, 0.02],
             marker_colors=[item["color"] for item in investment_data],
             textposition='outside', # explicitly sets text outside 
             textinfo='label+percent',
-            texttemplate="<b>%{label}</b><br>%{value:,.1f} M<br>(%{percent})", # sleek text template showing amount and %
-            textfont=dict(size=12, color='#FFFFFF', family="Chivo, sans-serif"),
+            texttemplate="<b>%{label}</b><br>PKR %{value:,.1f} M<br>(%{percent})", # sleek text template showing amount and %
+            textfont=dict(size=14, color='#FFFFFF', family="Chivo, sans-serif"),
             hovertemplate="<b>%{label}</b><br>Market Value: <b>PKR %{value:,.2f} M</b><br>Share: <b>%{percent}</b><extra></extra>",
             marker=dict(line=dict(color='#0f6286', width=2)) 
         )])
         
         fig_inv_donut.update_layout(
             showlegend=False,
-            margin=dict(t=50, b=50, l=80, r=80), # SIGNIFICANTLY increased margins to give outside labels room to breathe
+            margin=dict(t=50, b=50, l=100, r=100), # Expanded margins significantly to prevent clipping of outside labels
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
-            height=420 # slightly taller container so top/bottom floating text isn't cut off
+            height=450 # Height expanded to ensure text fits comfortably outside the donut
         )
         
-        st.markdown("<div class='animated-chart-container'>", unsafe_allow_html=True)
         st.plotly_chart(fig_inv_donut, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
 
     # RIGHT COLUMN: FINANCIAL TABLE
     with inv_col2:
