@@ -33,12 +33,12 @@ def get_base64_logo():
 
 logo_b64 = get_base64_logo()
 
-# Zero box-shadow, zero borders, zero background wrappers for smooth integration
+# Scaled logo size up by 25% (from 380px to 475px) with zero background borders
 if logo_b64:
-    splash_logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" style="width: 380px; max-width: 90%; margin: 0 auto 20px auto; padding: 0; border: none !important; outline: none !important; box-shadow: none !important; background: transparent !important; display: block;">'
+    splash_logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" style="width: 475px; max-width: 90%; margin: 0 auto 20px auto; padding: 0; border: none !important; outline: none !important; box-shadow: none !important; background: transparent !important; display: block;">'
     header_logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" alt="Logo" style="height: 48px; border: none !important; outline: none !important; box-shadow: none !important; background: transparent !important; object-fit: contain; margin: 0; padding: 0;">'
 else:
-    splash_logo_html = '<div style="color: #FFFFFF; font-size: 38px; font-weight: 700; margin-bottom: 20px; font-family: \'Chivo\', sans-serif; letter-spacing: 2px;">KARANDAAZ PAKISTAN</div>'
+    splash_logo_html = '<div style="color: #FFFFFF; font-size: 42px; font-weight: 700; margin-bottom: 20px; font-family: \'Chivo\', sans-serif; letter-spacing: 2px;">KARANDAAZ PAKISTAN</div>'
     header_logo_html = '<span style="color: #f68b1e; font-size: 22px; font-weight: 700; margin-right: 8px;">KRN</span>'
 
 # ---------------------------------------------------------
@@ -240,7 +240,7 @@ div[data-baseweb="select"] > div { border-radius: 8px; font-size: 16px; font-wei
 """), unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# ANIMATED SPLASH SCREEN (HIGH-TECH 3D QUANTUM LOADER)
+# ANIMATED SPLASH SCREEN (CONFIGURED TO 7 SECONDS)
 # ---------------------------------------------------------
 if is_first_load:
     splash_placeholder = st.empty()
@@ -249,12 +249,12 @@ if is_first_load:
         splash_content = clean_html(f"""
         <div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; background-color: #0f6286; position: fixed; top: 0; left: 0; width: 100vw; z-index: 9999999; padding: 0; margin: 0; overflow: hidden;">
             
-            <!-- Seamless Integrated Logo -->
+            <!-- Seamless Integrated Scaled-Up Logo -->
             {splash_logo_html}
             
             <h1 style="color: #FFFFFF; font-size: 40px; margin-top: 10px; margin-bottom: 35px; font-weight: 700; font-family: 'Chivo', sans-serif; text-align: center; letter-spacing: 0.5px;">Karandaaz Pakistan Treasury Dashboard</h1>
             
-            <!-- Cool 3D Quantum Particle Radar Loader -->
+            <!-- 3D Quantum Particle Radar Loader -->
             <div class="quantum-loader">
                 <div class="ring outer-ring"></div>
                 <div class="ring middle-ring"></div>
@@ -343,7 +343,8 @@ if is_first_load:
         </style>
         """)
         st.markdown(splash_content, unsafe_allow_html=True)
-        time.sleep(3.0)
+        # Duration extended to 7 seconds as requested
+        time.sleep(7.0)
     
     splash_placeholder.empty()
 
