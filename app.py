@@ -33,7 +33,6 @@ def get_base64_logo():
 
 logo_b64 = get_base64_logo()
 
-# Scaled logo size up by 25% (from 380px to 475px) with zero background borders
 if logo_b64:
     splash_logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" style="width: 475px; max-width: 90%; margin: 0 auto 20px auto; padding: 0; border: none !important; outline: none !important; box-shadow: none !important; background: transparent !important; display: block;">'
     header_logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" alt="Logo" style="height: 48px; border: none !important; outline: none !important; box-shadow: none !important; background: transparent !important; object-fit: contain; margin: 0; padding: 0;">'
@@ -343,7 +342,6 @@ if is_first_load:
         </style>
         """)
         st.markdown(splash_content, unsafe_allow_html=True)
-        # Duration extended to 7 seconds as requested
         time.sleep(7.0)
     
     splash_placeholder.empty()
@@ -467,7 +465,7 @@ with st.spinner("Rendering Visualizations..."):
 
     inv_col1, inv_col2 = st.columns([1, 1.35], gap="large")
 
-    # LEFT COLUMN: DONUT CHART
+    # LEFT COLUMN: DONUT CHART (UPDATED LABEL COLOR TO DEEP TEAL #0f6286)
     with inv_col1:
         st.markdown(
             clean_html(
@@ -487,7 +485,7 @@ with st.spinner("Rendering Visualizations..."):
             textposition='outside', 
             textinfo='label+percent',
             texttemplate="<b>%{label}</b><br>PKR %{value:,.1f} M<br>(%{percent})",
-            textfont=dict(size=14, color='#FFFFFF', family="Chivo, sans-serif"),
+            textfont=dict(size=14, color='#0f6286', family="Chivo, sans-serif"),
             hovertemplate="<b>%{label}</b><br>Market Value: <b>PKR %{value:,.2f} M</b><br>Share: <b>%{percent}</b><extra></extra>",
             marker=dict(line=dict(color='#0f6286', width=2)) 
         )])
