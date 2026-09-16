@@ -4,24 +4,34 @@ import plotly.graph_objects as go
 import time
 import base64
 import os
-import textwrap
 
 # 1. Page Configuration MUST be the first Streamlit command
 st.set_page_config(page_title="Karandaaz Treasury Summary FY26-27", layout="wide", initial_sidebar_state="collapsed")
 
 # ---------------------------------------------------------
-# LOGO CONVERSION & FALLBACK HANDLING
+# HELPER TO PREVENT STREAMLIT MARKDOWN CODE-BLOCK BUGS
+# ---------------------------------------------------------
+def clean_html(html_str):
+    """Strips all leading/trailing whitespace from every line to ensure Markdown never turns HTML into a code block."""
+    return "\n".join([line.strip() for line in html_str.splitlines() if line.strip()])
+
+# ---------------------------------------------------------
+# AUTOMATIC LOGO DETECTION & BASE64 ENCODING
 # ---------------------------------------------------------
 EXCEL_FILE = "Treasury Income FY26'27 - July26.xlsx"
-LOGO_FILE = "krn logo.jpg"
 
-def get_base64_image(file_path):
-    if os.path.exists(file_path):
-        with open(file_path, "rb") as f:
-            return base64.b64encode(f.read()).decode()
+def get_logo_b64():
+    # Search repository case-insensitively for any image matching logo names
+    for file in os.listdir('.'):
+        if any(term in file.lower() for term in ['krn', 'logo']) and file.lower().endswith(('.jpg', '.jpeg', '.png')):
+            try:
+                with open(file, "rb") as f:
+                    return base64.b64encode(f.read()).decode()
+            except Exception:
+                pass
     return None
 
-logo_b64 = get_base64_image(LOGO_FILE)
+logo_b64 = get_logo_b64()
 
 if logo_b64:
     splash_logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" style="width: 260px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.3);">'
@@ -170,104 +180,100 @@ quarter_data = {
 }
 
 # ---------------------------------------------------------
-# CUSTOM CSS ARCHITECTURE (STRIPPED OF LEADING INDENTATION)
+# GLOBAL STYLING ARCHITECTURE
 # ---------------------------------------------------------
-st.markdown(textwrap.dedent("""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Chivo:wght@400;700&display=swap');
+st.markdown(clean_html("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Chivo:wght@400;700&display=swap');
 
-    * { font-family: 'Chivo', sans-serif !important; box-sizing: border-box; }
-    html, body, .stApp { background-color: #F5F7F9 !important; margin: 0 !important; padding: 0 !important; }
-    header { visibility: hidden; height: 0; }
+* { font-family: 'Chivo', sans-serif !important; box-sizing: border-box; }
+html, body, .stApp { background-color: #F5F7F9 !important; margin: 0 !important; padding: 0 !important; }
+header { visibility: hidden; height: 0; }
 
-    .block-container { 
-        padding-top: 5rem !important; padding-bottom: 3rem !important; 
-        padding-left: 2rem !important; padding-right: 2rem !important; max-width: 100% !important; 
-    }
+.block-container { 
+    padding-top: 5rem !important; padding-bottom: 3rem !important; 
+    padding-left: 2rem !important; padding-right: 2rem !important; max-width: 100% !important; 
+}
 
-    /* SBP Marquee */
-    .sbp-marquee {
-        position: fixed; top: 0; left: 0; width: 100%;
-        background: #0f6286; color: #FFFFFF; padding: 11px 0;
-        overflow: hidden; white-space: nowrap; z-index: 999999;
-        border-bottom: 3px solid #f68b1e; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    .sbp-marquee a { color: #FFFFFF !important; text-decoration: none; font-size: 16px; }
-    .sbp-marquee > span { display: inline-block; padding-left: 100%; animation: marquee_scroll 28s linear infinite; }
-    @keyframes marquee_scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+/* SBP Rolling Banner */
+.sbp-marquee {
+    position: fixed; top: 0; left: 0; width: 100%;
+    background: #0f6286; color: #FFFFFF; padding: 11px 0;
+    overflow: hidden; white-space: nowrap; z-index: 999999;
+    border-bottom: 3px solid #f68b1e; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.sbp-marquee a { color: #FFFFFF !important; text-decoration: none; font-size: 16px; }
+.sbp-marquee > span { display: inline-block; padding-left: 100%; animation: marquee_scroll 28s linear infinite; }
+@keyframes marquee_scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-    /* Header Container */
-    .header-container { display: flex; align-items: center; justify-content: center; margin-top: 10px !important; margin-bottom: 16px; }
-    .glow-line { height: 2px; flex-grow: 1; max-width: 380px; background: transparent; }
-    .header-card { 
-        background: #0f6286; border-radius: 16px; padding: 16px 48px; 
-        margin: 0 24px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); 
-        font-weight: 700; font-size: 26px; color: #FFFFFF; 
-        display: flex; align-items: center; gap: 16px; 
-    }
+/* Header Component */
+.header-container { display: flex; align-items: center; justify-content: center; margin-top: 10px !important; margin-bottom: 16px; }
+.glow-line { height: 2px; flex-grow: 1; max-width: 380px; background: transparent; }
+.header-card { 
+    background: #0f6286; border-radius: 16px; padding: 16px 48px; 
+    margin: 0 24px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); 
+    font-weight: 700; font-size: 26px; color: #FFFFFF; 
+    display: flex; align-items: center; gap: 16px; 
+}
 
-    /* KPI Cards */
-    .kpi-card { 
-        background: #0f6286; border-radius: 16px; padding: 32px 16px; 
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); height: 100%; 
-        display: flex; flex-direction: column; justify-content: center; 
-        align-items: center; text-align: center; border: none;
-    }
-    .kpi-val { font-size: 32px; font-weight: 700; color: #FFFFFF; line-height: 1.1; margin: 4px 0; }
-    .kpi-lbl { font-size: 14px; font-weight: 700; color: #f68b1e; text-transform: uppercase; }
-    .kpi-sub { font-size: 14px; font-weight: 400; color: #ffffff; opacity: 0.9; }
+/* KPI Cards */
+.kpi-card { 
+    background: #0f6286; border-radius: 16px; padding: 32px 16px; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); height: 100%; 
+    display: flex; flex-direction: column; justify-content: center; 
+    align-items: center; text-align: center; border: none;
+}
+.kpi-val { font-size: 32px; font-weight: 700; color: #FFFFFF; line-height: 1.1; margin: 4px 0; }
+.kpi-lbl { font-size: 14px; font-weight: 700; color: #f68b1e; text-transform: uppercase; }
+.kpi-sub { font-size: 14px; font-weight: 400; color: #ffffff; opacity: 0.9; }
 
-    /* HTML Container Cards */
-    .html-card {
-        background-color: #0f6286; border-radius: 16px; padding: 32px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); display: flex;
-        flex-direction: column; justify-content: flex-start; text-align: left;
-        height: 100%; border: none;
-    }
-    div[data-baseweb="select"] > div { border-radius: 8px; font-size: 16px; font-weight: 700; padding: 4px; border: 1px solid #0f6286 !important; color: #333333; }
-    </style>
+/* HTML Container Cards */
+.html-card {
+    background-color: #0f6286; border-radius: 16px; padding: 32px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); display: flex;
+    flex-direction: column; justify-content: flex-start; text-align: left;
+    height: 100%; border: none;
+}
+div[data-baseweb="select"] > div { border-radius: 8px; font-size: 16px; font-weight: 700; padding: 4px; border: 1px solid #0f6286 !important; color: #333333; }
+</style>
 """), unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# ANIMATED SPLASH SCREEN (CLEARED VIA PLACEHOLDER)
+# ANIMATED SPLASH SCREEN (FIRST VISIT ONLY)
 # ---------------------------------------------------------
 if is_first_load:
     splash_placeholder = st.empty()
     
     with splash_placeholder.container():
-        splash_html = textwrap.dedent(f"""
-            <div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; background-color: #0f6286; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999999;">
-                
-                {splash_logo_html}
-                
-                <h1 style="color: #FFFFFF; font-size: 42px; margin-bottom: 12px; font-weight: 700; font-family: 'Chivo', sans-serif; text-align: center;">Karandaaz Pakistan Treasury Dashboard</h1>
-                <p style="color: #f68b1e; font-size: 18px; font-weight: 400; margin-bottom: 40px; font-family: 'Chivo', sans-serif; text-align: center;">Loading secure financial models...</p>
-                
-                <div class="data-wave">
-                    <div class="wave-bar bar-1"></div>
-                    <div class="wave-bar bar-2"></div>
-                    <div class="wave-bar bar-3"></div>
-                    <div class="wave-bar bar-4"></div>
-                    <div class="wave-bar bar-5"></div>
-                </div>
+        splash_content = clean_html(f"""
+        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; background-color: #0f6286; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999999;">
+            {splash_logo_html}
+            <h1 style="color: #FFFFFF; font-size: 42px; margin-bottom: 12px; font-weight: 700; font-family: 'Chivo', sans-serif; text-align: center;">Karandaaz Pakistan Treasury Dashboard</h1>
+            <p style="color: #f68b1e; font-size: 18px; font-weight: 400; margin-bottom: 40px; font-family: 'Chivo', sans-serif; text-align: center;">Loading secure financial models...</p>
+            <div class="data-wave">
+                <div class="wave-bar bar-1"></div>
+                <div class="wave-bar bar-2"></div>
+                <div class="wave-bar bar-3"></div>
+                <div class="wave-bar bar-4"></div>
+                <div class="wave-bar bar-5"></div>
             </div>
-
-            <style>
-            .data-wave {{ display: flex; align-items: center; gap: 8px; }}
-            .wave-bar {{ width: 10px; height: 45px; background-color: #f68b1e; border-radius: 6px; animation: waveAnim 1s ease-in-out infinite; }}
-            .bar-1 {{ animation-delay: 0.0s; }}
-            .bar-2 {{ animation-delay: 0.1s; background-color: #76C4E3; }}
-            .bar-3 {{ animation-delay: 0.2s; background-color: #FFFFFF; height: 60px; }}
-            .bar-4 {{ animation-delay: 0.3s; background-color: #76C4E3; }}
-            .bar-5 {{ animation-delay: 0.4s; }}
-            @keyframes waveAnim {{
-                0%, 100% {{ transform: scaleY(0.3); opacity: 0.6; }}
-                50% {{ transform: scaleY(1); opacity: 1; box-shadow: 0 0 15px rgba(255,255,255,0.4); }}
-            }}
-            </style>
+        </div>
+        <style>
+        .data-wave {{ display: flex; align-items: center; gap: 8px; }}
+        .wave-bar {{ width: 10px; height: 45px; background-color: #f68b1e; border-radius: 6px; animation: waveAnim 1s ease-in-out infinite; }}
+        .bar-1 {{ animation-delay: 0.0s; }}
+        .bar-2 {{ animation-delay: 0.1s; background-color: #76C4E3; }}
+        .bar-3 {{ animation-delay: 0.2s; background-color: #FFFFFF; height: 60px; }}
+        .bar-4 {{ animation-delay: 0.3s; background-color: #76C4E3; }}
+        .bar-5 {{ animation-delay: 0.4s; }}
+        @keyframes waveAnim {{
+            0%, 100% {{ transform: scaleY(0.3); opacity: 0.6; }}
+            50% {{ transform: scaleY(1); opacity: 1; box-shadow: 0 0 15px rgba(255,255,255,0.4); }}
+        }}
+        </style>
         """)
-        st.markdown(splash_html, unsafe_allow_html=True)
-        time.sleep(3.2)
+        st.markdown(splash_content, unsafe_allow_html=True)
+        time.sleep(3.0)
     
     splash_placeholder.empty()
 
@@ -279,30 +285,30 @@ CHART_FONT = dict(family="Chivo, sans-serif", color="#FFFFFF", size=14)
 with st.spinner("Rendering Visualizations..."):
 
     # SBP Rolling Banner
-    st.markdown(textwrap.dedent(f"""
-        <div class="sbp-marquee">
-            <span>
-                <a href="https://www.sbp.org.pk/our-operations/monetary-policy" target="_blank">
-                    <span style="color: #f68b1e; margin-right: 8px; font-weight: 700;">SBP MONETARY POLICY UPDATE:</span>
-                    The current Monetary Policy Rate is <b style="color:#FFFFFF;">{mpr_rate:.2f}%</b>. 
-                    Next MPC meeting is scheduled for <b style="color:#FFFFFF;">{next_mpr_date}</b>. 
-                    <span style="color:#FFFFFF; opacity:0.9;">Summary: The Monetary Policy Committee continues to monitor inflation targets and economic indicators.</span> 
-                    &nbsp;&nbsp;Click here to read the full policy statement on the official SBP website.
-                </a>
-            </span>
-        </div>
+    st.markdown(clean_html(f"""
+    <div class="sbp-marquee">
+        <span>
+            <a href="https://www.sbp.org.pk/our-operations/monetary-policy" target="_blank">
+                <span style="color: #f68b1e; margin-right: 8px; font-weight: 700;">SBP MONETARY POLICY UPDATE:</span>
+                The current Monetary Policy Rate is <b style="color:#FFFFFF;">{mpr_rate:.2f}%</b>. 
+                Next MPC meeting is scheduled for <b style="color:#FFFFFF;">{next_mpr_date}</b>. 
+                <span style="color:#FFFFFF; opacity:0.9;">Summary: The Monetary Policy Committee continues to monitor inflation targets and economic indicators.</span> 
+                &nbsp;&nbsp;Click here to read the full policy statement on the official SBP website.
+            </a>
+        </span>
+    </div>
     """), unsafe_allow_html=True)
 
-    # Header Section
-    st.markdown(textwrap.dedent(f"""
-        <div class="header-container">
-            <div class="glow-line"></div>
-            <div class="header-card">
-                {header_logo_html}
-                Treasury Portfolio Summary (FY26-27)
-            </div>
-            <div class="glow-line"></div>
+    # Header Card
+    st.markdown(clean_html(f"""
+    <div class="header-container">
+        <div class="glow-line"></div>
+        <div class="header-card">
+            {header_logo_html}
+            Treasury Portfolio Summary (FY26-27)
         </div>
+        <div class="glow-line"></div>
+    </div>
     """), unsafe_allow_html=True)
 
     col_e1, col_date, col_e2 = st.columns([1, 0.3, 1])
@@ -315,13 +321,13 @@ with st.spinner("Rendering Visualizations..."):
     # 4 Centered Top KPI Cards
     kpi1, kpi2, kpi3, kpi4 = st.columns(4, gap="medium")
     with kpi1:
-        st.markdown(f"<div class='kpi-card'><div class='kpi-lbl'>TOTAL INCOME</div><div class='kpi-val'>{q_ctx['total_income']:,.2f} M</div><div class='kpi-sub'>Quarterly Income ({selected_q})</div></div>", unsafe_allow_html=True)
+        st.markdown(clean_html(f"<div class='kpi-card'><div class='kpi-lbl'>TOTAL INCOME</div><div class='kpi-val'>{q_ctx['total_income']:,.2f} M</div><div class='kpi-sub'>Quarterly Income ({selected_q})</div></div>"), unsafe_allow_html=True)
     with kpi2:
-        st.markdown(f"<div class='kpi-card'><div class='kpi-lbl'>TREASURY POOL</div><div class='kpi-val'>{q_ctx['treasury_pool']:,.2f} M</div><div class='kpi-sub'>Total Allocation ({selected_q})</div></div>", unsafe_allow_html=True)
+        st.markdown(clean_html(f"<div class='kpi-card'><div class='kpi-lbl'>TREASURY POOL</div><div class='kpi-val'>{q_ctx['treasury_pool']:,.2f} M</div><div class='kpi-sub'>Total Allocation ({selected_q})</div></div>"), unsafe_allow_html=True)
     with kpi3:
-        st.markdown(f"<div class='kpi-card'><div class='kpi-lbl'>FORECASTED INCOME</div><div class='kpi-val'>{q_ctx['forecasted_income']:,.2f} M</div><div class='kpi-sub'>Forecasted for {selected_q}</div></div>", unsafe_allow_html=True)
+        st.markdown(clean_html(f"<div class='kpi-card'><div class='kpi-lbl'>FORECASTED INCOME</div><div class='kpi-val'>{q_ctx['forecasted_income']:,.2f} M</div><div class='kpi-sub'>Forecasted for {selected_q}</div></div>"), unsafe_allow_html=True)
     with kpi4:
-        st.markdown(f"<div class='kpi-card'><div class='kpi-lbl'>ANNUAL YIELD</div><div class='kpi-val'>{q_ctx['annual_yield']}</div><div class='kpi-sub'>Weighted Annual Yield</div></div>", unsafe_allow_html=True)
+        st.markdown(clean_html(f"<div class='kpi-card'><div class='kpi-lbl'>ANNUAL YIELD</div><div class='kpi-val'>{q_ctx['annual_yield']}</div><div class='kpi-sub'>Weighted Annual Yield</div></div>"), unsafe_allow_html=True)
     
     st.markdown("<div style='height: 24px;'></div>", unsafe_allow_html=True)
 
@@ -334,7 +340,7 @@ with st.spinner("Rendering Visualizations..."):
         month_cols_html += f"<div style='flex: 1; background: rgba(0,0,0,0.1); border-radius: 8px; padding: 14px 6px; text-align: center;'><div style='font-size: 14px; font-weight: 700; color: #f68b1e; text-transform: uppercase;'>{month_info['month']}</div><div style='font-size: 16px; font-weight: 400; color: #FFFFFF; margin-top: 8px; line-height: 1.6;'>{rates_br}</div></div>"
     month_cols_html += "</div>"
     with bot_col1:
-        st.markdown(f"<div class='kpi-card' style='justify-content: center; height: 210px;'><div class='kpi-lbl'>BANK PROFIT RATES ({selected_q})</div>{month_cols_html}</div>", unsafe_allow_html=True)
+        st.markdown(clean_html(f"<div class='kpi-card' style='justify-content: center; height: 210px;'><div class='kpi-lbl'>BANK PROFIT RATES ({selected_q})</div>{month_cols_html}</div>"), unsafe_allow_html=True)
 
     # 2. MPR Rate Card
     mpr_split_html = (
@@ -351,7 +357,7 @@ with st.spinner("Rendering Visualizations..."):
         "</div></div>"
     )
     with bot_col2:
-        st.markdown(f"<div class='kpi-card' style='justify-content: center; height: 210px; padding: 10px;'>{mpr_split_html}</div>", unsafe_allow_html=True)
+        st.markdown(clean_html(f"<div class='kpi-card' style='justify-content: center; height: 210px; padding: 10px;'>{mpr_split_html}</div>"), unsafe_allow_html=True)
 
     # 3. PKR Yields Card
     pkr_yields_html = (
@@ -363,7 +369,7 @@ with st.spinner("Rendering Visualizations..."):
         "</div>"
     )
     with bot_col3:
-        st.markdown(f"<div class='kpi-card' style='justify-content: center; height: 210px;'><div class='kpi-lbl'>PKR YIELDS</div>{pkr_yields_html}</div>", unsafe_allow_html=True)
+        st.markdown(clean_html(f"<div class='kpi-card' style='justify-content: center; height: 210px;'><div class='kpi-lbl'>PKR YIELDS</div>{pkr_yields_html}</div>"), unsafe_allow_html=True)
 
     # =========================================================
     # SECTION: CURRENT INVESTMENT POSITION
@@ -371,10 +377,12 @@ with st.spinner("Rendering Visualizations..."):
     st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
     
     st.markdown(
-        "<div style='background-color: #0f6286; border-radius: 16px; padding: 32px; text-align: left; margin-bottom: 24px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); font-family: \"Chivo\", sans-serif;'>"
-        "<h3 style='color: #ffffff; font-size: 26px; font-weight: 700; margin: 0; line-height: 1.2;'>Current Investment Position <span style='color: #f68b1e; font-weight: 400;'>&rarr;</span></h3>"
-        "<p style='color: #ffffff; font-size: 16px; font-weight: 400; line-height: 1.5; margin-top: 12px; margin-bottom: 0;'>Instrument-Level Ledger & Portfolio Concentration</p>"
-        "</div>", 
+        clean_html(
+            "<div style='background-color: #0f6286; border-radius: 16px; padding: 32px; text-align: left; margin-bottom: 24px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); font-family: \"Chivo\", sans-serif;'>"
+            "<h3 style='color: #ffffff; font-size: 26px; font-weight: 700; margin: 0; line-height: 1.2;'>Current Investment Position <span style='color: #f68b1e; font-weight: 400;'>&rarr;</span></h3>"
+            "<p style='color: #ffffff; font-size: 16px; font-weight: 400; line-height: 1.5; margin-top: 12px; margin-bottom: 0;'>Instrument-Level Ledger & Portfolio Concentration</p>"
+            "</div>"
+        ), 
         unsafe_allow_html=True
     )
 
@@ -391,10 +399,12 @@ with st.spinner("Rendering Visualizations..."):
     # LEFT COLUMN: DONUT CHART
     with inv_col1:
         st.markdown(
-            "<div class='html-card' style='padding-bottom: 0px; font-family: \"Chivo\", sans-serif;'>"
-            "<div style='font-size: 24px; font-weight: 700; color: #ffffff; line-height: 1.2;'>Portfolio Concentration <span style='color:#f68b1e; font-weight: 400;'>&rarr;</span></div>"
-            "<div style='font-size: 16px; font-weight: 400; color: #ffffff; line-height: 1.6; margin-top: 12px; margin-bottom: 10px;'>% Share of Gross Investment Portfolio</div>"
-            "</div>", 
+            clean_html(
+                "<div class='html-card' style='padding-bottom: 0px; font-family: \"Chivo\", sans-serif;'>"
+                "<div style='font-size: 24px; font-weight: 700; color: #ffffff; line-height: 1.2;'>Portfolio Concentration <span style='color:#f68b1e; font-weight: 400;'>&rarr;</span></div>"
+                "<div style='font-size: 16px; font-weight: 400; color: #ffffff; line-height: 1.6; margin-top: 12px; margin-bottom: 10px;'>% Share of Gross Investment Portfolio</div>"
+                "</div>"
+            ), 
             unsafe_allow_html=True
         )
         
@@ -451,4 +461,4 @@ with st.spinner("Rendering Visualizations..."):
             "</tr></tfoot>"
             "</table></div></div>"
         )
-        st.markdown(table_html, unsafe_allow_html=True)
+        st.markdown(clean_html(table_html), unsafe_allow_html=True)
