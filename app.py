@@ -4,24 +4,31 @@ import plotly.graph_objects as go
 import time
 import base64
 import os
+import textwrap
 
 # 1. Page Configuration MUST be the first Streamlit command
 st.set_page_config(page_title="Karandaaz Treasury Summary FY26-27", layout="wide", initial_sidebar_state="collapsed")
 
 # ---------------------------------------------------------
-# LOGO CONVERSION (BASE64) FOR HTML RENDERING
+# LOGO CONVERSION & FALLBACK HANDLING
 # ---------------------------------------------------------
 EXCEL_FILE = "Treasury Income FY26'27 - July26.xlsx"
 LOGO_FILE = "krn logo.jpg"
 
 def get_base64_image(file_path):
-    try:
+    if os.path.exists(file_path):
         with open(file_path, "rb") as f:
             return base64.b64encode(f.read()).decode()
-    except Exception:
-        return ""
+    return None
 
 logo_b64 = get_base64_image(LOGO_FILE)
+
+if logo_b64:
+    splash_logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" style="width: 260px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.3);">'
+    header_logo_html = f'<img src="data:image/jpeg;base64,{logo_b64}" alt="Logo" style="height: 35px; border-radius: 4px; object-fit: contain;">'
+else:
+    splash_logo_html = '<div style="color: #FFFFFF; font-size: 32px; font-weight: 700; margin-bottom: 20px; font-family: \'Chivo\', sans-serif; letter-spacing: 1px;">KARANDAAZ PAKISTAN</div>'
+    header_logo_html = '<span style="color: #f68b1e; font-size: 20px; font-weight: 700; margin-right: 8px;">KRN</span>'
 
 # ---------------------------------------------------------
 # SESSION STATE CONTROL FOR FIRST-TIME SPLASH LOAD
@@ -163,110 +170,105 @@ quarter_data = {
 }
 
 # ---------------------------------------------------------
-# CUSTOM CSS ARCHITECTURE (NO INDENTATION TO AVOID MARKDOWN BUGS)
+# CUSTOM CSS ARCHITECTURE (STRIPPED OF LEADING INDENTATION)
 # ---------------------------------------------------------
-st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Chivo:wght@400;700&display=swap');
+st.markdown(textwrap.dedent("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Chivo:wght@400;700&display=swap');
 
-* { font-family: 'Chivo', sans-serif !important; box-sizing: border-box; }
-html, body, .stApp { background-color: #F5F7F9 !important; margin: 0 !important; padding: 0 !important; }
-header { visibility: hidden; height: 0; }
+    * { font-family: 'Chivo', sans-serif !important; box-sizing: border-box; }
+    html, body, .stApp { background-color: #F5F7F9 !important; margin: 0 !important; padding: 0 !important; }
+    header { visibility: hidden; height: 0; }
 
-.block-container { 
-    padding-top: 5rem !important; padding-bottom: 3rem !important; 
-    padding-left: 2rem !important; padding-right: 2rem !important; max-width: 100% !important; 
-}
+    .block-container { 
+        padding-top: 5rem !important; padding-bottom: 3rem !important; 
+        padding-left: 2rem !important; padding-right: 2rem !important; max-width: 100% !important; 
+    }
 
-/* SBP Banner */
-.sbp-marquee {
-    position: fixed; top: 0; left: 0; width: 100%;
-    background: #0f6286; color: #FFFFFF; padding: 11px 0;
-    overflow: hidden; white-space: nowrap; z-index: 999999;
-    border-bottom: 3px solid #f68b1e; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-.sbp-marquee a { color: #FFFFFF !important; text-decoration: none; font-size: 16px; }
-.sbp-marquee > span { display: inline-block; padding-left: 100%; animation: marquee_scroll 28s linear infinite; }
-@keyframes marquee_scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+    /* SBP Marquee */
+    .sbp-marquee {
+        position: fixed; top: 0; left: 0; width: 100%;
+        background: #0f6286; color: #FFFFFF; padding: 11px 0;
+        overflow: hidden; white-space: nowrap; z-index: 999999;
+        border-bottom: 3px solid #f68b1e; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .sbp-marquee a { color: #FFFFFF !important; text-decoration: none; font-size: 16px; }
+    .sbp-marquee > span { display: inline-block; padding-left: 100%; animation: marquee_scroll 28s linear infinite; }
+    @keyframes marquee_scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-/* Fixed Header Card - No Indentation in Python String */
-.header-container { display: flex; align-items: center; justify-content: center; margin-top: 10px !important; margin-bottom: 16px; }
-.glow-line { height: 2px; flex-grow: 1; max-width: 380px; background: transparent; }
-.header-card { 
-    background: #0f6286; border-radius: 16px; padding: 16px 48px; 
-    margin: 0 24px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); 
-    font-weight: 700; font-size: 26px; color: #FFFFFF; 
-    display: flex; align-items: center; gap: 16px; 
-}
+    /* Header Container */
+    .header-container { display: flex; align-items: center; justify-content: center; margin-top: 10px !important; margin-bottom: 16px; }
+    .glow-line { height: 2px; flex-grow: 1; max-width: 380px; background: transparent; }
+    .header-card { 
+        background: #0f6286; border-radius: 16px; padding: 16px 48px; 
+        margin: 0 24px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); 
+        font-weight: 700; font-size: 26px; color: #FFFFFF; 
+        display: flex; align-items: center; gap: 16px; 
+    }
 
-/* KPI Cards */
-.kpi-card { 
-    background: #0f6286; border-radius: 16px; padding: 32px 16px; 
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); height: 100%; 
-    display: flex; flex-direction: column; justify-content: center; 
-    align-items: center; text-align: center; border: none;
-}
-.kpi-val { font-size: 32px; font-weight: 700; color: #FFFFFF; line-height: 1.1; margin: 4px 0; }
-.kpi-lbl { font-size: 14px; font-weight: 700; color: #f68b1e; text-transform: uppercase; }
-.kpi-sub { font-size: 14px; font-weight: 400; color: #ffffff; opacity: 0.9; }
+    /* KPI Cards */
+    .kpi-card { 
+        background: #0f6286; border-radius: 16px; padding: 32px 16px; 
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); height: 100%; 
+        display: flex; flex-direction: column; justify-content: center; 
+        align-items: center; text-align: center; border: none;
+    }
+    .kpi-val { font-size: 32px; font-weight: 700; color: #FFFFFF; line-height: 1.1; margin: 4px 0; }
+    .kpi-lbl { font-size: 14px; font-weight: 700; color: #f68b1e; text-transform: uppercase; }
+    .kpi-sub { font-size: 14px; font-weight: 400; color: #ffffff; opacity: 0.9; }
 
-/* HTML Container Cards */
-.html-card {
-    background-color: #0f6286; border-radius: 16px; padding: 32px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); display: flex;
-    flex-direction: column; justify-content: flex-start; text-align: left;
-    height: 100%; border: none;
-}
-div[data-baseweb="select"] > div { border-radius: 8px; font-size: 16px; font-weight: 700; padding: 4px; border: 1px solid #0f6286 !important; color: #333333; }
-</style>
-""", unsafe_allow_html=True)
+    /* HTML Container Cards */
+    .html-card {
+        background-color: #0f6286; border-radius: 16px; padding: 32px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); display: flex;
+        flex-direction: column; justify-content: flex-start; text-align: left;
+        height: 100%; border: none;
+    }
+    div[data-baseweb="select"] > div { border-radius: 8px; font-size: 16px; font-weight: 700; padding: 4px; border: 1px solid #0f6286 !important; color: #333333; }
+    </style>
+"""), unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# NEW ANIMATED SPLASH SCREEN (WORKS WITHOUT CLICKING)
+# ANIMATED SPLASH SCREEN (CLEARED VIA PLACEHOLDER)
 # ---------------------------------------------------------
 if is_first_load:
     splash_placeholder = st.empty()
     
     with splash_placeholder.container():
-        
-        # HTML generated flush-left so Markdown doesn't break it
-        splash_html = f"""
-<div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; background-color: #0f6286; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999999;">
-    
-    <img src="data:image/jpeg;base64,{logo_b64}" style="width: 280px; margin-bottom: 30px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
-    
-    <h1 style="color: #FFFFFF; font-size: 44px; margin-bottom: 12px; font-weight: 700; font-family: 'Chivo', sans-serif; text-align: center;">Karandaaz Pakistan Treasury Dashboard</h1>
-    <p style="color: #f68b1e; font-size: 20px; font-weight: 400; margin-bottom: 45px; font-family: 'Chivo', sans-serif; text-align: center;">Loading secure financial models...</p>
-    
-    <div class="data-wave">
-        <div class="wave-bar bar-1"></div>
-        <div class="wave-bar bar-2"></div>
-        <div class="wave-bar bar-3"></div>
-        <div class="wave-bar bar-4"></div>
-        <div class="wave-bar bar-5"></div>
-    </div>
-</div>
+        splash_html = textwrap.dedent(f"""
+            <div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; background-color: #0f6286; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999999;">
+                
+                {splash_logo_html}
+                
+                <h1 style="color: #FFFFFF; font-size: 42px; margin-bottom: 12px; font-weight: 700; font-family: 'Chivo', sans-serif; text-align: center;">Karandaaz Pakistan Treasury Dashboard</h1>
+                <p style="color: #f68b1e; font-size: 18px; font-weight: 400; margin-bottom: 40px; font-family: 'Chivo', sans-serif; text-align: center;">Loading secure financial models...</p>
+                
+                <div class="data-wave">
+                    <div class="wave-bar bar-1"></div>
+                    <div class="wave-bar bar-2"></div>
+                    <div class="wave-bar bar-3"></div>
+                    <div class="wave-bar bar-4"></div>
+                    <div class="wave-bar bar-5"></div>
+                </div>
+            </div>
 
-<style>
-.data-wave {{ display: flex; align-items: center; gap: 8px; }}
-.wave-bar {{ width: 10px; height: 50px; background-color: #f68b1e; border-radius: 6px; animation: waveAnim 1s ease-in-out infinite; }}
-.bar-1 {{ animation-delay: 0.0s; }}
-.bar-2 {{ animation-delay: 0.1s; background-color: #76C4E3; }}
-.bar-3 {{ animation-delay: 0.2s; background-color: #FFFFFF; height: 65px; }}
-.bar-4 {{ animation-delay: 0.3s; background-color: #76C4E3; }}
-.bar-5 {{ animation-delay: 0.4s; }}
-@keyframes waveAnim {{
-    0%, 100% {{ transform: scaleY(0.3); opacity: 0.6; }}
-    50% {{ transform: scaleY(1); opacity: 1; box-shadow: 0 0 15px rgba(255,255,255,0.4); }}
-}}
-</style>
-        """
+            <style>
+            .data-wave {{ display: flex; align-items: center; gap: 8px; }}
+            .wave-bar {{ width: 10px; height: 45px; background-color: #f68b1e; border-radius: 6px; animation: waveAnim 1s ease-in-out infinite; }}
+            .bar-1 {{ animation-delay: 0.0s; }}
+            .bar-2 {{ animation-delay: 0.1s; background-color: #76C4E3; }}
+            .bar-3 {{ animation-delay: 0.2s; background-color: #FFFFFF; height: 60px; }}
+            .bar-4 {{ animation-delay: 0.3s; background-color: #76C4E3; }}
+            .bar-5 {{ animation-delay: 0.4s; }}
+            @keyframes waveAnim {{
+                0%, 100% {{ transform: scaleY(0.3); opacity: 0.6; }}
+                50% {{ transform: scaleY(1); opacity: 1; box-shadow: 0 0 15px rgba(255,255,255,0.4); }}
+            }}
+            </style>
+        """)
         st.markdown(splash_html, unsafe_allow_html=True)
-        
-        # Streamlit waits for exactly 3.5 seconds
-        time.sleep(3.5)
+        time.sleep(3.2)
     
-    # Safely clears the splash screen completely, revealing the dashboard underneath.
     splash_placeholder.empty()
 
 # ---------------------------------------------------------
@@ -277,31 +279,31 @@ CHART_FONT = dict(family="Chivo, sans-serif", color="#FFFFFF", size=14)
 with st.spinner("Rendering Visualizations..."):
 
     # SBP Rolling Banner
-    st.markdown(f"""
-<div class="sbp-marquee">
-    <span>
-        <a href="https://www.sbp.org.pk/our-operations/monetary-policy" target="_blank">
-            <span style="color: #f68b1e; margin-right: 8px; font-weight: 700;">SBP MONETARY POLICY UPDATE:</span>
-            The current Monetary Policy Rate is <b style="color:#FFFFFF;">{mpr_rate:.2f}%</b>. 
-            Next MPC meeting is scheduled for <b style="color:#FFFFFF;">{next_mpr_date}</b>. 
-            <span style="color:#FFFFFF; opacity:0.9;">Summary: The Monetary Policy Committee continues to monitor inflation targets and economic indicators.</span> 
-            &nbsp;&nbsp;Click here to read the full policy statement on the official SBP website.
-        </a>
-    </span>
-</div>
-    """, unsafe_allow_html=True)
+    st.markdown(textwrap.dedent(f"""
+        <div class="sbp-marquee">
+            <span>
+                <a href="https://www.sbp.org.pk/our-operations/monetary-policy" target="_blank">
+                    <span style="color: #f68b1e; margin-right: 8px; font-weight: 700;">SBP MONETARY POLICY UPDATE:</span>
+                    The current Monetary Policy Rate is <b style="color:#FFFFFF;">{mpr_rate:.2f}%</b>. 
+                    Next MPC meeting is scheduled for <b style="color:#FFFFFF;">{next_mpr_date}</b>. 
+                    <span style="color:#FFFFFF; opacity:0.9;">Summary: The Monetary Policy Committee continues to monitor inflation targets and economic indicators.</span> 
+                    &nbsp;&nbsp;Click here to read the full policy statement on the official SBP website.
+                </a>
+            </span>
+        </div>
+    """), unsafe_allow_html=True)
 
-    # SCREEN 1: TOP SECTION (Fixed HTML indentation)
-    st.markdown(f"""
-<div class="header-container">
-    <div class="glow-line"></div>
-    <div class="header-card">
-        <img src="data:image/jpeg;base64,{logo_b64}" alt="" style="height: 35px; border-radius: 4px; object-fit: contain;">
-        Treasury Portfolio Summary (FY26-27)
-    </div>
-    <div class="glow-line"></div>
-</div>
-    """, unsafe_allow_html=True)
+    # Header Section
+    st.markdown(textwrap.dedent(f"""
+        <div class="header-container">
+            <div class="glow-line"></div>
+            <div class="header-card">
+                {header_logo_html}
+                Treasury Portfolio Summary (FY26-27)
+            </div>
+            <div class="glow-line"></div>
+        </div>
+    """), unsafe_allow_html=True)
 
     col_e1, col_date, col_e2 = st.columns([1, 0.3, 1])
     with col_date:
