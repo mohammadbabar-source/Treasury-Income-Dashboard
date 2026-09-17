@@ -263,6 +263,55 @@ st.markdown("""
     .html-card:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12); }
     
     div[data-baseweb="select"] > div { border-radius: 8px; font-size: 16px; font-weight: 700; padding: 4px; border: 1px solid #0f6286 !important; color: #333333; }
+
+    /* PURE CSS MODAL OVERLAY (Bypasses Streamlit JS restrictions) */
+    #modal-toggle { display: none; }
+    #incomeModal {
+        display: none;
+        opacity: 0;
+        position: fixed;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 99999999;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.3s ease;
+    }
+    #modal-toggle:checked ~ #incomeModal {
+        display: flex !important;
+        opacity: 1 !important;
+    }
+    .modal-content {
+        background: #0f6286; 
+        border-radius: 16px; 
+        padding: 32px 48px;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        text-align: left; 
+        position: relative; 
+        min-width: 600px;
+    }
+    .close-btn {
+        position: absolute; 
+        top: 16px; 
+        right: 24px;
+        color: #f68b1e; 
+        font-size: 32px; 
+        cursor: pointer; 
+        font-weight: bold;
+        transition: opacity 0.2s;
+    }
+    .close-btn:hover { opacity: 0.7; }
+    .info-icon {
+        cursor: pointer; 
+        margin-left: 6px; 
+        color: #f68b1e; 
+        vertical-align: middle; 
+        transition: opacity 0.2s;
+    }
+    .info-icon:hover { opacity: 0.7; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -276,7 +325,7 @@ if st.session_state.first_load:
         st.markdown("""
             <div style='display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; text-align: center; background-color: #0f6286; animation: fadeOut 0.8s ease-in 2.5s forwards; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999999;'>
                 <img src="krn logo.jpg" alt="Karandaaz Logo" style="width: 250px; margin-bottom: 24px; border-radius: 8px; animation: pulseLogo 1.5s ease-in-out infinite;" onerror="this.style.display='none'">
-                <h1 style='color: #FFFFFF; font-size: 52px; letter-spacing: 1px; margin-bottom: 8px; font-weight: 700;'>Karandaaz Pakistan - Treasury Portfolio, FY26-27</h1>
+                <h1 style='color: #FFFFFF; font-size: 58px; letter-spacing: 1px; margin-bottom: 8px; font-weight: 700;'>Karandaaz Pakistan - Treasury Portfolio, FY26-27</h1>
                 <p style='color: #f68b1e; font-size: 22px; font-weight: 400; letter-spacing: 0.5px;'>Initializing Dashboard & Financial Models...</p>
                 <div class="loader"></div>
             </div>
@@ -329,47 +378,44 @@ with st.spinner("Rendering Visualizations..."):
     q_ctx = quarter_data[selected_q]
     q_rates_list = get_quarter_rates(selected_q)
 
-    # =========================================================
-    # SLEEK HTML/CSS OVERLAY MODAL (Triggered by the Info Icon)
-    # =========================================================
-    st.markdown(f"""
-    <div id="incomeModal" style="display:none; opacity:0; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:99999999; align-items:center; justify-content:center; transition:opacity 0.3s ease;">
-        <div style="background:#0f6286; border-radius:16px; padding:32px 48px; border:1px solid rgba(255,255,255,0.1); box-shadow:0 20px 40px rgba(0,0,0,0.4); text-align:left; position:relative; min-width: 600px; font-family:'Chivo', sans-serif;">
-            <span onclick="var m=document.getElementById('incomeModal'); m.style.opacity='0'; setTimeout(()=>m.style.display='none',300);" style="position:absolute; top:16px; right:24px; color:#f68b1e; font-size:28px; cursor:pointer; font-weight:bold;">&times;</span>
-            <h3 style="color:#ffffff; font-size:24px; font-weight:700; margin:0 0 24px 0;">Income Breakdown <span style="color:#ffffff; opacity:0.6; font-size: 18px;">({selected_q})</span> <span style="color:#f68b1e; font-weight:400;">&rarr;</span></h3>
-            <div style="display:flex; gap:20px; justify-content:space-between;">
-                <div style="flex:1; background:rgba(0,0,0,0.15); padding:24px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); text-align:center;">
-                    <div style="color:#f68b1e; font-size:14px; font-weight:700; text-transform:uppercase; margin-bottom:8px;">OSR Income</div>
-                    <div style="color:#ffffff; font-size:24px; font-weight:700;">{q_ctx['osr_inc']:,.2f} <span style="font-size:16px; opacity:0.8;">M</span></div>
-                </div>
-                <div style="flex:1; background:rgba(0,0,0,0.15); padding:24px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); text-align:center;">
-                    <div style="color:#f68b1e; font-size:14px; font-weight:700; text-transform:uppercase; margin-bottom:8px;">LR Income</div>
-                    <div style="color:#ffffff; font-size:24px; font-weight:700;">{q_ctx['lr_inc']:,.2f} <span style="font-size:16px; opacity:0.8;">M</span></div>
-                </div>
-                <div style="flex:1; background:rgba(0,0,0,0.15); padding:24px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); text-align:center;">
-                    <div style="color:#f68b1e; font-size:14px; font-weight:700; text-transform:uppercase; margin-bottom:8px;">Escrow Income</div>
-                    <div style="color:#ffffff; font-size:24px; font-weight:700;">{q_ctx['esc_inc']:,.2f} <span style="font-size:16px; opacity:0.8;">M</span></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
 
     # 4 Centered Top KPI Cards
     kpi1, kpi2, kpi3, kpi4 = st.columns(4, gap="medium")
     with kpi1:
-        # Added sleek interactive icon inside the KPI box to trigger the modal
+        # PURE CSS Modal Implementation (No JavaScript required, unblockable by Streamlit)
         st.markdown(f"""
+        <input type="checkbox" id="modal-toggle">
+        
         <div class='kpi-card'>
             <div class='kpi-lbl'>
                 TOTAL INCOME
-                <span onclick="var m=document.getElementById('incomeModal'); m.style.display='flex'; setTimeout(()=>m.style.opacity='1',10);" style="cursor:pointer; margin-left:6px; color:#f68b1e; vertical-align:middle; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Click to view Breakdown">
+                <label for="modal-toggle" class="info-icon" title="Click to view Breakdown">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-top:-3px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                </span>
+                </label>
             </div>
             <div class='kpi-val'>{q_ctx['total_income']:,.2f} M</div>
             <div class='kpi-sub'>Quarterly Income ({selected_q})</div>
+        </div>
+
+        <div id="incomeModal">
+            <div class="modal-content">
+                <label for="modal-toggle" class="close-btn">&times;</label>
+                <h3 style="color:#ffffff; font-size:24px; font-weight:700; margin:0 0 24px 0;">Income Breakdown <span style="color:#ffffff; opacity:0.6; font-size: 18px;">({selected_q})</span> <span style="color:#f68b1e; font-weight:400;">&rarr;</span></h3>
+                <div style="display:flex; gap:20px; justify-content:space-between;">
+                    <div style="flex:1; background:rgba(0,0,0,0.15); padding:24px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); text-align:center;">
+                        <div style="color:#f68b1e; font-size:14px; font-weight:700; text-transform:uppercase; margin-bottom:8px;">OSR Income</div>
+                        <div style="color:#ffffff; font-size:24px; font-weight:700;">{q_ctx['osr_inc']:,.2f} <span style="font-size:16px; opacity:0.8;">M</span></div>
+                    </div>
+                    <div style="flex:1; background:rgba(0,0,0,0.15); padding:24px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); text-align:center;">
+                        <div style="color:#f68b1e; font-size:14px; font-weight:700; text-transform:uppercase; margin-bottom:8px;">LR Income</div>
+                        <div style="color:#ffffff; font-size:24px; font-weight:700;">{q_ctx['lr_inc']:,.2f} <span style="font-size:16px; opacity:0.8;">M</span></div>
+                    </div>
+                    <div style="flex:1; background:rgba(0,0,0,0.15); padding:24px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); text-align:center;">
+                        <div style="color:#f68b1e; font-size:14px; font-weight:700; text-transform:uppercase; margin-bottom:8px;">Escrow Income</div>
+                        <div style="color:#ffffff; font-size:24px; font-weight:700;">{q_ctx['esc_inc']:,.2f} <span style="font-size:16px; opacity:0.8;">M</span></div>
+                    </div>
+                </div>
+            </div>
         </div>
         """, unsafe_allow_html=True)
         
@@ -432,7 +478,6 @@ with st.spinner("Rendering Visualizations..."):
     
     st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
     
-    # Fully Styled Text Card for Current Investment Position matching your specifications
     st.markdown(
         "<div style='background-color: #0f6286; border-radius: 16px; padding: 32px; text-align: left; margin-bottom: 24px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); font-family: \"Chivo\", sans-serif;'>"
         "<h3 style='color: #ffffff; font-size: 26px; font-weight: 700; margin: 0; line-height: 1.2;'>Current Investment Position <span style='color: #f68b1e; font-weight: 400;'>&rarr;</span></h3>"
@@ -466,7 +511,6 @@ with st.spinner("Rendering Visualizations..."):
             labels=[item["instrument"] for item in investment_data],
             values=[item["value"] for item in investment_data],
             hole=0.62,
-            pull=[0.02, 0.02, 0.02, 0.02],
             marker_colors=[item["color"] for item in investment_data],
             textposition='outside', # explicitly sets text outside 
             textinfo='label+percent',
@@ -478,10 +522,10 @@ with st.spinner("Rendering Visualizations..."):
         
         fig_inv_donut.update_layout(
             showlegend=False,
-            margin=dict(t=50, b=50, l=100, r=100), # Expanded margins significantly to prevent clipping of outside labels
+            margin=dict(t=30, b=30, l=40, r=40), # Sizes Reverted
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
-            height=450 # Height expanded to ensure text fits comfortably outside the donut
+            height=370 # Sizes Reverted
         )
         
         st.plotly_chart(fig_inv_donut, use_container_width=True)
