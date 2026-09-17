@@ -102,7 +102,6 @@ except Exception as e:
     inc_q1, inc_q2, inc_q3, inc_q4 = 258.95, 0.0, 0.0, 0.0
     osr_q1, rpa_q1, esc_q1, tdr_q1, buysell_q1 = 165.72, 2.61, 2.00, 42.53, 46.07
     q1_pool = 16278.35
-    lr_funds, osr_funds, inv_cdel, rpa_acc, wv_greenfin, op_funds = 5521.09, 9310.81, 98.91, 250.56, 337.10, 68.24
     mpr_rate, next_mpr_date = 11.50, "Sep 14, 2026"
     df_rates = pd.DataFrame()
 
@@ -182,8 +181,6 @@ quarter_data = {
         "forecasted_income": inc_q1 if inc_q1 > 0 else 312.40,
         "annual_yield": "11.30%",
         "months": ['Jul 26', 'Aug 26', 'Sep 26'],
-        "income_trend": [inc_q1 * 0.33, inc_q1 * 0.35, inc_q1 * 0.32] if inc_q1 > 0 else [99.5, 105.2, 107.8], 
-        "margin_labels": ['OSR Savings', 'RPA Savings', 'Escrow', 'TDR', 'Buy/Sell'],
         "margin_values": [osr_q1, rpa_q1, esc_q1, tdr_q1, buysell_q1]
     },
     "Q2": {
@@ -193,8 +190,6 @@ quarter_data = {
         "forecasted_income": 0.0,
         "annual_yield": "N/A",
         "months": ['Oct 26', 'Nov 26', 'Dec 26'],
-        "income_trend": [0, 0, 0],
-        "margin_labels": ['OSR Savings', 'RPA Savings', 'Escrow', 'TDR', 'Buy/Sell'],
         "margin_values": [0, 0, 0, 0, 0]
     },
     "Q3": {
@@ -204,8 +199,6 @@ quarter_data = {
         "forecasted_income": 0.0,
         "annual_yield": "N/A",
         "months": ['Jan 27', 'Feb 27', 'Mar 27'],
-        "income_trend": [0, 0, 0],
-        "margin_labels": ['OSR Savings', 'RPA Savings', 'Escrow', 'TDR', 'Buy/Sell'],
         "margin_values": [0, 0, 0, 0, 0]
     },
     "Q4": {
@@ -215,51 +208,71 @@ quarter_data = {
         "forecasted_income": 0.0,
         "annual_yield": "N/A",
         "months": ['Apr 27', 'May 27', 'Jun 27'],
-        "income_trend": [0, 0, 0],
-        "margin_labels": ['OSR Savings', 'RPA Savings', 'Escrow', 'TDR', 'Buy/Sell'],
         "margin_values": [0, 0, 0, 0, 0]
     }
 }
 
 # ---------------------------------------------------------
-# GLOBAL STYLING ARCHITECTURE
+# GLOBAL STYLING ARCHITECTURE (CSS ANIMATIONS ADDED)
 # ---------------------------------------------------------
-st.markdown(clean_html("""
+# Dynamic delay logic: wait 7 seconds on first load to bypass splash, otherwise pop in quickly
+d_base = 7.1 if is_first_load else 0.1
+
+st.markdown(clean_html(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Chivo:wght@400;700&display=swap');
 
-* { font-family: 'Chivo', sans-serif !important; box-sizing: border-box; }
-html, body, .stApp { background-color: #F5F7F9 !important; margin: 0 !important; padding: 0 !important; }
-header { visibility: hidden; height: 0; }
+* {{ font-family: 'Chivo', sans-serif !important; box-sizing: border-box; }}
+html, body, .stApp {{ background-color: #F5F7F9 !important; margin: 0 !important; padding: 0 !important; }}
+header {{ visibility: hidden; height: 0; }}
 
-.block-container { 
+.block-container {{ 
     padding-top: 5rem !important; padding-bottom: 3rem !important; 
     padding-left: 2rem !important; padding-right: 2rem !important; max-width: 100% !important; 
-}
+}}
 
-/* SBP Rolling Banner */
-.sbp-marquee {
+/* --- DYNAMIC STAGGERED ENTRANCE ANIMATIONS --- */
+@keyframes fadeUp {{
+    0% {{ opacity: 0; transform: translateY(30px); }}
+    100% {{ opacity: 1; transform: translateY(0); }}
+}}
+.stagger-1 {{ animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) {d_base}s both; }}
+.stagger-2 {{ animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) {d_base + 0.15}s both; }}
+.stagger-3 {{ animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) {d_base + 0.30}s both; }}
+.stagger-4 {{ animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) {d_base + 0.45}s both; }}
+.stagger-5 {{ animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) {d_base + 0.60}s both; }}
+
+/* Animated Gradient Marquee Banner */
+.sbp-marquee {{
     position: fixed; top: 0; left: 0; width: 100%;
-    background: #0f6286; color: #FFFFFF; padding: 11px 0;
+    background: linear-gradient(270deg, #0f6286, #0b4a66, #1479a3, #0f6286); 
+    background-size: 400% 400%;
+    animation: gradientShift 12s ease infinite;
+    color: #FFFFFF; padding: 11px 0;
     overflow: hidden; white-space: nowrap; z-index: 999999;
-    border-bottom: 3px solid #f68b1e; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-.sbp-marquee a { color: #FFFFFF !important; text-decoration: none; font-size: 21px; }
-.sbp-marquee > span { display: inline-block; padding-left: 100%; animation: marquee_scroll 28s linear infinite; }
-@keyframes marquee_scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+    border-bottom: 3px solid #f68b1e; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}}
+@keyframes gradientShift {{
+    0% {{ background-position: 0% 50%; }}
+    50% {{ background-position: 100% 50%; }}
+    100% {{ background-position: 0% 50%; }}
+}}
+.sbp-marquee a {{ color: #FFFFFF !important; text-decoration: none; font-size: 21px; }}
+.sbp-marquee > span {{ display: inline-block; padding-left: 100%; animation: marquee_scroll 28s linear infinite; }}
+@keyframes marquee_scroll {{ 0% {{ transform: translateX(0); }} 100% {{ transform: translateX(-100%); }} }}
 
 /* Header Component */
-.header-container { display: flex; align-items: center; justify-content: center; margin-top: 10px !important; margin-bottom: 16px; }
-.glow-line { height: 2px; flex-grow: 1; max-width: 380px; background: transparent; }
-.header-card { 
+.header-container {{ display: flex; align-items: center; justify-content: center; margin-top: 10px !important; margin-bottom: 16px; }}
+.glow-line {{ height: 2px; flex-grow: 1; max-width: 380px; background: transparent; }}
+.header-card {{ 
     background: #0f6286; border-radius: 16px; padding: 14px 40px; 
-    margin: 0 24px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); 
+    margin: 0 24px; box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15); 
     font-weight: 700; font-size: 34px; color: #FFFFFF; 
     display: flex; align-items: center; gap: 16px; 
-}
+}}
 
-/* TOP 4 WHITE KPI CARDS WITH PULSING LIGHT BLUE BORDER */
-.top-kpi-card { 
+/* TOP 4 WHITE KPI CARDS (GLOW & LIFT INTERACTION) */
+.top-kpi-card {{ 
     background: #FFFFFF !important; 
     border-radius: 16px; 
     padding: 32px 16px; 
@@ -271,56 +284,55 @@ header { visibility: hidden; height: 0; }
     text-align: center; 
     border: 2.5px solid #76C4E3;
     animation: pulseLightBlue 2.5s ease-in-out infinite;
-    transition: transform 0.2s ease;
-}
-.top-kpi-card:hover { transform: translateY(-2px); }
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}}
+.top-kpi-card:hover {{ 
+    transform: translateY(-6px); 
+    box-shadow: 0 14px 28px rgba(118, 196, 227, 0.3), 0 10px 10px rgba(0,0,0,0.1); 
+}}
+@keyframes pulseLightBlue {{
+    0%, 100% {{ border-color: #76C4E3; box-shadow: 0 0 10px rgba(118, 196, 227, 0.35); }}
+    50% {{ border-color: #0f6286; box-shadow: 0 0 20px rgba(118, 196, 227, 0.8); }}
+}}
+.top-kpi-val {{ font-size: 42px; font-weight: 700; color: #0f6286 !important; line-height: 1.1; margin: 4px 0; }}
+.top-kpi-lbl {{ font-size: 18px; font-weight: 700; color: #0f6286 !important; text-transform: uppercase; }}
+.top-kpi-sub {{ font-size: 18px; font-weight: 400; color: #0f6286 !important; opacity: 0.85; }}
 
-@keyframes pulseLightBlue {
-    0%, 100% {
-        border-color: #76C4E3;
-        box-shadow: 0 0 10px rgba(118, 196, 227, 0.35);
-    }
-    50% {
-        border-color: #0f6286;
-        box-shadow: 0 0 20px rgba(118, 196, 227, 0.8);
-    }
-}
-
-.top-kpi-val { font-size: 42px; font-weight: 700; color: #0f6286 !important; line-height: 1.1; margin: 4px 0; }
-.top-kpi-lbl { font-size: 18px; font-weight: 700; color: #0f6286 !important; text-transform: uppercase; }
-.top-kpi-sub { font-size: 18px; font-weight: 400; color: #0f6286 !important; opacity: 0.85; }
-
-/* STANDARD KPI CARDS (BOTTOM ROW) */
-.kpi-card { 
-    background: #0f6286; border-radius: 16px; padding: 32px 16px; 
+/* STANDARD KPI & HTML CARDS (HOVER EFFECTS ADDED) */
+.kpi-card, .html-card {{ 
+    background: #0f6286; border-radius: 16px; padding: 32px; 
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); height: 100%; 
-    display: flex; flex-direction: column; justify-content: center; 
-    align-items: center; text-align: center; border: none;
-}
-.kpi-val { font-size: 42px; font-weight: 700; color: #FFFFFF; line-height: 1.1; margin: 4px 0; }
-.kpi-lbl { font-size: 18px; font-weight: 700; color: #f68b1e; text-transform: uppercase; }
-.kpi-sub { font-size: 18px; font-weight: 400; color: #ffffff; opacity: 0.9; }
+    display: flex; flex-direction: column; justify-content: center; border: none;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative; overflow: hidden;
+}}
+.kpi-card:hover, .html-card:hover {{
+    transform: translateY(-6px);
+    box-shadow: 0 15px 30px rgba(15, 98, 134, 0.3);
+}}
+.kpi-card::after, .html-card::after {{
+    content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 4px;
+    background: #f68b1e; transform: scaleX(0); transform-origin: left; transition: transform 0.3s ease;
+}}
+.kpi-card:hover::after, .html-card:hover::after {{ transform: scaleX(1); }}
 
-/* HTML Container Cards */
-.html-card {
-    background-color: #0f6286; border-radius: 16px; padding: 32px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); display: flex;
-    flex-direction: column; justify-content: flex-start; text-align: left;
-    height: 100%; border: none;
-}
-div[data-baseweb="select"] > div { border-radius: 8px; font-size: 21px; font-weight: 700; padding: 4px; border: 1px solid #0f6286 !important; color: #333333; }
+.kpi-val {{ font-size: 42px; font-weight: 700; color: #FFFFFF; line-height: 1.1; margin: 4px 0; text-align: center; }}
+.kpi-lbl {{ font-size: 18px; font-weight: 700; color: #f68b1e; text-transform: uppercase; text-align: center; }}
+.kpi-sub {{ font-size: 18px; font-weight: 400; color: #ffffff; opacity: 0.9; text-align: center; }}
+
+div[data-baseweb="select"] > div {{ border-radius: 8px; font-size: 21px; font-weight: 700; padding: 4px; border: 1px solid #0f6286 !important; color: #333333; }}
 
 /* CSS-ONLY MODAL OVERLAY STYLES */
-#income-modal-toggle:checked ~ #income-modal-overlay { display: flex !important; }
-.icon-btn-hover {
+#income-modal-toggle:checked ~ #income-modal-overlay {{ display: flex !important; }}
+.icon-btn-hover {{
     position: absolute; top: 12px; right: 14px; cursor: pointer; background: rgba(15, 98, 134, 0.08); 
     border-radius: 50%; padding: 8px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;
-}
-.icon-btn-hover:hover { background: rgba(246, 139, 30, 0.2) !important; transform: scale(1.2); }
-.close-hover { transition: opacity 0.2s; opacity: 0.8; }
-.close-hover:hover { opacity: 1 !important; }
-.branched-box-hover { transition: transform 0.2s; }
-.branched-box-hover:hover { transform: translateY(-4px); }
+}}
+.icon-btn-hover:hover {{ background: rgba(246, 139, 30, 0.2) !important; transform: scale(1.2); }}
+.close-hover {{ transition: opacity 0.2s; opacity: 0.8; }}
+.close-hover:hover {{ opacity: 1 !important; }}
+.branched-box-hover {{ transition: transform 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }}
+.branched-box-hover:hover {{ transform: translateY(-8px); box-shadow: 0 12px 25px rgba(0,0,0,0.4); }}
 </style>
 """), unsafe_allow_html=True)
 
@@ -333,9 +345,7 @@ if is_first_load:
     with splash_placeholder.container():
         splash_content = clean_html(f"""
         <div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; background-color: #0f6286; position: fixed; top: 0; left: 0; width: 100vw; z-index: 9999999; padding: 0; margin: 0; overflow: hidden;">
-            
             {splash_logo_html}
-            
             <h1 style="color: #FFFFFF; font-size: 52px; margin-top: 10px; margin-bottom: 35px; font-weight: 700; font-family: 'Chivo', sans-serif; text-align: center; letter-spacing: 0.5px;">Karandaaz Pakistan Treasury Dashboard</h1>
             
             <div class="quantum-loader">
@@ -352,74 +362,20 @@ if is_first_load:
         </div>
         
         <style>
-        .quantum-loader {{
-            position: relative;
-            width: 110px;
-            height: 110px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            perspective: 800px;
-        }}
-
-        .ring {{
-            position: absolute;
-            border-radius: 50%;
-            border: 3px solid transparent;
-        }}
-
-        .outer-ring {{
-            width: 100%;
-            height: 100%;
-            border-top-color: #f68b1e;
-            border-bottom-color: #f68b1e;
-            animation: spinClockwise 1.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
-            filter: drop-shadow(0 0 10px rgba(246, 139, 30, 0.6));
-        }}
-
-        .middle-ring {{
-            width: 75%;
-            height: 75%;
-            border-left-color: #76C4E3;
-            border-right-color: #76C4E3;
-            animation: spinCounterClockwise 1.2s linear infinite;
-            filter: drop-shadow(0 0 8px rgba(118, 196, 227, 0.8));
-        }}
-
-        .inner-ring {{
-            width: 50%;
-            height: 50%;
-            border-top-color: #FFFFFF;
-            animation: spinClockwise 0.9s ease-in-out infinite;
-        }}
-
-        .core-glow {{
-            width: 18px;
-            height: 18px;
-            background-color: #FFFFFF;
-            border-radius: 50%;
-            box-shadow: 0 0 15px #FFFFFF, 0 0 30px #f68b1e, 0 0 45px #76C4E3;
-            animation: pulseCore 1.2s ease-in-out infinite alternate;
-        }}
-
-        .particle {{
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background-color: #f68b1e;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #f68b1e;
-        }}
-
+        .quantum-loader {{ position: relative; width: 110px; height: 110px; display: flex; justify-content: center; align-items: center; perspective: 800px; }}
+        .ring {{ position: absolute; border-radius: 50%; border: 3px solid transparent; }}
+        .outer-ring {{ width: 100%; height: 100%; border-top-color: #f68b1e; border-bottom-color: #f68b1e; animation: spinClockwise 1.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite; filter: drop-shadow(0 0 10px rgba(246, 139, 30, 0.6)); }}
+        .middle-ring {{ width: 75%; height: 75%; border-left-color: #76C4E3; border-right-color: #76C4E3; animation: spinCounterClockwise 1.2s linear infinite; filter: drop-shadow(0 0 8px rgba(118, 196, 227, 0.8)); }}
+        .inner-ring {{ width: 50%; height: 50%; border-top-color: #FFFFFF; animation: spinClockwise 0.9s ease-in-out infinite; }}
+        .core-glow {{ width: 18px; height: 18px; background-color: #FFFFFF; border-radius: 50%; box-shadow: 0 0 15px #FFFFFF, 0 0 30px #f68b1e, 0 0 45px #76C4E3; animation: pulseCore 1.2s ease-in-out infinite alternate; }}
+        .particle {{ position: absolute; width: 6px; height: 6px; background-color: #f68b1e; border-radius: 50%; box-shadow: 0 0 8px #f68b1e; }}
         .p1 {{ top: 10%; left: 50%; animation: floatParticle1 2s ease-in-out infinite; }}
         .p2 {{ bottom: 15%; left: 20%; animation: floatParticle2 2.2s ease-in-out infinite; }}
         .p3 {{ top: 40%; right: 10%; animation: floatParticle3 1.8s ease-in-out infinite; }}
-
         @keyframes spinClockwise {{ 0% {{ transform: rotate(0deg) rotateX(20deg); }} 100% {{ transform: rotate(360deg) rotateX(20deg); }} }}
         @keyframes spinCounterClockwise {{ 0% {{ transform: rotate(0deg) rotateY(20deg); }} 100% {{ transform: rotate(-360deg) rotateY(20deg); }} }}
         @keyframes pulseCore {{ 0% {{ transform: scale(0.7); opacity: 0.6; }} 100% {{ transform: scale(1.3); opacity: 1; }} }}
         @keyframes textPulse {{ 0%, 100% {{ opacity: 0.5; }} 50% {{ opacity: 1; }} }}
-        
         @keyframes floatParticle1 {{ 0%, 100% {{ transform: translateY(0) scale(1); }} 50% {{ transform: translateY(-12px) scale(1.5); }} }}
         @keyframes floatParticle2 {{ 0%, 100% {{ transform: translateX(0) scale(1); }} 50% {{ transform: translateX(12px) scale(1.3); }} }}
         @keyframes floatParticle3 {{ 0%, 100% {{ transform: translateY(0) scale(1); }} 50% {{ transform: translateY(10px) scale(0.8); }} }}
@@ -452,9 +408,9 @@ with st.spinner("Rendering Visualizations..."):
     </div>
     """), unsafe_allow_html=True)
 
-    # Header Card
+    # Header Card (Stagger 1)
     st.markdown(clean_html(f"""
-    <div class="header-container">
+    <div class="header-container stagger-1">
         <div class="glow-line"></div>
         <div class="header-card">
             {header_logo_html}
@@ -466,7 +422,9 @@ with st.spinner("Rendering Visualizations..."):
 
     col_e1, col_date, col_e2 = st.columns([1, 0.3, 1])
     with col_date:
+        st.markdown("<div class='stagger-1'>", unsafe_allow_html=True)
         selected_q = st.selectbox("", ["Q1", "Q2", "Q3", "Q4"], label_visibility="collapsed")
+        st.markdown("</div>", unsafe_allow_html=True)
 
     q_ctx = quarter_data[selected_q]
     q_rates_list = get_quarter_rates(selected_q)
@@ -476,12 +434,11 @@ with st.spinner("Rendering Visualizations..."):
     lr_val = lr_funds if selected_q == 'Q1' else 0.0
     esc_val = esc_q1 if selected_q == 'Q1' else 0.0
 
-    # 4 Centered Top KPI Cards (FIRST CARD HAS CSS CLICKABLE BRANCHING ICON & INTERACTIVE MODAL OVERLAY)
+    # 4 Centered Top KPI Cards (Stagger 2)
     kpi1, kpi2, kpi3, kpi4 = st.columns(4, gap="medium")
     with kpi1:
         st.markdown(clean_html(f"""
-        <div>
-            <!-- HIDDEN CHECKBOX CONTROLS THE MODAL STATE IN PURE CSS -->
+        <div class='stagger-2' style="height: 100%;">
             <input type="checkbox" id="income-modal-toggle" style="display: none;">
             
             <div class='top-kpi-card' style='position: relative;'>
@@ -500,25 +457,20 @@ with st.spinner("Rendering Visualizations..."):
 
             <!-- CSS-ONLY INTERACTIVE OVERLAY WITH BLUR BACKDROP & 3 CONNECTED BRANCHING BOXES -->
             <div id="income-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 35, 55, 0.75); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 9999999; justify-content: center; align-items: center;">
-                <!-- INVISIBLE LABEL COVERS ENTIRE BACKGROUND SO CLICKING OUTSIDE CLOSES MODAL -->
                 <label for="income-modal-toggle" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: default;"></label>
-                
                 <div style="background: #0f6286; border: 2.5px solid #76C4E3; border-radius: 24px; padding: 36px; max-width: 920px; width: 92%; box-shadow: 0 25px 60px rgba(0,0,0,0.6); text-align: center; position: relative; animation: popUpModal 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 10;">
                     
-                    <!-- CLOSE BUTTON -->
                     <label for="income-modal-toggle" class="close-hover" style="position: absolute; top: 16px; right: 22px; color: #FFFFFF; font-size: 32px; font-weight: 700; cursor: pointer;">&times;</label>
                     
                     <div style="color: #f68b1e; font-size: 18px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;">INCOME LEDGER BREAKDOWN ({selected_q})</div>
                     <div style="color: #FFFFFF; font-size: 34px; font-weight: 700; margin-top: 4px;">Total Income Allocation Structure</div>
                     
-                    <!-- CENTRAL SOURCE NODE -->
                     <div style="margin-top: 24px; display: flex; justify-content: center;">
                         <div style="background: rgba(255,255,255,0.12); border: 2px solid #f68b1e; padding: 12px 32px; border-radius: 30px; color: #FFFFFF; font-size: 24px; font-weight: 700; display: inline-block; box-shadow: 0 0 20px rgba(246, 139, 30, 0.4);">
                             Total Income: PKR {q_ctx['total_income']:,.2f} M
                         </div>
                     </div>
 
-                    <!-- 3 CONNECTING BRANCHING LINES -->
                     <div style="width: 100%; height: 60px; margin: 10px 0;">
                         <svg width="100%" height="60" viewBox="0 0 800 60" fill="none" preserveAspectRatio="none">
                             <path d="M400 0 L400 25 L150 25 L150 60" stroke="#f68b1e" stroke-width="3" stroke-dasharray="6 4"/>
@@ -531,49 +483,39 @@ with st.spinner("Rendering Visualizations..."):
                         </svg>
                     </div>
 
-                    <!-- 3 BRANCHED TEXT BOXES -->
                     <div style="display: flex; gap: 20px; justify-content: space-between; margin-top: 10px;">
-                        <!-- 1. OSR INCOME -->
                         <div class="branched-box-hover" style="flex: 1; background: rgba(0,0,0,0.25); border: 2px solid #f68b1e; border-radius: 18px; padding: 22px;">
                             <div style="color: #f68b1e; font-size: 18px; font-weight: 700; text-transform: uppercase;">1. OSR Income</div>
                             <div style="color: #FFFFFF; font-size: 32px; font-weight: 700; margin-top: 8px;">{osr_val:,.2f} M</div>
                             <div style="color: rgba(255,255,255,0.75); font-size: 16px; margin-top: 6px;">Operational Savings Rate</div>
                         </div>
-
-                        <!-- 2. LR INCOME -->
                         <div class="branched-box-hover" style="flex: 1; background: rgba(0,0,0,0.25); border: 2px solid #76C4E3; border-radius: 18px; padding: 22px;">
                             <div style="color: #76C4E3; font-size: 18px; font-weight: 700; text-transform: uppercase;">2. LR Income</div>
                             <div style="color: #FFFFFF; font-size: 32px; font-weight: 700; margin-top: 8px;">{lr_val:,.2f} M</div>
                             <div style="color: rgba(255,255,255,0.75); font-size: 16px; margin-top: 6px;">Liquidity Reserve</div>
                         </div>
-
-                        <!-- 3. ESCROW INCOME -->
                         <div class="branched-box-hover" style="flex: 1; background: rgba(0,0,0,0.25); border: 2px solid #FFC107; border-radius: 18px; padding: 22px;">
                             <div style="color: #FFC107; font-size: 18px; font-weight: 700; text-transform: uppercase;">3. Escrow Income</div>
                             <div style="color: #FFFFFF; font-size: 32px; font-weight: 700; margin-top: 8px;">{esc_val:,.2f} M</div>
                             <div style="color: rgba(255,255,255,0.75); font-size: 16px; margin-top: 6px;">Escrow Account Returns</div>
                         </div>
                     </div>
-
                     <div style="color: rgba(255,255,255,0.65); font-size: 16px; margin-top: 26px;">Click anywhere outside this box to return to dashboard</div>
                 </div>
             </div>
         </div>
-
-        <style>
-        @keyframes popUpModal {{ from {{ transform: scale(0.85); opacity: 0; }} to {{ transform: scale(1); opacity: 1; }} }}
-        </style>
         """), unsafe_allow_html=True)
 
     with kpi2:
-        st.markdown(clean_html(f"<div class='top-kpi-card'><div class='top-kpi-lbl'>TREASURY POOL</div><div class='top-kpi-val'>{q_ctx['treasury_pool']:,.2f} M</div><div class='top-kpi-sub'>Total Allocation ({selected_q})</div></div>"), unsafe_allow_html=True)
+        st.markdown(clean_html(f"<div class='stagger-2' style='height: 100%;'><div class='top-kpi-card'><div class='top-kpi-lbl'>TREASURY POOL</div><div class='top-kpi-val'>{q_ctx['treasury_pool']:,.2f} M</div><div class='top-kpi-sub'>Total Allocation ({selected_q})</div></div></div>"), unsafe_allow_html=True)
     with kpi3:
-        st.markdown(clean_html(f"<div class='top-kpi-card'><div class='top-kpi-lbl'>FORECASTED INCOME</div><div class='top-kpi-val'>{q_ctx['forecasted_income']:,.2f} M</div><div class='top-kpi-sub'>Forecasted for {selected_q}</div></div>"), unsafe_allow_html=True)
+        st.markdown(clean_html(f"<div class='stagger-2' style='height: 100%;'><div class='top-kpi-card'><div class='top-kpi-lbl'>FORECASTED INCOME</div><div class='top-kpi-val'>{q_ctx['forecasted_income']:,.2f} M</div><div class='top-kpi-sub'>Forecasted for {selected_q}</div></div></div>"), unsafe_allow_html=True)
     with kpi4:
-        st.markdown(clean_html(f"<div class='top-kpi-card'><div class='top-kpi-lbl'>ANNUAL YIELD</div><div class='top-kpi-val'>{q_ctx['annual_yield']}</div><div class='top-kpi-sub'>Weighted Annual Yield</div></div>"), unsafe_allow_html=True)
+        st.markdown(clean_html(f"<div class='stagger-2' style='height: 100%;'><div class='top-kpi-card'><div class='top-kpi-lbl'>ANNUAL YIELD</div><div class='top-kpi-val'>{q_ctx['annual_yield']}</div><div class='top-kpi-sub'>Weighted Annual Yield</div></div></div>"), unsafe_allow_html=True)
     
     st.markdown("<div style='height: 24px;'></div>", unsafe_allow_html=True)
 
+    # 3 Middle Row KPI Cards (Stagger 3)
     bot_col1, bot_col2, bot_col3 = st.columns(3, gap="medium")
 
     # 1. Bank Profit Rates Card
@@ -583,7 +525,7 @@ with st.spinner("Rendering Visualizations..."):
         month_cols_html += f"<div style='flex: 1; background: rgba(0,0,0,0.1); border-radius: 8px; padding: 14px 6px; text-align: center;'><div style='font-size: 18px; font-weight: 700; color: #f68b1e; text-transform: uppercase;'>{month_info['month']}</div><div style='font-size: 21px; font-weight: 400; color: #FFFFFF; margin-top: 8px; line-height: 1.6;'>{rates_br}</div></div>"
     month_cols_html += "</div>"
     with bot_col1:
-        st.markdown(clean_html(f"<div class='kpi-card' style='justify-content: center; height: 210px;'><div class='kpi-lbl'>BANK PROFIT RATES ({selected_q})</div>{month_cols_html}</div>"), unsafe_allow_html=True)
+        st.markdown(clean_html(f"<div class='stagger-3' style='height: 100%;'><div class='kpi-card' style='justify-content: center; align-items: flex-start; text-align: left;'><div class='kpi-lbl' style='text-align: left;'>BANK PROFIT RATES ({selected_q})</div>{month_cols_html}</div></div>"), unsafe_allow_html=True)
 
     # 2. MPR Rate Card
     mpr_split_html = (
@@ -600,7 +542,7 @@ with st.spinner("Rendering Visualizations..."):
         "</div></div>"
     )
     with bot_col2:
-        st.markdown(clean_html(f"<div class='kpi-card' style='justify-content: center; height: 210px; padding: 10px;'>{mpr_split_html}</div>"), unsafe_allow_html=True)
+        st.markdown(clean_html(f"<div class='stagger-3' style='height: 100%;'><div class='kpi-card' style='justify-content: center; padding: 10px;'>{mpr_split_html}</div></div>"), unsafe_allow_html=True)
 
     # 3. PKR Yields Card
     pkr_yields_html = (
@@ -612,16 +554,16 @@ with st.spinner("Rendering Visualizations..."):
         f"</div>"
     )
     with bot_col3:
-        st.markdown(clean_html(f"<div class='kpi-card' style='justify-content: center; height: 210px;'><div class='kpi-lbl'>PKR YIELDS ({latest_pkrv_date_str})</div>{pkr_yields_html}</div>"), unsafe_allow_html=True)
+        st.markdown(clean_html(f"<div class='stagger-3' style='height: 100%;'><div class='kpi-card' style='justify-content: center; align-items: flex-start; text-align: left;'><div class='kpi-lbl' style='text-align: left;'>PKR YIELDS ({latest_pkrv_date_str})</div>{pkr_yields_html}</div></div>"), unsafe_allow_html=True)
 
     # =========================================================
-    # SECTION: CURRENT INVESTMENT POSITION
+    # SECTION: CURRENT INVESTMENT POSITION (Stagger 4)
     # =========================================================
     st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
     
     st.markdown(
         clean_html(
-            "<div style='background-color: #0f6286; border-radius: 16px; padding: 32px; text-align: left; margin-bottom: 24px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); font-family: \"Chivo\", sans-serif;'>"
+            "<div class='stagger-4' style='background-color: #0f6286; border-radius: 16px; padding: 32px; text-align: left; margin-bottom: 24px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); font-family: \"Chivo\", sans-serif; transition: transform 0.3s ease;' onmouseover='this.style.transform=\"translateY(-4px)\"' onmouseout='this.style.transform=\"translateY(0)\"'>"
             "<h3 style='color: #ffffff; font-size: 34px; font-weight: 700; margin: 0; line-height: 1.2;'>Current Investment Position <span style='color: #f68b1e; font-weight: 400;'>&rarr;</span></h3>"
             "<p style='color: #ffffff; font-size: 21px; font-weight: 400; line-height: 1.5; margin-top: 12px; margin-bottom: 0;'>Instrument-Level Ledger & Portfolio Concentration</p>"
             "</div>"
@@ -643,7 +585,7 @@ with st.spinner("Rendering Visualizations..."):
     with inv_col1:
         st.markdown(
             clean_html(
-                "<div class='html-card' style='padding-bottom: 0px; font-family: \"Chivo\", sans-serif;'>"
+                "<div class='html-card stagger-4' style='padding-bottom: 0px; font-family: \"Chivo\", sans-serif;'>"
                 "<div style='font-size: 31px; font-weight: 700; color: #ffffff; line-height: 1.2;'>Portfolio Concentration <span style='color:#f68b1e; font-weight: 400;'>&rarr;</span></div>"
                 "<div style='font-size: 21px; font-weight: 400; color: #ffffff; line-height: 1.6; margin-top: 12px; margin-bottom: 10px;'>% Share of Gross Investment Portfolio</div>"
                 "</div>"
@@ -671,16 +613,18 @@ with st.spinner("Rendering Visualizations..."):
             plot_bgcolor='rgba(0,0,0,0)', 
             height=450 
         )
+        st.markdown("<div class='stagger-4'>", unsafe_allow_html=True)
         st.plotly_chart(fig_inv_donut, use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
     # RIGHT COLUMN: FINANCIAL TABLE
     with inv_col2:
         table_rows = ""
         for item in investment_data:
             table_rows += (
-                "<tr class='inv-row'>"
+                "<tr class='inv-row' style='transition: all 0.3s ease; cursor: default;' onmouseover='this.style.backgroundColor=\"rgba(246, 139, 30, 0.15)\"; this.style.transform=\"scale(1.02)\"' onmouseout='this.style.backgroundColor=\"transparent\"; this.style.transform=\"scale(1)\"'>"
                 f"<td style='padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.2); text-align: left; font-weight: 700; color: #FFFFFF; font-size: 20px;'>"
-                f"<span style='display:inline-block; width:12px; height:12px; border-radius:50%; background-color:{item['color']}; margin-right:12px;'></span>"
+                f"<span style='display:inline-block; width:12px; height:12px; border-radius:50%; background-color:{item['color']}; margin-right:12px; box-shadow: 0 0 8px {item['color']};'></span>"
                 f"{item['instrument']}</td>"
                 f"<td style='padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.2); text-align: right; font-weight: 400; color: #FFFFFF; font-size: 20px;'>{item['value']:,.2f} M</td>"
                 f"<td style='padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.2); text-align: right; font-weight: 700; color: {item['color']}; font-size: 20px;'>{item['conc']:.1f}%</td>"
@@ -688,8 +632,7 @@ with st.spinner("Rendering Visualizations..."):
             )
             
         table_html = (
-            "<style>.inv-row { transition: background-color 0.2s ease; } .inv-row:hover { background-color: rgba(0,0,0,0.1); }</style>"
-            "<div class='html-card' style='height: 100%; font-family: \"Chivo\", sans-serif;'>"
+            "<div class='html-card stagger-4' style='height: 100%; font-family: \"Chivo\", sans-serif;'>"
             "<div style='font-size: 31px; font-weight: 700; color: #ffffff; line-height: 1.2;'>Position by Instrument <span style='color:#f68b1e; font-weight: 400;'>&rarr;</span></div>"
             "<div style='font-size: 21px; font-weight: 400; color: #ffffff; line-height: 1.6; margin-top: 12px; margin-bottom: 18px;'>Market Value & Concentration Breakdown</div>"
             "<div style='flex-grow: 1; width: 100%; border-radius: 8px; overflow: hidden;'>"
@@ -710,13 +653,13 @@ with st.spinner("Rendering Visualizations..."):
         st.markdown(clean_html(table_html), unsafe_allow_html=True)
 
     # =========================================================
-    # SECTION: PKRV ANALYSIS
+    # SECTION: PKRV ANALYSIS (Stagger 5)
     # =========================================================
     st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
     
     st.markdown(
         clean_html(
-            "<div style='background-color: #0f6286; border-radius: 16px; padding: 32px; text-align: left; margin-bottom: 24px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); font-family: \"Chivo\", sans-serif;'>"
+            "<div class='stagger-5' style='background-color: #0f6286; border-radius: 16px; padding: 32px; text-align: left; margin-bottom: 24px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); font-family: \"Chivo\", sans-serif; transition: transform 0.3s ease;' onmouseover='this.style.transform=\"translateY(-4px)\"' onmouseout='this.style.transform=\"translateY(0)\"'>"
             "<h3 style='color: #ffffff; font-size: 34px; font-weight: 700; margin: 0; line-height: 1.2;'>PKRV Analysis <span style='color: #f68b1e; font-weight: 400;'>&rarr;</span></h3>"
             "<p style='color: #ffffff; font-size: 21px; font-weight: 400; line-height: 1.5; margin-top: 12px; margin-bottom: 0;'>Secondary Market Yield Curves & Tenor Trends (Jun 30, 2026 – Sep 15, 2026)</p>"
             "</div>"
@@ -777,23 +720,25 @@ with st.spinner("Rendering Visualizations..."):
 
     st.markdown(
         clean_html(
-            "<div class='html-card' style='font-family: \"Chivo\", sans-serif; padding-bottom: 20px; border-bottom-left-radius: 0; border-bottom-right-radius: 0;'>"
+            "<div class='html-card stagger-5' style='font-family: \"Chivo\", sans-serif; padding-bottom: 20px; border-bottom-left-radius: 0; border-bottom-right-radius: 0;'>"
             "<div style='font-size: 31px; font-weight: 700; color: #ffffff; line-height: 1.2;'>Quarterly PKRV Yield Movement <span style='color:#f68b1e; font-weight: 400;'>&rarr;</span></div>"
             "<div style='font-size: 21px; font-weight: 400; color: #ffffff; line-height: 1.6; margin-top: 10px;'>Daily Secondary Market Rates across 1M, 3M, 6M, and 12M Tenors starting June 30, 2026</div>"
             "</div>"
         ), 
         unsafe_allow_html=True
     )
+    st.markdown("<div class='stagger-5'>", unsafe_allow_html=True)
     st.plotly_chart(fig_pkrv, use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
     # =========================================================
-    # SECTION: KEY ECONOMIC INDICATORS
+    # SECTION: KEY ECONOMIC INDICATORS (Stagger 5)
     # =========================================================
     st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
     
     st.markdown(
         clean_html(
-            "<div style='background-color: #0f6286; border-radius: 16px; padding: 32px; text-align: left; margin-bottom: 24px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); font-family: \"Chivo\", sans-serif;'>"
+            "<div class='stagger-5' style='background-color: #0f6286; border-radius: 16px; padding: 32px; text-align: left; margin-bottom: 24px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); font-family: \"Chivo\", sans-serif; transition: transform 0.3s ease;' onmouseover='this.style.transform=\"translateY(-4px)\"' onmouseout='this.style.transform=\"translateY(0)\"'>"
             "<h3 style='color: #ffffff; font-size: 34px; font-weight: 700; margin: 0; line-height: 1.2;'>Key Economic Indicators <span style='color: #f68b1e; font-weight: 400;'>&rarr;</span></h3>"
             "<p style='color: #ffffff; font-size: 21px; font-weight: 400; line-height: 1.5; margin-top: 12px; margin-bottom: 0;'>Macroeconomic Trends & Market Intelligence</p>"
             "</div>"
@@ -807,7 +752,7 @@ with st.spinner("Rendering Visualizations..."):
     with econ_col1:
         st.markdown(
             clean_html(
-                "<div class='html-card' style='font-family: \"Chivo\", sans-serif;'>"
+                "<div class='html-card stagger-5' style='font-family: \"Chivo\", sans-serif;'>"
                 "<div style='font-size: 31px; font-weight: 700; color: #ffffff; line-height: 1.2;'>Economic Outlook & Inflation <span style='color:#f68b1e; font-weight: 400;'>&rarr;</span></div>"
                 "<div style='font-size: 21px; font-weight: 400; color: #ffffff; line-height: 1.6; margin-top: 18px;'>"
                 "&bull; <b>Headline CPI Inflation:</b> Pakistan's CPI inflation rose to <b>11.1% YoY in August 2026</b> (up from 9.2% in July), driven by rural inflation at 12.2% and urban inflation at 10.4%.<br><br>"
@@ -826,7 +771,7 @@ with st.spinner("Rendering Visualizations..."):
     with econ_col2:
         st.markdown(
             clean_html(
-                "<div class='html-card' style='font-family: \"Chivo\", sans-serif;'>"
+                "<div class='html-card stagger-5' style='font-family: \"Chivo\", sans-serif;'>"
                 "<div style='font-size: 31px; font-weight: 700; color: #ffffff; line-height: 1.2;'>Fiscal Dynamics & FX Reserves <span style='color:#f68b1e; font-weight: 400;'>&rarr;</span></div>"
                 "<div style='font-size: 21px; font-weight: 400; color: #ffffff; line-height: 1.6; margin-top: 18px;'>"
                 "Foreign exchange reserves maintain a healthy trajectory backed by stable worker remittance inflows, multilateral credit disbursements, and moderate current account pressures. "
