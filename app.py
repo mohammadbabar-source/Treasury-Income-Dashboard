@@ -309,6 +309,18 @@ header { visibility: hidden; height: 0; }
     height: 100%; border: none;
 }
 div[data-baseweb="select"] > div { border-radius: 8px; font-size: 21px; font-weight: 700; padding: 4px; border: 1px solid #0f6286 !important; color: #333333; }
+
+/* CSS-ONLY MODAL OVERLAY STYLES */
+#income-modal-toggle:checked ~ #income-modal-overlay { display: flex !important; }
+.icon-btn-hover {
+    position: absolute; top: 12px; right: 14px; cursor: pointer; background: rgba(15, 98, 134, 0.08); 
+    border-radius: 50%; padding: 8px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;
+}
+.icon-btn-hover:hover { background: rgba(246, 139, 30, 0.2) !important; transform: scale(1.2); }
+.close-hover { transition: opacity 0.2s; opacity: 0.8; }
+.close-hover:hover { opacity: 1 !important; }
+.branched-box-hover { transition: transform 0.2s; }
+.branched-box-hover:hover { transform: translateY(-4px); }
 </style>
 """), unsafe_allow_html=True)
 
@@ -464,84 +476,87 @@ with st.spinner("Rendering Visualizations..."):
     lr_val = lr_funds if selected_q == 'Q1' else 0.0
     esc_val = esc_q1 if selected_q == 'Q1' else 0.0
 
-    # 4 Centered Top KPI Cards (FIRST CARD HAS CLICKABLE BRANCHING ICON & INTERACTIVE MODAL OVERLAY)
+    # 4 Centered Top KPI Cards (FIRST CARD HAS CSS CLICKABLE BRANCHING ICON & INTERACTIVE MODAL OVERLAY)
     kpi1, kpi2, kpi3, kpi4 = st.columns(4, gap="medium")
     with kpi1:
         st.markdown(clean_html(f"""
-        <div class='top-kpi-card' style='position: relative;'>
-            <!-- CLICKABLE BRANCHING NODE ICON -->
-            <div onclick="document.getElementById('income-modal-overlay').style.display='flex'" 
-                 title="Click to view 3-Way Income Breakdown" 
-                 style="position: absolute; top: 12px; right: 14px; cursor: pointer; background: rgba(15, 98, 134, 0.08); border-radius: 50%; padding: 8px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;"
-                 onmouseover="this.style.background='rgba(246, 139, 30, 0.2)'; this.style.transform='scale(1.2)';"
-                 onmouseout="this.style.background='rgba(15, 98, 134, 0.08)'; this.style.transform='scale(1)';"
-            >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0f6286" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="6" y1="3" x2="6" y2="15"></line>
-                    <circle cx="18" cy="6" r="3"></circle>
-                    <circle cx="6" cy="18" r="3"></circle>
-                    <path d="M18 9a9 9 0 0 1-9 9"></path>
-                </svg>
-            </div>
-            <div class='top-kpi-lbl'>TOTAL INCOME</div>
-            <div class='top-kpi-val'>{q_ctx['total_income']:,.2f} M</div>
-            <div class='top-kpi-sub'>Quarterly Income ({selected_q})</div>
-        </div>
-
-        <!-- SLEEK INTERACTIVE OVERLAY WITH BLUR BACKDROP & 3 CONNECTED BRANCHING BOXES -->
-        <div id="income-modal-overlay" onclick="if(event.target === this) this.style.display='none'" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 35, 55, 0.75); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 9999999; justify-content: center; align-items: center;">
-            <div style="background: #0f6286; border: 2.5px solid #76C4E3; border-radius: 24px; padding: 36px; max-width: 920px; width: 92%; box-shadow: 0 25px 60px rgba(0,0,0,0.6); text-align: center; position: relative; animation: popUpModal 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
-                <!-- CLOSE BUTTON -->
-                <div onclick="document.getElementById('income-modal-overlay').style.display='none'" style="position: absolute; top: 16px; right: 22px; color: #FFFFFF; font-size: 32px; font-weight: 700; cursor: pointer; opacity: 0.8; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">&times;</div>
-                
-                <div style="color: #f68b1e; font-size: 18px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;">INCOME LEDGER BREAKDOWN ({selected_q})</div>
-                <div style="color: #FFFFFF; font-size: 34px; font-weight: 700; margin-top: 4px;">Total Income Allocation Structure</div>
-                
-                <!-- CENTRAL SOURCE NODE -->
-                <div style="margin-top: 24px; display: flex; justify-content: center;">
-                    <div style="background: rgba(255,255,255,0.12); border: 2px solid #f68b1e; padding: 12px 32px; border-radius: 30px; color: #FFFFFF; font-size: 24px; font-weight: 700; display: inline-block; box-shadow: 0 0 20px rgba(246, 139, 30, 0.4);">
-                        Total Income: PKR {q_ctx['total_income']:,.2f} M
-                    </div>
-                </div>
-
-                <!-- 3 CONNECTING BRANCHING LINES -->
-                <div style="width: 100%; height: 60px; margin: 10px 0;">
-                    <svg width="100%" height="60" viewBox="0 0 800 60" fill="none" preserveAspectRatio="none">
-                        <path d="M400 0 L400 25 L150 25 L150 60" stroke="#f68b1e" stroke-width="3" stroke-dasharray="6 4"/>
-                        <path d="M400 0 L400 60" stroke="#76C4E3" stroke-width="3" stroke-dasharray="6 4"/>
-                        <path d="M400 0 L400 25 L650 25 L650 60" stroke="#FFC107" stroke-width="3" stroke-dasharray="6 4"/>
-                        <circle cx="400" cy="0" r="6" fill="#FFFFFF"/>
-                        <circle cx="150" cy="60" r="6" fill="#f68b1e"/>
-                        <circle cx="400" cy="60" r="6" fill="#76C4E3"/>
-                        <circle cx="650" cy="60" r="6" fill="#FFC107"/>
+        <div>
+            <!-- HIDDEN CHECKBOX CONTROLS THE MODAL STATE IN PURE CSS -->
+            <input type="checkbox" id="income-modal-toggle" style="display: none;">
+            
+            <div class='top-kpi-card' style='position: relative;'>
+                <label for="income-modal-toggle" class="icon-btn-hover" title="Click to view 3-Way Income Breakdown">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0f6286" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="6" y1="3" x2="6" y2="15"></line>
+                        <circle cx="18" cy="6" r="3"></circle>
+                        <circle cx="6" cy="18" r="3"></circle>
+                        <path d="M18 9a9 9 0 0 1-9 9"></path>
                     </svg>
+                </label>
+                <div class='top-kpi-lbl'>TOTAL INCOME</div>
+                <div class='top-kpi-val'>{q_ctx['total_income']:,.2f} M</div>
+                <div class='top-kpi-sub'>Quarterly Income ({selected_q})</div>
+            </div>
+
+            <!-- CSS-ONLY INTERACTIVE OVERLAY WITH BLUR BACKDROP & 3 CONNECTED BRANCHING BOXES -->
+            <div id="income-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 35, 55, 0.75); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 9999999; justify-content: center; align-items: center;">
+                <!-- INVISIBLE LABEL COVERS ENTIRE BACKGROUND SO CLICKING OUTSIDE CLOSES MODAL -->
+                <label for="income-modal-toggle" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: default;"></label>
+                
+                <div style="background: #0f6286; border: 2.5px solid #76C4E3; border-radius: 24px; padding: 36px; max-width: 920px; width: 92%; box-shadow: 0 25px 60px rgba(0,0,0,0.6); text-align: center; position: relative; animation: popUpModal 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 10;">
+                    
+                    <!-- CLOSE BUTTON -->
+                    <label for="income-modal-toggle" class="close-hover" style="position: absolute; top: 16px; right: 22px; color: #FFFFFF; font-size: 32px; font-weight: 700; cursor: pointer;">&times;</label>
+                    
+                    <div style="color: #f68b1e; font-size: 18px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;">INCOME LEDGER BREAKDOWN ({selected_q})</div>
+                    <div style="color: #FFFFFF; font-size: 34px; font-weight: 700; margin-top: 4px;">Total Income Allocation Structure</div>
+                    
+                    <!-- CENTRAL SOURCE NODE -->
+                    <div style="margin-top: 24px; display: flex; justify-content: center;">
+                        <div style="background: rgba(255,255,255,0.12); border: 2px solid #f68b1e; padding: 12px 32px; border-radius: 30px; color: #FFFFFF; font-size: 24px; font-weight: 700; display: inline-block; box-shadow: 0 0 20px rgba(246, 139, 30, 0.4);">
+                            Total Income: PKR {q_ctx['total_income']:,.2f} M
+                        </div>
+                    </div>
+
+                    <!-- 3 CONNECTING BRANCHING LINES -->
+                    <div style="width: 100%; height: 60px; margin: 10px 0;">
+                        <svg width="100%" height="60" viewBox="0 0 800 60" fill="none" preserveAspectRatio="none">
+                            <path d="M400 0 L400 25 L150 25 L150 60" stroke="#f68b1e" stroke-width="3" stroke-dasharray="6 4"/>
+                            <path d="M400 0 L400 60" stroke="#76C4E3" stroke-width="3" stroke-dasharray="6 4"/>
+                            <path d="M400 0 L400 25 L650 25 L650 60" stroke="#FFC107" stroke-width="3" stroke-dasharray="6 4"/>
+                            <circle cx="400" cy="0" r="6" fill="#FFFFFF"/>
+                            <circle cx="150" cy="60" r="6" fill="#f68b1e"/>
+                            <circle cx="400" cy="60" r="6" fill="#76C4E3"/>
+                            <circle cx="650" cy="60" r="6" fill="#FFC107"/>
+                        </svg>
+                    </div>
+
+                    <!-- 3 BRANCHED TEXT BOXES -->
+                    <div style="display: flex; gap: 20px; justify-content: space-between; margin-top: 10px;">
+                        <!-- 1. OSR INCOME -->
+                        <div class="branched-box-hover" style="flex: 1; background: rgba(0,0,0,0.25); border: 2px solid #f68b1e; border-radius: 18px; padding: 22px;">
+                            <div style="color: #f68b1e; font-size: 18px; font-weight: 700; text-transform: uppercase;">1. OSR Income</div>
+                            <div style="color: #FFFFFF; font-size: 32px; font-weight: 700; margin-top: 8px;">{osr_val:,.2f} M</div>
+                            <div style="color: rgba(255,255,255,0.75); font-size: 16px; margin-top: 6px;">Operational Savings Rate</div>
+                        </div>
+
+                        <!-- 2. LR INCOME -->
+                        <div class="branched-box-hover" style="flex: 1; background: rgba(0,0,0,0.25); border: 2px solid #76C4E3; border-radius: 18px; padding: 22px;">
+                            <div style="color: #76C4E3; font-size: 18px; font-weight: 700; text-transform: uppercase;">2. LR Income</div>
+                            <div style="color: #FFFFFF; font-size: 32px; font-weight: 700; margin-top: 8px;">{lr_val:,.2f} M</div>
+                            <div style="color: rgba(255,255,255,0.75); font-size: 16px; margin-top: 6px;">Liquidity Reserve</div>
+                        </div>
+
+                        <!-- 3. ESCROW INCOME -->
+                        <div class="branched-box-hover" style="flex: 1; background: rgba(0,0,0,0.25); border: 2px solid #FFC107; border-radius: 18px; padding: 22px;">
+                            <div style="color: #FFC107; font-size: 18px; font-weight: 700; text-transform: uppercase;">3. Escrow Income</div>
+                            <div style="color: #FFFFFF; font-size: 32px; font-weight: 700; margin-top: 8px;">{esc_val:,.2f} M</div>
+                            <div style="color: rgba(255,255,255,0.75); font-size: 16px; margin-top: 6px;">Escrow Account Returns</div>
+                        </div>
+                    </div>
+
+                    <div style="color: rgba(255,255,255,0.65); font-size: 16px; margin-top: 26px;">Click anywhere outside this box to return to dashboard</div>
                 </div>
-
-                <!-- 3 BRANCHED TEXT BOXES -->
-                <div style="display: flex; gap: 20px; justify-content: space-between; margin-top: 10px;">
-                    <!-- 1. OSR INCOME -->
-                    <div style="flex: 1; background: rgba(0,0,0,0.25); border: 2px solid #f68b1e; border-radius: 18px; padding: 22px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
-                        <div style="color: #f68b1e; font-size: 18px; font-weight: 700; text-transform: uppercase;">1. OSR Income</div>
-                        <div style="color: #FFFFFF; font-size: 32px; font-weight: 700; margin-top: 8px;">{osr_val:,.2f} M</div>
-                        <div style="color: rgba(255,255,255,0.75); font-size: 16px; margin-top: 6px;">Operational Savings Rate</div>
-                    </div>
-
-                    <!-- 2. LR INCOME -->
-                    <div style="flex: 1; background: rgba(0,0,0,0.25); border: 2px solid #76C4E3; border-radius: 18px; padding: 22px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
-                        <div style="color: #76C4E3; font-size: 18px; font-weight: 700; text-transform: uppercase;">2. LR Income</div>
-                        <div style="color: #FFFFFF; font-size: 32px; font-weight: 700; margin-top: 8px;">{lr_val:,.2f} M</div>
-                        <div style="color: rgba(255,255,255,0.75); font-size: 16px; margin-top: 6px;">Liquidity Reserve</div>
-                    </div>
-
-                    <!-- 3. ESCROW INCOME -->
-                    <div style="flex: 1; background: rgba(0,0,0,0.25); border: 2px solid #FFC107; border-radius: 18px; padding: 22px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
-                        <div style="color: #FFC107; font-size: 18px; font-weight: 700; text-transform: uppercase;">3. Escrow Income</div>
-                        <div style="color: #FFFFFF; font-size: 32px; font-weight: 700; margin-top: 8px;">{esc_val:,.2f} M</div>
-                        <div style="color: rgba(255,255,255,0.75); font-size: 16px; margin-top: 6px;">Escrow Account Returns</div>
-                    </div>
-                </div>
-
-                <div style="color: rgba(255,255,255,0.65); font-size: 16px; margin-top: 26px;">Click anywhere outside this box to return to dashboard</div>
             </div>
         </div>
 
@@ -587,7 +602,7 @@ with st.spinner("Rendering Visualizations..."):
     with bot_col2:
         st.markdown(clean_html(f"<div class='kpi-card' style='justify-content: center; height: 210px; padding: 10px;'>{mpr_split_html}</div>"), unsafe_allow_html=True)
 
-    # 3. PKR Yields Card (DYNAMIC RECENT NUMBERS & DATE)
+    # 3. PKR Yields Card
     pkr_yields_html = (
         f"<div style='display: flex; justify-content: space-between; width: 100%; gap: 10px; margin-top: 10px; height: 100%;'>"
         f"<div style='flex: 1; display: flex; flex-direction: column; justify-content: center; background: rgba(0,0,0,0.1); border-radius: 8px; padding: 14px 4px; text-align: center;'><div style='font-size: 18px; font-weight: 700; color: #f68b1e; text-transform: uppercase;'>1M</div><div style='font-size: 23px; font-weight: 700; color: #FFFFFF; margin-top: 8px;'>{val_1m_str}</div></div>"
