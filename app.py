@@ -85,6 +85,13 @@ try:
     pool_sep = get_pool_val(11, 4) / 1e6
     q1_pool = pool_sep if pool_sep > 0 else (pool_aug if pool_aug > 0 else pool_jul)
 
+    lr_funds = get_pool_val(4, 4) / 1e6 if get_pool_val(4, 4) > 0 else get_pool_val(4, 2) / 1e6
+    osr_funds = get_pool_val(5, 4) / 1e6 if get_pool_val(5, 4) > 0 else get_pool_val(5, 2) / 1e6
+    inv_cdel = get_pool_val(6, 4) / 1e6 if get_pool_val(6, 4) > 0 else get_pool_val(6, 2) / 1e6
+    rpa_acc = get_pool_val(7, 4) / 1e6 if get_pool_val(7, 4) > 0 else get_pool_val(7, 2) / 1e6
+    wv_greenfin = get_pool_val(8, 4) / 1e6 if get_pool_val(8, 4) > 0 else get_pool_val(8, 2) / 1e6
+    op_funds = get_pool_val(9, 4) / 1e6 if get_pool_val(9, 4) > 0 else get_pool_val(9, 2) / 1e6
+
     df_mpr = pd.read_excel(EXCEL_FILE, sheet_name='MPR')
     mpr_rate = float(df_mpr.iloc[0]['MPC Rate']) * 100
     next_mpr_date = pd.to_datetime(df_mpr.iloc[1]['MPC Meeting Date']).strftime('%b %d, %Y')
@@ -95,6 +102,7 @@ except Exception as e:
     inc_q1, inc_q2, inc_q3, inc_q4 = 258.95, 0.0, 0.0, 0.0
     osr_q1, rpa_q1, esc_q1, tdr_q1, buysell_q1 = 165.72, 2.61, 2.00, 42.53, 46.07
     q1_pool = 16278.35
+    lr_funds, osr_funds, inv_cdel, rpa_acc, wv_greenfin, op_funds = 5521.09, 9310.81, 98.91, 250.56, 337.10, 68.24
     mpr_rate, next_mpr_date = 11.50, "Sep 14, 2026"
     df_rates = pd.DataFrame()
 
@@ -451,10 +459,97 @@ with st.spinner("Rendering Visualizations..."):
     q_ctx = quarter_data[selected_q]
     q_rates_list = get_quarter_rates(selected_q)
 
-    # 4 Centered Top KPI Cards (WHITE BACKGROUND, PULSING LIGHT BLUE BORDER, TEAL BLUE TEXT)
+    # DYNAMIC BREAKDOWN VALUES FOR THE OVERLAY MODAL
+    osr_val = osr_q1 if selected_q == 'Q1' else 0.0
+    lr_val = lr_funds if selected_q == 'Q1' else 0.0
+    esc_val = esc_q1 if selected_q == 'Q1' else 0.0
+
+    # 4 Centered Top KPI Cards (FIRST CARD HAS CLICKABLE BRANCHING ICON & INTERACTIVE MODAL OVERLAY)
     kpi1, kpi2, kpi3, kpi4 = st.columns(4, gap="medium")
     with kpi1:
-        st.markdown(clean_html(f"<div class='top-kpi-card'><div class='top-kpi-lbl'>TOTAL INCOME</div><div class='top-kpi-val'>{q_ctx['total_income']:,.2f} M</div><div class='top-kpi-sub'>Quarterly Income ({selected_q})</div></div>"), unsafe_allow_html=True)
+        st.markdown(clean_html(f"""
+        <div class='top-kpi-card' style='position: relative;'>
+            <!-- CLICKABLE BRANCHING NODE ICON -->
+            <div onclick="document.getElementById('income-modal-overlay').style.display='flex'" 
+                 title="Click to view 3-Way Income Breakdown" 
+                 style="position: absolute; top: 12px; right: 14px; cursor: pointer; background: rgba(15, 98, 134, 0.08); border-radius: 50%; padding: 8px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;"
+                 onmouseover="this.style.background='rgba(246, 139, 30, 0.2)'; this.style.transform='scale(1.2)';"
+                 onmouseout="this.style.background='rgba(15, 98, 134, 0.08)'; this.style.transform='scale(1)';"
+            >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0f6286" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="6" y1="3" x2="6" y2="15"></line>
+                    <circle cx="18" cy="6" r="3"></circle>
+                    <circle cx="6" cy="18" r="3"></circle>
+                    <path d="M18 9a9 9 0 0 1-9 9"></path>
+                </svg>
+            </div>
+            <div class='top-kpi-lbl'>TOTAL INCOME</div>
+            <div class='top-kpi-val'>{q_ctx['total_income']:,.2f} M</div>
+            <div class='top-kpi-sub'>Quarterly Income ({selected_q})</div>
+        </div>
+
+        <!-- SLEEK INTERACTIVE OVERLAY WITH BLUR BACKDROP & 3 CONNECTED BRANCHING BOXES -->
+        <div id="income-modal-overlay" onclick="if(event.target === this) this.style.display='none'" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 35, 55, 0.75); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 9999999; justify-content: center; align-items: center;">
+            <div style="background: #0f6286; border: 2.5px solid #76C4E3; border-radius: 24px; padding: 36px; max-width: 920px; width: 92%; box-shadow: 0 25px 60px rgba(0,0,0,0.6); text-align: center; position: relative; animation: popUpModal 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+                <!-- CLOSE BUTTON -->
+                <div onclick="document.getElementById('income-modal-overlay').style.display='none'" style="position: absolute; top: 16px; right: 22px; color: #FFFFFF; font-size: 32px; font-weight: 700; cursor: pointer; opacity: 0.8; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">&times;</div>
+                
+                <div style="color: #f68b1e; font-size: 18px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;">INCOME LEDGER BREAKDOWN ({selected_q})</div>
+                <div style="color: #FFFFFF; font-size: 34px; font-weight: 700; margin-top: 4px;">Total Income Allocation Structure</div>
+                
+                <!-- CENTRAL SOURCE NODE -->
+                <div style="margin-top: 24px; display: flex; justify-content: center;">
+                    <div style="background: rgba(255,255,255,0.12); border: 2px solid #f68b1e; padding: 12px 32px; border-radius: 30px; color: #FFFFFF; font-size: 24px; font-weight: 700; display: inline-block; box-shadow: 0 0 20px rgba(246, 139, 30, 0.4);">
+                        Total Income: PKR {q_ctx['total_income']:,.2f} M
+                    </div>
+                </div>
+
+                <!-- 3 CONNECTING BRANCHING LINES -->
+                <div style="width: 100%; height: 60px; margin: 10px 0;">
+                    <svg width="100%" height="60" viewBox="0 0 800 60" fill="none" preserveAspectRatio="none">
+                        <path d="M400 0 L400 25 L150 25 L150 60" stroke="#f68b1e" stroke-width="3" stroke-dasharray="6 4"/>
+                        <path d="M400 0 L400 60" stroke="#76C4E3" stroke-width="3" stroke-dasharray="6 4"/>
+                        <path d="M400 0 L400 25 L650 25 L650 60" stroke="#FFC107" stroke-width="3" stroke-dasharray="6 4"/>
+                        <circle cx="400" cy="0" r="6" fill="#FFFFFF"/>
+                        <circle cx="150" cy="60" r="6" fill="#f68b1e"/>
+                        <circle cx="400" cy="60" r="6" fill="#76C4E3"/>
+                        <circle cx="650" cy="60" r="6" fill="#FFC107"/>
+                    </svg>
+                </div>
+
+                <!-- 3 BRANCHED TEXT BOXES -->
+                <div style="display: flex; gap: 20px; justify-content: space-between; margin-top: 10px;">
+                    <!-- 1. OSR INCOME -->
+                    <div style="flex: 1; background: rgba(0,0,0,0.25); border: 2px solid #f68b1e; border-radius: 18px; padding: 22px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="color: #f68b1e; font-size: 18px; font-weight: 700; text-transform: uppercase;">1. OSR Income</div>
+                        <div style="color: #FFFFFF; font-size: 32px; font-weight: 700; margin-top: 8px;">{osr_val:,.2f} M</div>
+                        <div style="color: rgba(255,255,255,0.75); font-size: 16px; margin-top: 6px;">Operational Savings Rate</div>
+                    </div>
+
+                    <!-- 2. LR INCOME -->
+                    <div style="flex: 1; background: rgba(0,0,0,0.25); border: 2px solid #76C4E3; border-radius: 18px; padding: 22px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="color: #76C4E3; font-size: 18px; font-weight: 700; text-transform: uppercase;">2. LR Income</div>
+                        <div style="color: #FFFFFF; font-size: 32px; font-weight: 700; margin-top: 8px;">{lr_val:,.2f} M</div>
+                        <div style="color: rgba(255,255,255,0.75); font-size: 16px; margin-top: 6px;">Liquidity Reserve</div>
+                    </div>
+
+                    <!-- 3. ESCROW INCOME -->
+                    <div style="flex: 1; background: rgba(0,0,0,0.25); border: 2px solid #FFC107; border-radius: 18px; padding: 22px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="color: #FFC107; font-size: 18px; font-weight: 700; text-transform: uppercase;">3. Escrow Income</div>
+                        <div style="color: #FFFFFF; font-size: 32px; font-weight: 700; margin-top: 8px;">{esc_val:,.2f} M</div>
+                        <div style="color: rgba(255,255,255,0.75); font-size: 16px; margin-top: 6px;">Escrow Account Returns</div>
+                    </div>
+                </div>
+
+                <div style="color: rgba(255,255,255,0.65); font-size: 16px; margin-top: 26px;">Click anywhere outside this box to return to dashboard</div>
+            </div>
+        </div>
+
+        <style>
+        @keyframes popUpModal {{ from {{ transform: scale(0.85); opacity: 0; }} to {{ transform: scale(1); opacity: 1; }} }}
+        </style>
+        """), unsafe_allow_html=True)
+
     with kpi2:
         st.markdown(clean_html(f"<div class='top-kpi-card'><div class='top-kpi-lbl'>TREASURY POOL</div><div class='top-kpi-val'>{q_ctx['treasury_pool']:,.2f} M</div><div class='top-kpi-sub'>Total Allocation ({selected_q})</div></div>"), unsafe_allow_html=True)
     with kpi3:
