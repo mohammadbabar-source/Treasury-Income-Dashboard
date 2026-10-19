@@ -6,7 +6,10 @@ import base64
 import os
 import numpy as np
 import json
-import streamlit.components.v1 as components
+try:
+    import streamlit.components.v1 as components
+except Exception:
+    components = None
 
 # 1. Page Configuration MUST be the first Streamlit command
 st.set_page_config(page_title="Karandaaz Treasury Summary FY26-27", layout="wide", initial_sidebar_state="collapsed")
@@ -1098,9 +1101,10 @@ function go(n, force){
 }
 let lastW=-1;
 function fit(){
-  const vp=document.getElementById('viewport'), w=vp.clientWidth, h=vp.clientHeight;
+  const vp=document.getElementById('viewport'), w=vp.clientWidth||window.innerWidth, h=vp.clientHeight||(window.innerHeight-60);
+  if(w<20||h<20){ lastW=0; return; }   // tab hidden: keep last scale, replay when shown
   const s=Math.min(w/1600,h/900)*0.985; stage.style.transform=`translate(-50%,-50%) scale(${s})`;
-  if(lastW===0 && w>0) go(cur,true);   // replay when the tab becomes visible
+  if(lastW===0) go(cur,true);          // replay when the tab becomes visible
   lastW=w;
 }
 document.getElementById('prev').onclick=()=>go(cur-1);
@@ -1120,6 +1124,8 @@ stage.addEventListener('click',()=>window.focus());
 window.addEventListener('resize',fit);
 document.addEventListener('fullscreenchange',fit);
 fit(); go(0,true);
+if(window.ResizeObserver) new ResizeObserver(fit).observe(document.getElementById('viewport'));
+setInterval(fit,600);
 </script>
 </body></html>'''
 
@@ -1558,7 +1564,7 @@ with st.spinner("Rendering Visualizations..."):
     # =========================================================
     with tab_tc:
         tc_deck_html = build_tc_deck_html(logo_b64)
-        if hasattr(st, "iframe"):   # Streamlit 1.5x+ (components.html is deprecated there)
-            st.iframe(tc_deck_html, height=780)
-        else:                       # older Streamlit versions
+        try:
             components.html(tc_deck_html, height=780, scrolling=False)
+        except Exception:
+            st.iframe(tc_deck_html, height=780)
